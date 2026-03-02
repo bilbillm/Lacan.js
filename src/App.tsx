@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
@@ -18,8 +18,21 @@ const panels: PanelData[] = [
 
 function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [isAppLoaded, setIsAppLoaded] = useState(false)
 
   const selectedPanel = panels.find(p => p.id === selectedId)
+
+  // 随机进场顺序 - 每次刷新页面不同
+  const randomOrder = useMemo(() => {
+    const indices = [0, 1, 2, 3]
+    return indices.sort(() => Math.random() - 0.5)
+  }, [])
+
+  // 进场动画彻底完成后标记加载完成
+  useEffect(() => {
+    const timer = setTimeout(() => setIsAppLoaded(true), 4600)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <div className="app-container">
@@ -29,7 +42,11 @@ function App() {
       <div className="absolute top-20 left-0 right-0 z-10 flex flex-col items-center gap-4 pointer-events-none">
         <motion.h1
           className="text-5xl font-light tracking-[0.35em] text-white/70 leading-none"
+          initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{
+            opacity: 1,
+            filter: 'blur(0px)',
+            y: 0,
             textShadow: [
               '0 0 5px rgba(255,255,255,0.3), 0 0 15px rgba(255,255,255,0.15), 0 0 25px rgba(255,255,255,0.08)',
               '0 0 8px rgba(255,255,255,0.5), 0 0 25px rgba(255,255,255,0.25), 0 0 40px rgba(255,255,255,0.12)',
@@ -37,16 +54,25 @@ function App() {
             ],
           }}
           transition={{
-            duration: 4,
-            ease: 'easeInOut',
-            repeat: Infinity,
+            opacity: { delay: 2, duration: 1.2, ease: 'easeOut' },
+            filter: { delay: 2, duration: 1.2, ease: 'easeOut' },
+            y: { delay: 2, duration: 1.2, ease: 'easeOut' },
+            textShadow: {
+              duration: 4,
+              ease: 'easeInOut',
+              repeat: Infinity,
+            },
           }}
         >
           LACAN.JS
         </motion.h1>
         <motion.p
           className="text-base font-light tracking-[0.35em] text-white/40"
+          initial={{ opacity: 0, filter: 'blur(8px)', y: -20 }}
           animate={{
+            opacity: 1,
+            filter: 'blur(0px)',
+            y: 0,
             textShadow: [
               '0 0 3px rgba(255,255,255,0.15), 0 0 8px rgba(255,255,255,0.08)',
               '0 0 5px rgba(255,255,255,0.25), 0 0 12px rgba(255,255,255,0.12)',
@@ -54,10 +80,15 @@ function App() {
             ],
           }}
           transition={{
-            duration: 4,
-            ease: 'easeInOut',
-            repeat: Infinity,
-            delay: 0.5,
+            opacity: { delay: 2.5, duration: 0.8, ease: 'easeOut' },
+            filter: { delay: 2.5, duration: 0.8, ease: 'easeOut' },
+            y: { delay: 2.5, duration: 0.8, ease: 'easeOut' },
+            textShadow: {
+              duration: 4,
+              ease: 'easeInOut',
+              repeat: Infinity,
+              delay: 0.5,
+            },
           }}
         >
           The Spatial Architecture of Psychoanalysis
@@ -68,22 +99,37 @@ function App() {
       {!selectedId && (
         <div className="absolute inset-0 flex items-center justify-center p-8">
           <div className="flex flex-row flex-wrap justify-center items-center gap-12 pt-24">
-            {panels.map((panel) => (
-              <GlassPanel
-                key={panel.id}
-                layoutId={panel.id}
-                width={288}
-                height={416}
-                onClick={() => setSelectedId(panel.id)}
-                className="cursor-pointer"
-              >
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-xl font-light tracking-widest text-white/40">
-                    {panel.title}
-                  </span>
-                </div>
-              </GlassPanel>
-            ))}
+            {panels.map((panel, index) => {
+              // 随机进场顺序
+              const delay = 3.3 + randomOrder.indexOf(index) * 0.15
+              return (
+                <motion.div
+                  key={panel.id}
+                  layout
+                  initial={isAppLoaded ? false : { opacity: 0, y: 30, filter: 'blur(5px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  transition={{
+                    delay: isAppLoaded ? 0 : delay,
+                    duration: 0.8,
+                    ease: 'easeOut'
+                  }}
+                >
+                  <GlassPanel
+                    layoutId={panel.id}
+                    width={288}
+                    height={416}
+                    onClick={() => setSelectedId(panel.id)}
+                    className="cursor-pointer"
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xl font-light tracking-widest text-white/40">
+                        {panel.title}
+                      </span>
+                    </div>
+                  </GlassPanel>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       )}

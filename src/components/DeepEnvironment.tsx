@@ -79,27 +79,26 @@ function DitheringOverlay() {
 
 // Perspective Wireframe Room Component
 function PerspectiveRoom() {
-  // 使用 strokeDashoffset 实现描边动画
-  const drawVariants = {
-    initial: { strokeDashoffset: 1000 },
-    animate: { strokeDashoffset: 0 }
-  }
-
-  // 动画时序 - 按照计划文件
-  // 后墙(垂直线): delay 0.2s, duration 2.5s, easeInOut
-  // 透视线: delay 1.8s/2.0s, duration 1.5s, easeOut
-  const verticalDuration = 1.5
-  const perspectiveDuration = 5
+  // 当前动画时序
+  // 垂直线: delay 0.2s, duration 2s, easeInOut
+  // 透视线: delay 0.2s, duration 6s, easeOut
+  // 底边线: delay 1.5s, duration 1s, easeInOut
+  const verticalDuration = 2
+  const perspectiveDuration = 6
   const bottomDuration = 1
+
+  // 呼吸光晕效果 - 线条绘制完成后开始
+  const glowFilter = [
+    'drop-shadow(0 0 3px rgba(255,255,255,0.5))',
+    'drop-shadow(0 0 8px rgba(255,255,255,0.8))',
+    'drop-shadow(0 0 3px rgba(255,255,255,0.5))',
+  ]
 
   return (
     <svg
       className="absolute inset-0 w-full h-full pointer-events-none z-0"
       preserveAspectRatio="none"
       viewBox="0 0 100 100"
-      style={{
-        filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.4))',
-      }}
     >
       {/* 左垂直线 - 从上往下绘制 */}
       <motion.line
@@ -110,13 +109,14 @@ function PerspectiveRoom() {
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        variants={drawVariants}
-        initial="initial"
-        animate="animate"
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        animate={{
+          strokeDashoffset: 0,
+          filter: glowFilter,
+        }}
         transition={{
-          duration: verticalDuration,
-          delay: 0.2,
-          ease: 'linear'
+          strokeDashoffset: { duration: verticalDuration, delay: 0.2, ease: 'easeInOut' },
+          filter: { duration: 3, delay: 2.7, ease: 'easeInOut', repeat: Infinity },
         }}
       />
 
@@ -129,13 +129,14 @@ function PerspectiveRoom() {
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        variants={drawVariants}
-        initial="initial"
-        animate="animate"
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        animate={{
+          strokeDashoffset: 0,
+          filter: glowFilter,
+        }}
         transition={{
-          duration: verticalDuration,
-          delay: 0.2,
-          ease: 'linear'
+          strokeDashoffset: { duration: verticalDuration, delay: 0.2, ease: 'easeInOut' },
+          filter: { duration: 3, delay: 2.7, ease: 'easeInOut', repeat: Infinity },
         }}
       />
 
@@ -144,17 +145,18 @@ function PerspectiveRoom() {
         x1="3" y1="100"
         x2="15" y2="75"
         stroke="rgba(255, 255, 255, 0.3)"
-        strokeWidth="0.5"
+        strokeWidth="0.6"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        variants={drawVariants}
-        initial="initial"
-        animate="animate"
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        animate={{
+          strokeDashoffset: 0,
+          filter: glowFilter,
+        }}
         transition={{
-          duration: perspectiveDuration,
-          delay: 0.2,
-          ease: 'easeOut'
+          strokeDashoffset: { duration: perspectiveDuration, delay: 0.2, ease: 'easeOut' },
+          filter: { duration: 3, delay: 3.3, ease: 'easeInOut', repeat: Infinity },
         }}
       />
 
@@ -163,17 +165,18 @@ function PerspectiveRoom() {
         x1="97" y1="100"
         x2="85" y2="75"
         stroke="rgba(255, 255, 255, 0.3)"
-        strokeWidth="0.5"
+        strokeWidth="0.6"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        variants={drawVariants}
-        initial="initial"
-        animate="animate"
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        animate={{
+          strokeDashoffset: 0,
+          filter: glowFilter,
+        }}
         transition={{
-          duration: perspectiveDuration,
-          delay: 0.2,
-          ease: 'easeOut'
+          strokeDashoffset: { duration: perspectiveDuration, delay: 0.2, ease: 'easeOut' },
+          filter: { duration: 3, delay: 3.5, ease: 'easeInOut', repeat: Infinity },
         }}
       />
 
@@ -186,13 +189,14 @@ function PerspectiveRoom() {
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        variants={drawVariants}
-        initial="initial"
-        animate="animate"
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        animate={{
+          strokeDashoffset: 0,
+          filter: glowFilter,
+        }}
         transition={{
-          duration: bottomDuration,
-          delay: 1.5,
-          ease: 'linear'
+          strokeDashoffset: { duration: bottomDuration, delay: 1.5, ease: 'easeInOut' },
+          filter: { duration: 3, delay: 4.2, ease: 'easeInOut', repeat: Infinity },
         }}
       />
 
@@ -205,13 +209,14 @@ function PerspectiveRoom() {
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        variants={drawVariants}
-        initial="initial"
-        animate="animate"
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        animate={{
+          strokeDashoffset: 0,
+          filter: glowFilter,
+        }}
         transition={{
-          duration: bottomDuration,
-          delay: 1.5,
-          ease: 'linear'
+          strokeDashoffset: { duration: bottomDuration, delay: 1.5, ease: 'easeInOut' },
+          filter: { duration: 3, delay: 4.2, ease: 'easeInOut', repeat: Infinity },
         }}
       />
     </svg>
