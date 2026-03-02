@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create vite@latest . -- --template react-ts)",
+      "Bash(npm install)",
+      "Bash(npm install tailwindcss @tailwindcss/vite framer-motion)",
+      "Bash(npm run build)",
+      "Read(//c/Users/lumoren/.claude/plans/**)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\lumoren\\Documents\\GitHub\\Lacan.js\\lacan-temp",
+      "c:\\Users\\lumoren\\.claude\\plans"
+    ]
+  }
+}
