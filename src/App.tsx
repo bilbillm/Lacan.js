@@ -1,9 +1,11 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, lazy, Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
 import GlassPanel from './components/GlassPanel'
-import SchemaL from './components/SchemaL'
+
+// 懒加载 SchemaL 组件
+const SchemaL = lazy(() => import('./components/SchemaL'))
 
 interface PanelData {
   id: string
@@ -126,7 +128,17 @@ function App() {
                       onClick={() => setSelectedId(panel.id)}
                       className="cursor-pointer"
                     >
-                      {panel.content || (
+                      {panel.content ? (
+                        <Suspense fallback={
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-xl font-light tracking-widest text-white/40">
+                              {panel.title}
+                            </span>
+                          </div>
+                        }>
+                          {panel.content}
+                        </Suspense>
+                      ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <span className="text-xl font-light tracking-widest text-white/40">
                             {panel.title}
@@ -151,7 +163,17 @@ function App() {
                           width={288}
                           height={416}
                         >
-                          {panel.content || (
+                          {panel.content ? (
+                            <Suspense fallback={
+                              <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-xl font-light tracking-widest text-white/40">
+                                  {panel.title}
+                                </span>
+                              </div>
+                            }>
+                              {panel.content}
+                            </Suspense>
+                          ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <span className="text-xl font-light tracking-widest text-white/40">
                                 {panel.title}
@@ -198,7 +220,17 @@ function App() {
                   maxHeight: 600,
                 }}
               >
-                {selectedPanel.content || (
+                {selectedPanel.content ? (
+                  <Suspense fallback={
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-3xl font-light tracking-widest text-white/40">
+                        {selectedPanel.title}
+                      </span>
+                    </div>
+                  }>
+                    {selectedPanel.content}
+                  </Suspense>
+                ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <span className="text-3xl font-light tracking-widest text-white/40">
                       {selectedPanel.title}
