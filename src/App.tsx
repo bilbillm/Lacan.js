@@ -3,14 +3,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
 import GlassPanel from './components/GlassPanel'
+import SchemaL from './components/SchemaL'
 
 interface PanelData {
   id: string
   title: string
+  content?: React.ReactNode
 }
 
 const panels: PanelData[] = [
-  { id: 'panel-1', title: 'Mirror Stage' },
+  { id: 'panel-1', title: 'Mirror Stage', content: <SchemaL /> },
   { id: 'panel-2', title: 'The Symbolic' },
   { id: 'panel-3', title: 'The Imaginary' },
   { id: 'panel-4', title: 'The Real' },
@@ -44,7 +46,7 @@ function App() {
           className="text-5xl font-light tracking-[0.35em] text-white/70 leading-none"
           initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{
-            opacity: 0,
+            opacity: 1,
             filter: 'blur(0px)',
             y: 0,
             textShadow: [
@@ -124,11 +126,13 @@ function App() {
                       onClick={() => setSelectedId(panel.id)}
                       className="cursor-pointer"
                     >
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-xl font-light tracking-widest text-white/40">
-                          {panel.title}
-                        </span>
-                      </div>
+                      {panel.content || (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-xl font-light tracking-widest text-white/40">
+                            {panel.title}
+                          </span>
+                        </div>
+                      )}
                     </GlassPanel>
 
                     {/* 倒影层 */}
@@ -147,11 +151,13 @@ function App() {
                           width={288}
                           height={416}
                         >
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-xl font-light tracking-widest text-white/40">
-                              {panel.title}
-                            </span>
-                          </div>
+                          {panel.content || (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <span className="text-xl font-light tracking-widest text-white/40">
+                                {panel.title}
+                              </span>
+                            </div>
+                          )}
                         </GlassPanel>
                       </div>
                     )}
@@ -192,11 +198,13 @@ function App() {
                   maxHeight: 600,
                 }}
               >
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-3xl font-light tracking-widest text-white/40">
-                    {selectedPanel.title}
-                  </span>
-                </div>
+                {selectedPanel.content || (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-3xl font-light tracking-widest text-white/40">
+                      {selectedPanel.title}
+                    </span>
+                  </div>
+                )}
               </GlassPanel>
             </div>
           </>
