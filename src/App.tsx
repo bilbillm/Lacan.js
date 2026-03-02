@@ -138,7 +138,7 @@ function App() {
                         style={{
                           transform: 'scaleY(-1)',
                           filter: 'blur(8px)',
-                          opacity: 1,
+                          opacity: 0.5,
                           WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
                           maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
                         }}
