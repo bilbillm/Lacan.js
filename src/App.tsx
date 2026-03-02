@@ -64,39 +64,14 @@ function App() {
         </motion.p>
       </div>
 
-      {/* Tiled Gallery Layout - 带进出场动画 */}
-      <div className="absolute inset-0 flex items-center justify-center p-8">
-        <AnimatePresence mode="popLayout">
-          {panels.map((panel, index) => (
-            <motion.div
-              key={panel.id}
-              layoutId={panel.id}
-              initial={{ y: 100, opacity: 0, filter: 'blur(20px)' }}
-              animate={{
-                y: 0,
-                opacity: 1,
-                filter: 'blur(0px)',
-                scale: 1,
-              }}
-              exit={{
-                y: -50,
-                scale: 0.95,
-                opacity: 0,
-                filter: 'blur(15px)',
-                transition: {
-                  duration: 0.7,
-                  ease: [0.22, 1, 0.36, 1],
-                },
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 60,
-                damping: 20,
-                delay: index * 0.1,
-              }}
-              className="z-20"
-            >
+      {/* Tiled Gallery Layout - only show when no panel is selected */}
+      {!selectedId && (
+        <div className="absolute inset-0 flex items-center justify-center p-8">
+          <div className="flex flex-row flex-wrap justify-center items-center gap-12 pt-24">
+            {panels.map((panel) => (
               <GlassPanel
+                key={panel.id}
+                layoutId={panel.id}
                 width={288}
                 height={416}
                 onClick={() => setSelectedId(panel.id)}
@@ -108,10 +83,10 @@ function App() {
                   </span>
                 </div>
               </GlassPanel>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Focus View - selected panel expanded to center */}
       <AnimatePresence>

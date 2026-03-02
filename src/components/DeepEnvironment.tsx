@@ -77,6 +77,147 @@ function DitheringOverlay() {
   )
 }
 
+// Perspective Wireframe Room Component
+function PerspectiveRoom() {
+  // 使用 strokeDashoffset 实现描边动画
+  const drawVariants = {
+    initial: { strokeDashoffset: 1000 },
+    animate: { strokeDashoffset: 0 }
+  }
+
+  // 动画时序 - 按照计划文件
+  // 后墙(垂直线): delay 0.2s, duration 2.5s, easeInOut
+  // 透视线: delay 1.8s/2.0s, duration 1.5s, easeOut
+  const verticalDuration = 1.5
+  const perspectiveDuration = 5
+  const bottomDuration = 1
+
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 100"
+      style={{
+        filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.4))',
+      }}
+    >
+      {/* 左垂直线 - 从上往下绘制 */}
+      <motion.line
+        x1="15" y1="0"
+        x2="15" y2="75"
+        stroke="rgba(255, 255, 255, 0.3)"
+        strokeWidth="0.5"
+        strokeDasharray="1000"
+        strokeDashoffset="1000"
+        vectorEffect="non-scaling-stroke"
+        variants={drawVariants}
+        initial="initial"
+        animate="animate"
+        transition={{
+          duration: verticalDuration,
+          delay: 0.2,
+          ease: 'linear'
+        }}
+      />
+
+      {/* 右垂直线 - 从上往下绘制 */}
+      <motion.line
+        x1="85" y1="0"
+        x2="85" y2="75"
+        stroke="rgba(255, 255, 255, 0.3)"
+        strokeWidth="0.5"
+        strokeDasharray="1000"
+        strokeDashoffset="1000"
+        vectorEffect="non-scaling-stroke"
+        variants={drawVariants}
+        initial="initial"
+        animate="animate"
+        transition={{
+          duration: verticalDuration,
+          delay: 0.2,
+          ease: 'linear'
+        }}
+      />
+
+      {/* 左下角透视线 - 从屏幕角落向后墙角落绘制 */}
+      <motion.line
+        x1="3" y1="100"
+        x2="15" y2="75"
+        stroke="rgba(255, 255, 255, 0.3)"
+        strokeWidth="0.5"
+        strokeDasharray="1000"
+        strokeDashoffset="1000"
+        vectorEffect="non-scaling-stroke"
+        variants={drawVariants}
+        initial="initial"
+        animate="animate"
+        transition={{
+          duration: perspectiveDuration,
+          delay: 0.2,
+          ease: 'easeOut'
+        }}
+      />
+
+      {/* 右下角透视线 - 从屏幕角落向后墙角落绘制 */}
+      <motion.line
+        x1="97" y1="100"
+        x2="85" y2="75"
+        stroke="rgba(255, 255, 255, 0.3)"
+        strokeWidth="0.5"
+        strokeDasharray="1000"
+        strokeDashoffset="1000"
+        vectorEffect="non-scaling-stroke"
+        variants={drawVariants}
+        initial="initial"
+        animate="animate"
+        transition={{
+          duration: perspectiveDuration,
+          delay: 0.2,
+          ease: 'easeOut'
+        }}
+      />
+
+      {/* 底边横线左半段 - 从左向右绘制 */}
+      <motion.line
+        x1="15" y1="75"
+        x2="50" y2="75"
+        stroke="rgba(255, 255, 255, 0.3)"
+        strokeWidth="0.5"
+        strokeDasharray="1000"
+        strokeDashoffset="1000"
+        vectorEffect="non-scaling-stroke"
+        variants={drawVariants}
+        initial="initial"
+        animate="animate"
+        transition={{
+          duration: bottomDuration,
+          delay: 1.5,
+          ease: 'linear'
+        }}
+      />
+
+      {/* 底边横线右半段 - 从右向左绘制 */}
+      <motion.line
+        x1="85" y1="75"
+        x2="50" y2="75"
+        stroke="rgba(255, 255, 255, 0.3)"
+        strokeWidth="0.5"
+        strokeDasharray="1000"
+        strokeDashoffset="1000"
+        vectorEffect="non-scaling-stroke"
+        variants={drawVariants}
+        initial="initial"
+        animate="animate"
+        transition={{
+          duration: bottomDuration,
+          delay: 1.5,
+          ease: 'linear'
+        }}
+      />
+    </svg>
+  )
+}
+
 export default function DeepEnvironment() {
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: 'rgb(5, 5, 7)' }}>
@@ -92,6 +233,9 @@ export default function DeepEnvironment() {
       {glowHazes.map((haze) => (
         <GlowHaze key={haze.id} haze={haze} />
       ))}
+
+      {/* Perspective wireframe room */}
+      <PerspectiveRoom />
 
       {/* SVG Dithering overlay - eliminates color banding */}
       <DitheringOverlay />
