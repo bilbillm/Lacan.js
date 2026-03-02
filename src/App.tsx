@@ -44,7 +44,7 @@ function App() {
           className="text-5xl font-light tracking-[0.35em] text-white/70 leading-none"
           initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{
-            opacity: 1,
+            opacity: 0,
             filter: 'blur(0px)',
             y: 0,
             textShadow: [
@@ -114,19 +114,48 @@ function App() {
                     ease: 'easeOut'
                   }}
                 >
-                  <GlassPanel
-                    layoutId={panel.id}
-                    width={288}
-                    height={416}
-                    onClick={() => setSelectedId(panel.id)}
-                    className="cursor-pointer"
-                  >
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-xl font-light tracking-widest text-white/40">
-                        {panel.title}
-                      </span>
-                    </div>
-                  </GlassPanel>
+                  {/* 包裹容器 */}
+                  <div className="relative flex flex-col items-center">
+                    {/* 主面板 */}
+                    <GlassPanel
+                      layoutId={panel.id}
+                      width={288}
+                      height={416}
+                      onClick={() => setSelectedId(panel.id)}
+                      className="cursor-pointer"
+                    >
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-xl font-light tracking-widest text-white/40">
+                          {panel.title}
+                        </span>
+                      </div>
+                    </GlassPanel>
+
+                    {/* 倒影层 */}
+                    {!selectedId && (
+                      <div
+                        className="absolute top-full mt-2 left-0 w-full pointer-events-none z-0"
+                        style={{
+                          transform: 'scaleY(-1)',
+                          filter: 'blur(8px)',
+                          opacity: 1,
+                          WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
+                          maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
+                        }}
+                      >
+                        <GlassPanel
+                          width={288}
+                          height={416}
+                        >
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-xl font-light tracking-widest text-white/40">
+                              {panel.title}
+                            </span>
+                          </div>
+                        </GlassPanel>
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               )
             })}

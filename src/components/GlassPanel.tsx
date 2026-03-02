@@ -9,6 +9,7 @@ interface GlassPanelProps {
   layoutId?: string
   onClick?: () => void
   style?: React.CSSProperties
+  disableParallax?: boolean
 }
 
 export default function GlassPanel({
@@ -18,7 +19,8 @@ export default function GlassPanel({
   className = '',
   layoutId,
   onClick,
-  style
+  style,
+  disableParallax = false
 }: GlassPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -44,7 +46,7 @@ export default function GlassPanel({
   const [isHovered, setIsHovered] = useState(false)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!panelRef.current) return
+    if (!panelRef.current || disableParallax) return
 
     const rect = panelRef.current.getBoundingClientRect()
     const centerX = rect.width / 2
@@ -88,8 +90,8 @@ export default function GlassPanel({
       <motion.div
         className="absolute inset-0 rounded-2xl"
         style={{
-          rotateX,
-          rotateY,
+          rotateX: disableParallax ? 0 : rotateX,
+          rotateY: disableParallax ? 0 : rotateY,
           transformStyle: 'preserve-3d',
         }}
       >
