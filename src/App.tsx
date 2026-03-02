@@ -215,6 +215,7 @@ function App() {
                 height="80vh"
                 className="pointer-events-auto"
                 onClick={() => {}}
+                disableParallax={true}
                 style={{
                   maxWidth: 500,
                   maxHeight: 600,

@@ -54,11 +54,11 @@ export default function SchemaL() {
         </marker>
       </defs>
 
-      {/* 顶层水平线: (Es)S -> a 小他者 - 虚线 */}
+      {/* 顶层水平线: (Es)S -> a 小他者 - 单向箭头缩短一半，虚线 */}
       <line
         x1={NODES.S.x}
         y1={NODES.S.y}
-        x2={NODES.a_other.x}
+        x2={50}
         y2={NODES.a_other.y}
         stroke="rgba(255,255,255,0.4)"
         strokeWidth="0.5"
@@ -66,15 +66,36 @@ export default function SchemaL() {
         markerEnd="url(#arrowDashed)"
       />
 
-      {/* 底层水平线: A 大他者 -> a' 想象自我 - 实线 */}
+      {/* 虚线: 箭头末尾 -> a 小他者 */}
+      <line
+        x1={50}
+        y1={NODES.a_other.y}
+        x2={NODES.a_other.x}
+        y2={NODES.a_other.y}
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="0.5"
+        strokeDasharray="2 2"
+      />
+
+      {/* 底层水平线: A 大他者 -> a' 想象自我 - 单向箭头（1/2长度） */}
       <line
         x1={NODES.A.x}
         y1={NODES.A.y}
-        x2={NODES.a_ego.x}
+        x2={50}
         y2={NODES.a_ego.y}
         stroke="rgba(255,255,255,0.4)"
         strokeWidth="0.5"
         markerEnd="url(#arrowSolid)"
+      />
+
+      {/* 底层水平线: A 大他者 -> a' 想象自我 - 剩余部分实线 */}
+      <line
+        x1={50}
+        y1={NODES.a_ego.y}
+        x2={NODES.a_ego.x}
+        y2={NODES.a_ego.y}
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="0.5"
       />
 
       {/* 对角线: A 大他者 -> (Es)S - 右下角半段实线 */}
@@ -88,10 +109,22 @@ export default function SchemaL() {
         markerEnd="url(#arrowSolid)"
       />
 
-      {/* 对角线: A 大他者 -> (Es)S - 左上角半段虚线 */}
+      {/* 对角线: A 大他者 -> (Es)S - 左上角半段虚线箭头（1/2长度） */}
       <line
         x1={NODES.MID.x}
         y1={NODES.MID.y}
+        x2={35}
+        y2={35}
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="0.5"
+        strokeDasharray="2 2"
+        markerEnd="url(#arrowDashed)"
+      />
+
+      {/* 对角线: A 大他者 -> (Es)S - 虚线剩余部分 */}
+      <line
+        x1={35}
+        y1={35}
         x2={NODES.S.x}
         y2={NODES.S.y}
         stroke="rgba(255,255,255,0.4)"
@@ -99,15 +132,25 @@ export default function SchemaL() {
         strokeDasharray="2 2"
       />
 
-      {/* 对角线: a 小他者 -> a' 想象自我 (想象关系) - 实线单向箭头，缩短避免与节点重合 */}
+      {/* 对角线: a 小他者 -> a' 想象自我 (想象关系) - 实线单向箭头，长度为实线的2/3 */}
       <line
         x1={NODES.a_other.x}
         y1={NODES.a_other.y}
-        x2={NODES.a_ego.x - 8}
-        y2={NODES.a_ego.y + 8}
+        x2={40}
+        y2={60}
         stroke="rgba(255,255,255,0.4)"
         strokeWidth="0.5"
         markerEnd="url(#arrowSolid)"
+      />
+
+      {/* 完整实线: a 小他者 -> a' 想象自我 (想象关系) - 2/3到终点 */}
+      <line
+        x1={40}
+        y1={60}
+        x2={NODES.a_ego.x}
+        y2={NODES.a_ego.y}
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="0.5"
       />
 
       {/* 节点 S - (Es) S */}
@@ -216,16 +259,16 @@ export default function SchemaL() {
         无意识
       </text>
 
-      {/* 对角线文本: 想象关系 (a 小他者到a'想象自我的实线箭头旁) - 45度倾斜 */}
+      {/* 对角线文本: 想象关系 (a 小他者到a'想象自我的实线箭头旁) - -45度倾斜 */}
       <text
-        x={35}
-        y={42}
+        x={58}
+        y={35}
         textAnchor="middle"
         fontSize="2.5"
         fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
         fontWeight="300"
         fill="rgba(255,255,255,0.5)"
-        transform="rotate(45, 35, 42)"
+        transform="rotate(-45, 58, 35)"
       >
         想象关系
       </text>
