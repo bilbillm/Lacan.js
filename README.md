@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# Lacan.js
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+精神分析理论的空间化可视化，基于雅克·拉康的三大秩序构建。
 
-Currently, two official plugins are available:
+> The Spatial Architecture of Psychoanalysis
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 特性
 
-## React Compiler
+- **Schema L 可视化** - 拉康镜像阶段图示的精确 SVG 实现，包含无意识与想象关系的动态呈现
+- **玻璃态面板 UI** - Apple visionOS 风格的毛玻璃效果，带有微妙的视差交互
+- **深层空间背景** - 多层次透视线条动画，构建深邃的心理空间隐喻
+- **流畅动画** - 基于 Framer Motion 的入场动画与交互反馈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 技术栈
 
-## Expanding the ESLint configuration
+- React 18 + TypeScript
+- Vite
+- Framer Motion
+- Tailwind CSS
+- SVG
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 核心概念
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+拉康的三大秩序：
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **The Symbolic (符号界)** - 语言与符号秩序
+2. **The Imaginary (想象界)** - 自我与他者的想象关系
+3. **The Real (实在界)** - 无法被符号化的真实
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 开始使用
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 项目结构
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── components/
+│   ├── SchemaL.tsx        # Schema L 图示组件
+│   ├── GlassPanel.tsx     # 玻璃态面板组件
+│   └── DeepEnvironment.tsx # 深层环境背景
+├── App.tsx                # 主应用
+├── App.css
+└── index.css
+```
+
+## License
+
+MIT
