@@ -101,7 +101,7 @@ function PerspectiveRoom() {
       <motion.line
         x1="15" y1="75"
         x2="50" y2="75"
-        stroke="rgba(255, 255, 255, 0.7)"
+        stroke="rgba(255, 255, 255, 0.35)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
@@ -121,7 +121,7 @@ function PerspectiveRoom() {
       <motion.line
         x1="85" y1="75"
         x2="50" y2="75"
-        stroke="rgba(255, 255, 255, 0.7)"
+        stroke="rgba(255, 255, 255, 0.35)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
