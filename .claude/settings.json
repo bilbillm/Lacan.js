@@ -5,7 +5,8 @@
       "Bash(npm install)",
       "Bash(npm install tailwindcss @tailwindcss/vite framer-motion)",
       "Bash(npm run build)",
-      "Read(//c/Users/lumoren/.claude/plans/**)"
+      "Read(//c/Users/lumoren/.claude/plans/**)",
+      "Bash(npx tsc --noEmit)"
     ],
     "additionalDirectories": [
       "C:\\Users\\lumoren\\Documents\\GitHub\\Lacan.js\\lacan-temp",

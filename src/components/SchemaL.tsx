@@ -7,12 +7,16 @@ const NODES = {
   MID: { x: 50, y: 50 },      // 对角线中点
 } as const
 
-export default function SchemaL() {
+interface SchemaLProps {
+  isExpanded?: boolean
+}
+
+export default function SchemaL({ isExpanded = false }: SchemaLProps) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full">
       {/* 标题 */}
       <div className="absolute top-4 left-0 right-0 text-center">
-        <span className="text-lg font-light tracking-widest text-white/40">
+        <span className={`font-light tracking-widest text-white/40 ${isExpanded ? 'text-2xl' : 'text-lg'}`}>
           Schema L
         </span>
       </div>
