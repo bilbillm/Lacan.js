@@ -6,7 +6,12 @@
       "Bash(npm install tailwindcss @tailwindcss/vite framer-motion)",
       "Bash(npm run build)",
       "Read(//c/Users/lumoren/.claude/plans/**)",
-      "Bash(npx tsc --noEmit)"
+      "Bash(npx tsc --noEmit)",
+      "Bash(gh repo view gjoncas/Lacan-Mathemes --json description,readme,repositoryName,url)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm run dev)",
+      "WebFetch(domain:minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com)",
+      "Bash(node -e \":*)"
     ],
     "additionalDirectories": [
       "C:\\Users\\lumoren\\Documents\\GitHub\\Lacan.js\\lacan-temp",

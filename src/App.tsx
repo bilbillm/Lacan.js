@@ -4,8 +4,9 @@ import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
 import GlassPanel from './components/GlassPanel'
 
-// 懒加载 SchemaL 组件
+// 懒加载 SchemaL 和 SchemaR 组件
 const SchemaL = lazy(() => import('./components/SchemaL'))
+const SchemaR = lazy(() => import('./components/SchemaR'))
 
 interface PanelData {
   id: string
@@ -72,12 +73,22 @@ const pVariants = {
 function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [isAppLoaded, setIsAppLoaded] = useState(false)
+  const [selectedNodes, setSelectedNodes] = useState<[string, string] | null>(null)
 
   const selectedPanel = panels.find(p => p.id === selectedId)
 
-  // 处理退出聚焦
+  // 处理节点选择 - 当选择两个节点时
+  const handleNodesSelected = (node1: string, node2: string) => {
+    setSelectedNodes([node1, node2])
+  }
+
+  // 处理退出聚焦（先清除节点选择，触发退场动画后再退出聚焦）
   const handleExitFocus = () => {
-    setSelectedId(null)
+    setSelectedNodes(null)
+    // 延迟 600ms 后再退出聚焦，让右侧面板有时间播放退场动画
+    setTimeout(() => {
+      setSelectedId(null)
+    }, 600)
   }
 
   // 判断是否应该使用延迟入场动画：首次加载时
@@ -193,7 +204,17 @@ function App() {
                           </span>
                         </div>
                       }>
-                        <SchemaL isExpanded={false} />
+                        <SchemaL isExpanded={false} onNodesSelected={handleNodesSelected} />
+                      </Suspense>
+                    ) : panel.id === 'panel-2' ? (
+                      <Suspense fallback={
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-xl font-light tracking-widest text-white/40">
+                            {panel.title}
+                          </span>
+                        </div>
+                      }>
+                        <SchemaR isExpanded={false} />
                       </Suspense>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -230,6 +251,16 @@ function App() {
                           }>
                             <SchemaL isExpanded={false} />
                           </Suspense>
+                        ) : panel.id === 'panel-2' ? (
+                          <Suspense fallback={
+                            <div className="w-full h-full flex items-center justify-center">
+                              <span className="text-xl font-light tracking-widest text-white/40">
+                                {panel.title}
+                              </span>
+                            </div>
+                          }>
+                            <SchemaR isExpanded={false} />
+                          </Suspense>
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <span className="text-xl font-light tracking-widest text-white/40">
@@ -247,7 +278,7 @@ function App() {
         </div>
       </div>
 
-      {/* Focus View - selected panel expanded to center */}
+      {/* Focus View - selected panel expanded */}
       <AnimatePresence>
         {selectedId && selectedPanel && (
           <>
@@ -263,40 +294,95 @@ function App() {
               }}
             />
 
-            {/* Expanded Panel */}
-            <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-              <GlassPanel
-                layoutId={selectedId}
-                width="60vw"
-                height="80vh"
-                className="pointer-events-auto"
-                onClick={() => {}}
-                disableParallax={true}
+            {/* Expanded Panel - moves to left when nodes selected */}
+            <div
+              className="absolute inset-0 z-50 pointer-events-none"
+            >
+              <div
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-600"
                 style={{
-                  // 保持原始卡片 288:416 比例 (0.6923)，同时放大尺寸
-                  maxWidth: 540,
-                  maxHeight: 780,
+                  transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                  left: selectedNodes ? '30%' : '50%',
                 }}
               >
-                {selectedPanel.id === 'panel-1' ? (
-                  <Suspense fallback={
+                <GlassPanel
+                  layoutId={selectedId}
+                  width="60vw"
+                  height="80vh"
+                  className="pointer-events-auto"
+                  onClick={() => {}}
+                  disableParallax={true}
+                  style={{
+                    // 保持原始卡片 288:416 比例 (0.6923)，同时放大尺寸
+                    maxWidth: 540,
+                    maxHeight: 780,
+                  }}
+                >
+                  {selectedPanel.id === 'panel-1' ? (
+                    <Suspense fallback={
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-3xl font-light tracking-widest text-white/40">
+                          {selectedPanel.title}
+                        </span>
+                      </div>
+                    }>
+                      <SchemaL isExpanded={true} onNodesSelected={handleNodesSelected} />
+                    </Suspense>
+                  ) : selectedPanel.id === 'panel-2' ? (
+                    <Suspense fallback={
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-3xl font-light tracking-widest text-white/40">
+                          {selectedPanel.title}
+                        </span>
+                      </div>
+                    }>
+                      <SchemaR isExpanded={true} />
+                    </Suspense>
+                  ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="text-3xl font-light tracking-widest text-white/40">
                         {selectedPanel.title}
                       </span>
                     </div>
-                  }>
-                    <SchemaL isExpanded={true} />
-                  </Suspense>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-3xl font-light tracking-widest text-white/40">
-                      {selectedPanel.title}
-                    </span>
-                  </div>
-                )}
-              </GlassPanel>
+                  )}
+                </GlassPanel>
+              </div>
             </div>
+
+            {/* Right-side panel - appears when nodes selected */}
+            <AnimatePresence>
+              {selectedNodes && (
+                <motion.div
+                  className="absolute inset-0 z-50 flex items-center justify-end pointer-events-none"
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 100 }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.4, 0, 0.2, 1],
+                  }}
+                  style={{ paddingRight: '10vw' }}
+                >
+                  <GlassPanel
+                    width="50vw"
+                    height="80vh"
+                    className="pointer-events-auto"
+                    onClick={() => {}}
+                    disableParallax={true}
+                    style={{
+                      maxWidth: 540,
+                      maxHeight: 780,
+                    }}
+                  >
+                    <div className="w-full h-full flex items-center justify-center p-8">
+                      <span className="text-2xl font-light tracking-widest text-white/60">
+                        Sample Text
+                      </span>
+                    </div>
+                  </GlassPanel>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </>
         )}
       </AnimatePresence>

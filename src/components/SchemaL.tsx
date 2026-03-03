@@ -1,282 +1,201 @@
-// Schema L 顶点坐标常量 (100x100 坐标系)
-const NODES = {
-  S: { x: 20, y: 20 },        // (Es) S - 左上
-  a_other: { x: 80, y: 20 }, // a 小他者 - 右上
-  a_ego: { x: 20, y: 80 },    // a' 想象自我 - 左下
-  A: { x: 80, y: 80 },        // A 大他者 - 右下
-  MID: { x: 50, y: 50 },      // 对角线中点
-} as const
+import schemaLSvgContent from '../svgs/lacan schema L_1.svg?raw'
+import { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 
 interface SchemaLProps {
   isExpanded?: boolean
+  onNodesSelected?: (node1: string, node2: string) => void
 }
 
-export default function SchemaL({ isExpanded = false }: SchemaLProps) {
+type NodeId = 'S' | 'A' | 'a' | "a'"
+
+export default function SchemaL({ isExpanded = false, onNodesSelected }: SchemaLProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedNodes, setSelectedNodes] = useState<NodeId[]>([])
+
+  // 处理 SVG 内容，将黑色改为白色
+  const processedSvg = useMemo(() => {
+    let svg = schemaLSvgContent
+
+    // 调试：检测潜在节点数量
+    const potentialMatches = svg.match(/<path[^>]*transform="matrix[^>]*>/g)
+    console.log('[SchemaL] 潜在节点数量:', potentialMatches ? potentialMatches.length : 0)
+
+    // 将黑色 stroke 替换为白色半透明
+    svg = svg.replace(/stroke:rgb\(0%,0%,0%\)/g, 'stroke:rgba(255,255,255,0.5)')
+    svg = svg.replace(/stroke:rgb\(0%, 0%, 0%\)/g, 'stroke:rgba(255,255,255,0.5)')
+    // 将黑色 fill 替换为白色（节点）
+    svg = svg.replace(/fill:rgb\(0%,0%,0%\)/g, 'fill:rgba(255,255,255,0.8)')
+    svg = svg.replace(/fill:rgb\(0%, 0%, 0%\)/g, 'fill:rgba(255,255,255,0.8)')
+    // 将白色 fill 保持
+    svg = svg.replace(/fill:rgb\(100%,100%,100%\)/g, 'fill:rgba(255,255,255,0.9)')
+    svg = svg.replace(/fill:rgb\(100%, 100%, 100%\)/g, 'fill:rgba(255,255,255,0.9)')
+
+    // 注入交互属性到四个圆节点
+    // 圆点特征：fill + transform="matrix(...)" + stroke-width
+    // 分步匹配：不依赖属性顺序
+    const nodeIds: NodeId[] = ['S', 'A', "a'", 'a']
+    let nodeIndex = 0
+
+    // 匹配所有带 transform="matrix 的 path 元素
+    svg = svg.replace(
+      /<path(\s+[^>]*)?>/g,
+      (match, attrs) => {
+        if (nodeIndex >= 4) return match
+
+        // attrs 可能是 undefined 或空字符串
+        const attrStr = attrs || ''
+
+        // 检查是否包含 transform="matrix
+        const hasTransform = attrStr.includes('transform="matrix')
+        // 检查是否包含 fill:rgba(255,255,255,0.8 或 0.9
+        const hasFill = attrStr.includes('fill:rgba(255,255,255,0.8)') || attrStr.includes('fill:rgba(255,255,255,0.9)')
+        // 检查是否包含 stroke-width
+        const hasStrokeWidth = attrStr.includes('stroke-width')
+
+        // 只有同时满足这三个条件才是圆节点
+        if (hasTransform && hasFill && hasStrokeWidth) {
+          const nodeId = nodeIds[nodeIndex]
+          console.log(`[SchemaL] 注入节点 ${nodeIndex}: ${nodeId}`)
+          nodeIndex++
+          return match.replace('<path', `<path id="node-${nodeId}" class="lacan-node"`)
+        }
+
+        return match
+      }
+    )
+
+    console.log(`[SchemaL] 最终注入节点数: ${nodeIndex}`)
+
+    return svg
+  }, [])
+
+  // 处理节点点击
+  const handleNodeClick = useCallback((nodeId: string) => {
+    setSelectedNodes(prev => {
+      const currentNode = nodeId.replace('node-', '') as NodeId
+      const newSelected = prev.includes(currentNode)
+        ? prev.filter(n => n !== currentNode) // 取消选中
+        : prev.length >= 2
+          ? [currentNode] // 超过2个时，清空并只保留当前
+          : [...prev, currentNode] // 添加选中
+
+      // 当选中2个节点时触发回调
+      if (newSelected.length === 2 && onNodesSelected) {
+        onNodesSelected(newSelected[0], newSelected[1])
+      }
+
+      return newSelected
+    })
+  }, [onNodesSelected])
+
+  // 使用 useEffect 绑定事件监听
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const svgElement = container.querySelector('svg')
+    if (!svgElement) return
+
+    // 更新选中状态样式
+    const updateSelectionStyles = () => {
+      const nodes = svgElement.querySelectorAll('.lacan-node') as NodeListOf<SVGPathElement>
+      nodes.forEach(node => {
+        const nodeId = node.id.replace('node-', '') as NodeId
+        const isSelected = selectedNodes.includes(nodeId)
+
+        if (isSelected) {
+          node.style.stroke = '#fff'
+          node.style.strokeWidth = '3px'
+          node.style.strokeDasharray = '0'
+          node.style.transition = 'stroke 0.2s ease, stroke-width 0.2s ease'
+        } else {
+          node.style.stroke = 'transparent'
+          node.style.strokeWidth = '3px'
+          node.style.strokeDasharray = '0'
+        }
+      })
+    }
+
+    // 获取四个圆节点
+    const nodes = svgElement.querySelectorAll('.lacan-node') as NodeListOf<SVGPathElement>
+
+    // 调试：验证只有4个节点
+    if (nodes.length !== 4) {
+      console.warn(`[SchemaL] Expected 4 nodes, found ${nodes.length}`)
+      nodes.forEach((node, i) => {
+        console.log(`Node ${i}:`, node.id, node.getAttribute('d')?.slice(0, 50))
+      })
+    }
+
+    // 添加 hover 效果
+    const handleMouseEnter = (e: Event) => {
+      const target = e.target as SVGPathElement
+      const nodeId = target.id.replace('node-', '') as NodeId
+      if (!selectedNodes.includes(nodeId)) {
+        target.style.stroke = 'rgba(255,255,255,0.6)'
+        target.style.strokeWidth = '3px'
+        target.style.strokeDasharray = '2 2'
+      }
+    }
+
+    const handleMouseLeave = (e: Event) => {
+      const target = e.target as SVGPathElement
+      const nodeId = target.id.replace('node-', '') as NodeId
+      if (!selectedNodes.includes(nodeId)) {
+        target.style.stroke = 'transparent'
+        target.style.strokeDasharray = '0'
+      }
+    }
+
+    // 添加 hover 效果和点击事件到每个节点
+    const handleNodeClickEvent = (e: Event) => {
+      const target = e.currentTarget as SVGPathElement
+      const nodeId = target.id
+      handleNodeClick(nodeId)
+    }
+
+    nodes.forEach(node => {
+      node.style.transition = 'stroke 0.2s ease, stroke-width 0.2s ease'
+      node.addEventListener('mouseenter', handleMouseEnter)
+      node.addEventListener('mouseleave', handleMouseLeave)
+      node.addEventListener('click', handleNodeClickEvent)
+    })
+
+    updateSelectionStyles()
+
+    return () => {
+      nodes.forEach(node => {
+        node.removeEventListener('mouseenter', handleMouseEnter)
+        node.removeEventListener('mouseleave', handleMouseLeave)
+        node.removeEventListener('click', handleNodeClickEvent)
+      })
+    }
+  }, [processedSvg, selectedNodes, handleNodeClick])
+
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full">
+    <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2">
+      {/* CSS 锁定交互范围 */}
+      <style>{`
+        .lacan-svg-container svg * {
+          pointer-events: none !important;
+        }
+        .lacan-svg-container .lacan-node {
+          pointer-events: all !important;
+          cursor: pointer;
+        }
+      `}</style>
       {/* 标题 */}
-      <div className="absolute top-4 left-0 right-0 text-center">
-        <span className={`font-light tracking-widest text-white/40 ${isExpanded ? 'text-2xl' : 'text-lg'}`}>
+      <div className="text-center mb-2">
+        <span className={`font-light tracking-widest text-white/40 ${isExpanded ? 'text-xl' : 'text-base'}`}>
           Schema L
         </span>
       </div>
-      <svg
-        viewBox="0 0 100 100"
-        className="w-full h-full p-8 pointer-events-none"
-        preserveAspectRatio="xMidYMid meet"
-      >
-      <defs>
-        {/* 发光滤镜 */}
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="0" stdDeviation="1" floodColor="rgba(255,255,255,0.5)" />
-        </filter>
-
-        {/* 实线箭头 */}
-        <marker
-          id="arrowSolid"
-          markerWidth="4"
-          markerHeight="4"
-          refX="3"
-          refY="2"
-          orient="auto"
-          markerUnits="strokeWidth"
-        >
-          <path d="M0,0 L4,2 L0,4 L1,2 Z" fill="rgba(255,255,255,0.5)" />
-        </marker>
-
-        {/* 虚线箭头 */}
-        <marker
-          id="arrowDashed"
-          markerWidth="4"
-          markerHeight="4"
-          refX="3"
-          refY="2"
-          orient="auto"
-          markerUnits="strokeWidth"
-        >
-          <path d="M0,0 L4,2 L0,4 L1,2 Z" fill="rgba(255,255,255,0.5)" />
-        </marker>
-      </defs>
-
-      {/* 顶层水平线: (Es)S -> a 小他者 - 单向箭头缩短一半，虚线 */}
-      <line
-        x1={NODES.S.x}
-        y1={NODES.S.y}
-        x2={50}
-        y2={NODES.a_other.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        strokeDasharray="2 2"
-        markerEnd="url(#arrowDashed)"
+      {/* 使用处理后的 SVG 内容 - 居中 */}
+      <div
+        ref={containerRef}
+        className="lacan-svg-container flex-1 w-full flex items-center justify-center"
+        dangerouslySetInnerHTML={{ __html: processedSvg }}
       />
-
-      {/* 虚线: 箭头末尾 -> a 小他者 */}
-      <line
-        x1={50}
-        y1={NODES.a_other.y}
-        x2={NODES.a_other.x}
-        y2={NODES.a_other.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        strokeDasharray="2 2"
-      />
-
-      {/* 底层水平线: A 大他者 -> a' 想象自我 - 单向箭头（1/2长度） */}
-      <line
-        x1={NODES.A.x}
-        y1={NODES.A.y}
-        x2={50}
-        y2={NODES.a_ego.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        markerEnd="url(#arrowSolid)"
-      />
-
-      {/* 底层水平线: A 大他者 -> a' 想象自我 - 剩余部分实线 */}
-      <line
-        x1={50}
-        y1={NODES.a_ego.y}
-        x2={NODES.a_ego.x}
-        y2={NODES.a_ego.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-      />
-
-      {/* 对角线: A 大他者 -> (Es)S - 右下角半段实线 */}
-      <line
-        x1={NODES.A.x}
-        y1={NODES.A.y}
-        x2={NODES.MID.x}
-        y2={NODES.MID.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        markerEnd="url(#arrowSolid)"
-      />
-
-      {/* 对角线: A 大他者 -> (Es)S - 左上角半段虚线箭头（1/2长度） */}
-      <line
-        x1={NODES.MID.x}
-        y1={NODES.MID.y}
-        x2={35}
-        y2={35}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        strokeDasharray="2 2"
-        markerEnd="url(#arrowDashed)"
-      />
-
-      {/* 对角线: A 大他者 -> (Es)S - 虚线剩余部分 */}
-      <line
-        x1={35}
-        y1={35}
-        x2={NODES.S.x}
-        y2={NODES.S.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        strokeDasharray="2 2"
-      />
-
-      {/* 对角线: a 小他者 -> a' 想象自我 (想象关系) - 实线单向箭头，长度为实线的2/3 */}
-      <line
-        x1={NODES.a_other.x}
-        y1={NODES.a_other.y}
-        x2={40}
-        y2={60}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-        markerEnd="url(#arrowSolid)"
-      />
-
-      {/* 完整实线: a 小他者 -> a' 想象自我 (想象关系) - 2/3到终点 */}
-      <line
-        x1={40}
-        y1={60}
-        x2={NODES.a_ego.x}
-        y2={NODES.a_ego.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="0.5"
-      />
-
-      {/* 节点 S - (Es) S */}
-      <circle
-        cx={NODES.S.x}
-        cy={NODES.S.y}
-        r="1.5"
-        fill="rgba(255,255,255,0.8)"
-        filter="url(#glow)"
-      />
-
-      {/* 节点 a 小他者 */}
-      <circle
-        cx={NODES.a_other.x}
-        cy={NODES.a_other.y}
-        r="1.5"
-        fill="rgba(255,255,255,0.8)"
-        filter="url(#glow)"
-      />
-
-      {/* 节点 a' 想象自我 */}
-      <circle
-        cx={NODES.a_ego.x}
-        cy={NODES.a_ego.y}
-        r="1.5"
-        fill="rgba(255,255,255,0.8)"
-        filter="url(#glow)"
-      />
-
-      {/* 节点 A 大他者 */}
-      <circle
-        cx={NODES.A.x}
-        cy={NODES.A.y}
-        r="1.5"
-        fill="rgba(255,255,255,0.8)"
-        filter="url(#glow)"
-      />
-
-      {/* 标签 (Es) S */}
-      <text
-        x={NODES.S.x - 5}
-        y={NODES.S.y}
-        textAnchor="end"
-        dominantBaseline="middle"
-        fontSize="3.5"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
-        fontWeight="300"
-        fill="rgba(255,255,255,0.6)"
-      >
-        (Es) S
-      </text>
-
-      {/* 标签 a 小他者 */}
-      <text
-        x={NODES.a_other.x + 5}
-        y={NODES.a_other.y}
-        textAnchor="start"
-        dominantBaseline="middle"
-        fontSize="3.5"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
-        fontWeight="300"
-        fill="rgba(255,255,255,0.6)"
-      >
-        a 小他者
-      </text>
-
-      {/* 标签 a' */}
-      <text
-        x={NODES.a_ego.x - 5}
-        y={NODES.a_ego.y}
-        textAnchor="end"
-        dominantBaseline="middle"
-        fontSize="3.5"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
-        fontWeight="300"
-        fill="rgba(255,255,255,0.6)"
-      >
-        a'
-      </text>
-
-      {/* 标签 A 大他者 */}
-      <text
-        x={NODES.A.x + 5}
-        y={NODES.A.y}
-        textAnchor="start"
-        dominantBaseline="middle"
-        fontSize="3.5"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
-        fontWeight="300"
-        fill="rgba(255,255,255,0.6)"
-      >
-        A 大他者
-      </text>
-
-      {/* 对角线文本: 无意识 (A 大他者到(Es)S的实线箭头旁) - 45度倾斜 */}
-      <text
-        x={68}
-        y={60}
-        textAnchor="middle"
-        fontSize="2.5"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
-        fontWeight="300"
-        fill="rgba(255,255,255,0.5)"
-        transform="rotate(-45, 68, 60)"
-      >
-        无意识
-      </text>
-
-      {/* 对角线文本: 想象关系 (a 小他者到a'想象自我的实线箭头旁) - -45度倾斜 */}
-      <text
-        x={58}
-        y={35}
-        textAnchor="middle"
-        fontSize="2.5"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
-        fontWeight="300"
-        fill="rgba(255,255,255,0.5)"
-        transform="rotate(-45, 58, 35)"
-      >
-        想象关系
-      </text>
-    </svg>
     </div>
   )
 }
