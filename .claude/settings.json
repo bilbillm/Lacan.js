@@ -11,7 +11,9 @@
       "WebFetch(domain:github.com)",
       "Bash(npm run dev)",
       "WebFetch(domain:minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "WebFetch(domain:bilbillm.github.io)",
+      "Bash(curl -s \"https://bilbillm.github.io/Lacan.js/\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\lumoren\\Documents\\GitHub\\Lacan.js\\lacan-temp",
