@@ -114,7 +114,7 @@ function App() {
 
       {/* Global Header - 使用 gap 控制间距，带呼吸光效 */}
       <motion.div
-        className={`absolute top-20 left-0 right-0 flex flex-col items-center gap-4 pointer-events-none ${selectedId ? 'z-0' : 'z-10'}`}
+        className={`relative top-20 left-0 right-0 flex flex-col items-center gap-4 pointer-events-none ${selectedId ? 'z-0' : 'z-10'}`}
         animate={selectedId ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
@@ -163,8 +163,8 @@ function App() {
       </motion.div>
 
       {/* Tiled Gallery Layout */}
-      <div className="absolute inset-0 flex items-center justify-center p-8">
-        <div className="flex flex-row flex-wrap justify-center items-center gap-12 pt-24">
+      <div className="relative flex items-center justify-center p-8 min-h-screen">
+        <div className="flex flex-row flex-wrap justify-center items-center gap-12 pt-24 pb-24">
           {panels.map((panel, index) => {
             // 随机进场顺序
             const delay = 3.3 + randomOrder.indexOf(index) * 0.15
