@@ -110,7 +110,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsAppLoaded(true)
-    }, 4600)
+    }, 1000)
     return () => clearTimeout(timer)
   }, [])
 
@@ -131,13 +131,13 @@ function App() {
           animate={selectedId ? "blurred" : "visible"}
           transition={{
             opacity: shouldAnimateEntry
-              ? { delay: 2, duration: 1.2, ease: 'easeOut' }
+              ? { delay: 0.3, duration: 0.6, ease: 'easeOut' }
               : { duration: 0.4, ease: 'easeInOut' },
             filter: shouldAnimateEntry
-              ? { delay: 2, duration: 1.2, ease: 'easeOut' }
+              ? { delay: 0.3, duration: 0.6, ease: 'easeOut' }
               : { duration: 0.4, ease: 'easeInOut' },
             y: shouldAnimateEntry
-              ? { delay: 2, duration: 1.2, ease: 'easeOut' }
+              ? { delay: 0.3, duration: 0.6, ease: 'easeOut' }
               : { duration: 0.4, ease: 'easeInOut' },
             scale: { duration: 0.4 },
             textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity },
@@ -152,7 +152,7 @@ function App() {
           animate={selectedId ? "blurred" : "visible"}
           transition={{
             opacity: shouldAnimateEntry
-              ? { delay: 2.5, duration: 0.8, ease: 'easeOut' }
+              ? { delay: 0.5, duration: 0.5, ease: 'easeOut' }
               : { duration: 0.4, ease: 'easeInOut' },
             filter: shouldAnimateEntry
               ? { delay: 2.5, duration: 0.8, ease: 'easeOut' }

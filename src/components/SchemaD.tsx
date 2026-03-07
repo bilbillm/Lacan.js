@@ -1,5 +1,5 @@
-import schemaDSvgContent from '../svgs/lacan graph of desire_4.svg?raw'
-import { useMemo, useRef, useEffect, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
+import schemaDUrl from '../svgs/lacan graph of desire_4.svg?url'
 
 interface SchemaDProps {
   isExpanded?: boolean
@@ -8,71 +8,34 @@ interface SchemaDProps {
 
 type NodeId = 'S' | 'O' | 'D' | 'a'
 
+interface NodeConfig {
+  id: NodeId
+  cx: number
+  cy: number
+  r: number
+}
+
+// Graph of Desire 的四个节点配置
+// 基于 SVG viewBox="0 0 207.658 194.922"
+const NODES: NodeConfig[] = [
+  { id: 'S', cx: 66.91, cy: 47.24, r: 10 },     // 左上 S
+  { id: 'O', cx: 139.19, cy: 47.24, r: 10 },    // 右上 O
+  { id: 'D', cx: 41.79, cy: 120.51, r: 10 },    // 左下 D
+  { id: 'a', cx: 164.31, cy: 120.51, r: 10 },   // 右下 a
+]
+
 export default function SchemaD({ isExpanded = false, onNodesSelected }: SchemaDProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
   const [selectedNodes, setSelectedNodes] = useState<NodeId[]>([])
+  const [hoveredNode, setHoveredNode] = useState<NodeId | null>(null)
 
-  // 处理 SVG 内容，将黑色改为白色
-  const processedSvg = useMemo(() => {
-    let svg = schemaDSvgContent
-
-    // 将黑色 stroke 替换为白色半透明
-    svg = svg.replace(/stroke:rgb\(0%,0%,0%\)/g, 'stroke:rgba(255,255,255,0.5)')
-    svg = svg.replace(/stroke:rgb\(0%, 0%, 0%\)/g, 'stroke:rgba(255,255,255,0.5)')
-    svg = svg.replace(/stroke:#000000/g, 'stroke:rgba(255,255,255,0.5)')
-    svg = svg.replace(/stroke:black/g, 'stroke:rgba(255,255,255,0.5)')
-    // 将黑色 fill 替换为白色（节点）
-    svg = svg.replace(/fill:rgb\(0%,0%,0%\)/g, 'fill:rgba(255,255,255,0.8)')
-    svg = svg.replace(/fill:rgb\(0%, 0%, 0%\)/g, 'fill:rgba(255,255,255,0.8)')
-    svg = svg.replace(/fill:#000000/g, 'fill:rgba(255,255,255,0.8)')
-    svg = svg.replace(/fill:black/g, 'fill:rgba(255,255,255,0.8)')
-    // 将白色 fill 保持
-    svg = svg.replace(/fill:rgb\(100%,100%,100%\)/g, 'fill:rgba(255,255,255,0.9)')
-    svg = svg.replace(/fill:rgb\(100%, 100%, 100%\)/g, 'fill:rgba(255,255,255,0.9)')
-
-    // 注入交互属性到节点
-    const nodeIds: NodeId[] = ['S', 'O', 'D', 'a']
-    let nodeIndex = 0
-
-    // 匹配所有带 transform 的 path 元素
-    svg = svg.replace(
-      /<path(\s+[^>]*)?>/g,
-      (match, attrs) => {
-        if (nodeIndex >= 4) return match
-
-        // attrs 可能是 undefined 或空字符串
-        const attrStr = attrs || ''
-
-        // 检查是否包含 transform
-        const hasTransform = attrStr.includes('transform')
-        // 检查是否包含 fill
-        const hasFill = attrStr.includes('fill:rgba(255,255,255,0.8)') || attrStr.includes('fill:rgba(255,255,255,0.9)')
-
-        // 只有同时满足这两个条件才是节点
-        if (hasTransform && hasFill) {
-          const nodeId = nodeIds[nodeIndex]
-          nodeIndex++
-          return match.replace('<path', `<path id="node-${nodeId}" class="lacan-node"`)
-        }
-
-        return match
-      }
-    )
-
-    return svg
-  }, [])
-
-  // 处理节点点击
-  const handleNodeClick = useCallback((nodeId: string) => {
+  const handleNodeClick = useCallback((nodeId: NodeId) => {
     setSelectedNodes(prev => {
-      const currentNode = nodeId.replace('node-', '') as NodeId
-      const newSelected = prev.includes(currentNode)
-        ? prev.filter(n => n !== currentNode) // 取消选中
+      const newSelected = prev.includes(nodeId)
+        ? prev.filter(n => n !== nodeId)
         : prev.length >= 2
-          ? [currentNode] // 超过2个时，清空并只保留当前
-          : [...prev, currentNode] // 添加选中
+          ? [nodeId]
+          : [...prev, nodeId]
 
-      // 当选中2个节点时触发回调
       if (newSelected.length === 2 && onNodesSelected) {
         onNodesSelected(newSelected[0], newSelected[1])
       }
@@ -81,106 +44,54 @@ export default function SchemaD({ isExpanded = false, onNodesSelected }: SchemaD
     })
   }, [onNodesSelected])
 
-  // 使用 useEffect 绑定事件监听
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const svgElement = container.querySelector('svg')
-    if (!svgElement) return
-
-    // 更新选中状态样式
-    const updateSelectionStyles = () => {
-      const nodes = svgElement.querySelectorAll('.lacan-node') as NodeListOf<SVGPathElement>
-      nodes.forEach(node => {
-        const nodeId = node.id.replace('node-', '') as NodeId
-        const isSelected = selectedNodes.includes(nodeId)
-
-        if (isSelected) {
-          node.style.stroke = '#fff'
-          node.style.strokeWidth = '3px'
-          node.style.strokeDasharray = '0'
-          node.style.transition = 'stroke 0.2s ease, stroke-width 0.2s ease'
-        } else {
-          node.style.stroke = 'transparent'
-          node.style.strokeWidth = '3px'
-          node.style.strokeDasharray = '0'
-        }
-      })
-    }
-
-    // 获取节点
-    const nodes = svgElement.querySelectorAll('.lacan-node') as NodeListOf<SVGPathElement>
-
-    // 添加 hover 效果
-    const handleMouseEnter = (e: Event) => {
-      const target = e.target as SVGPathElement
-      const nodeId = target.id.replace('node-', '') as NodeId
-      if (!selectedNodes.includes(nodeId)) {
-        target.style.stroke = 'rgba(255,255,255,0.6)'
-        target.style.strokeWidth = '3px'
-        target.style.strokeDasharray = '2 2'
-      }
-    }
-
-    const handleMouseLeave = (e: Event) => {
-      const target = e.target as SVGPathElement
-      const nodeId = target.id.replace('node-', '') as NodeId
-      if (!selectedNodes.includes(nodeId)) {
-        target.style.stroke = 'transparent'
-        target.style.strokeDasharray = '0'
-      }
-    }
-
-    // 添加 hover 效果和点击事件到每个节点
-    const handleNodeClickEvent = (e: Event) => {
-      const target = e.currentTarget as SVGPathElement
-      const nodeId = target.id
-      handleNodeClick(nodeId)
-    }
-
-    nodes.forEach(node => {
-      node.style.transition = 'stroke 0.2s ease, stroke-width 0.2s ease'
-      node.addEventListener('mouseenter', handleMouseEnter)
-      node.addEventListener('mouseleave', handleMouseLeave)
-      node.addEventListener('click', handleNodeClickEvent)
-    })
-
-    updateSelectionStyles()
-
-    return () => {
-      nodes.forEach(node => {
-        node.removeEventListener('mouseenter', handleMouseEnter)
-        node.removeEventListener('mouseleave', handleMouseLeave)
-        node.removeEventListener('click', handleNodeClickEvent)
-      })
-    }
-  }, [processedSvg, selectedNodes, handleNodeClick])
-
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2">
-      {/* CSS 锁定交互范围 */}
-      <style>{`
-        .lacan-svg-container svg * {
-          pointer-events: none !important;
-        }
-        .lacan-svg-container .lacan-node {
-          pointer-events: all !important;
-          cursor: pointer;
-        }
-      `}</style>
-      {/* 标题 */}
       <div className="text-center mb-2">
         <span className={`font-light tracking-widest text-white/40 ${isExpanded ? 'text-xl' : 'text-base'}`}>
           Graph of Desire
         </span>
       </div>
-      {/* 使用处理后的 SVG 内容 - 居中 */}
-      <div
-        ref={containerRef}
-        className="lacan-svg-container flex-1 w-full flex items-center justify-center"
-        dangerouslySetInnerHTML={{ __html: processedSvg }}
-      />
+
+      <div className="relative flex-1 w-full flex items-center justify-center">
+        <img 
+          src={schemaDUrl} 
+          alt="Graph of Desire" 
+          className="w-full h-full max-w-full max-h-full"
+          style={{ 
+            display: 'block',
+            filter: 'invert(1) opacity(0.8)'
+          }}
+        />
+
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 207.658 194.922"
+          preserveAspectRatio="xMidYMid meet"
+          style={{ maxWidth: '100%', maxHeight: '100%' }}
+        >
+          {NODES.map(node => {
+            const isSelected = selectedNodes.includes(node.id)
+            const isHovered = hoveredNode === node.id
+
+            return (
+              <circle
+                key={node.id}
+                cx={node.cx}
+                cy={node.cy}
+                r={node.r}
+                className="pointer-events-auto cursor-pointer transition-all duration-200"
+                fill="transparent"
+                stroke={isSelected ? '#fff' : isHovered ? 'rgba(255,255,255,0.6)' : 'transparent'}
+                strokeWidth={isSelected ? 3 : isHovered ? 2 : 0}
+                strokeDasharray={isHovered && !isSelected ? '4 2' : '0'}
+                onMouseEnter={() => setHoveredNode(node.id)}
+                onMouseLeave={() => setHoveredNode(null)}
+                onClick={() => handleNodeClick(node.id)}
+              />
+            )
+          })}
+        </svg>
+      </div>
     </div>
   )
 }
