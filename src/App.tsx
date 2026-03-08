@@ -120,12 +120,12 @@ function App() {
 
       {/* Global Header - 使用 gap 控制间距，带呼吸光效 */}
       <motion.div
-        className={`relative top-20 left-0 right-0 flex flex-col items-center gap-4 pointer-events-none ${selectedId ? 'z-0' : 'z-10'}`}
+        className={`absolute top-8 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none ${selectedId ? 'z-0' : 'z-10'}`}
         animate={selectedId ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
         <motion.h1
-          className="text-5xl font-light tracking-[0.35em] text-white/70 leading-none"
+          className="text-3xl font-light tracking-[0.35em] text-white/70 leading-none"
           initial="initial"
           variants={h1Variants}
           animate={selectedId ? "blurred" : "visible"}
@@ -168,10 +168,10 @@ function App() {
         </motion.p>
       </motion.div>
 
-      {/* Tiled Gallery Layout */}
-      <div className="relative flex items-center justify-center p-8 min-h-screen">
-        <div className="flex flex-row flex-wrap justify-center items-center gap-12 pt-24 pb-24">
-          {panels.map((panel, index) => {
+      {/* Tiled Gallery Layout - 4 cards per row */}
+      <div className="absolute inset-0 flex items-center justify-center px-12 pt-24">
+        <div className="grid grid-cols-4 gap-6 w-full max-w-6xl">
+          {panels.slice(0, 4).map((panel, index) => {
             // 随机进场顺序
             const delay = 3.3 + randomOrder.indexOf(index) * 0.15
             const isSelected = selectedId === panel.id
@@ -197,8 +197,8 @@ function App() {
                   {/* 主面板 */}
                   <GlassPanel
                     layoutId={panel.id}
-                    width={288}
-                    height={416}
+                    width={220}
+                    height={320}
                     onClick={() => setSelectedId(panel.id)}
                     className="cursor-pointer"
                   >
@@ -250,73 +250,6 @@ function App() {
                       </div>
                     )}
                   </GlassPanel>
-
-                  {/* 倒影层 */}
-                  {!selectedId && (
-                    <div
-                      className="absolute top-full mt-2 left-0 w-full pointer-events-none z-0"
-                      style={{
-                        transform: 'scaleY(-1)',
-                        filter: 'blur(8px)',
-                        opacity: 0.5,
-                        WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-                        maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-                      }}
-                    >
-                      <GlassPanel
-                        width={288}
-                        height={416}
-                      >
-                        {panel.id === 'panel-1' ? (
-                          <Suspense fallback={
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-xl font-light tracking-widest text-white/40">
-                                {panel.title}
-                              </span>
-                            </div>
-                          }>
-                            <SchemaL isExpanded={false} />
-                          </Suspense>
-                        ) : panel.id === 'panel-2' ? (
-                          <Suspense fallback={
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-xl font-light tracking-widest text-white/40">
-                                {panel.title}
-                              </span>
-                            </div>
-                          }>
-                            <SchemaR isExpanded={false} />
-                          </Suspense>
-                        ) : panel.id === 'panel-3' ? (
-                          <Suspense fallback={
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-xl font-light tracking-widest text-white/40">
-                                {panel.title}
-                              </span>
-                            </div>
-                          }>
-                            <SchemaI isExpanded={false} />
-                          </Suspense>
-                        ) : panel.id === 'panel-4' ? (
-                          <Suspense fallback={
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-xl font-light tracking-widest text-white/40">
-                                {panel.title}
-                              </span>
-                            </div>
-                          }>
-                            <SchemaD isExpanded={false} />
-                          </Suspense>
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-xl font-light tracking-widest text-white/40">
-                              {panel.title}
-                            </span>
-                          </div>
-                        )}
-                      </GlassPanel>
-                    </div>
-                  )}
                 </div>
               </motion.div>
             )
