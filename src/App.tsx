@@ -80,6 +80,12 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [isAppLoaded, setIsAppLoaded] = useState(false)
   const [selectedNodes, setSelectedNodes] = useState<[string, string] | null>(null)
+  const [pageGroup, setPageGroup] = useState(0)
+
+  const panelsPerPage = 4
+  const totalPages = Math.ceil(panels.length / panelsPerPage)
+
+  const currentPanels = panels.slice(pageGroup * panelsPerPage, (pageGroup + 1) * panelsPerPage)
 
   const selectedPanel = panels.find(p => p.id === selectedId)
 
@@ -113,6 +119,24 @@ function App() {
     }, 1000)
     return () => clearTimeout(timer)
   }, [])
+
+  // 滚轮控制页面切换
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (selectedId) return
+
+      e.preventDefault()
+
+      if (e.deltaY > 100) {
+        setPageGroup((prev) => (prev + 1) % totalPages)
+      } else if (e.deltaY < -100) {
+        setPageGroup((prev) => (prev - 1 + totalPages) % totalPages)
+      }
+    }
+
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    return () => window.removeEventListener('wheel', handleWheel)
+  }, [selectedId, totalPages])
 
   return (
     <div className="app-container">
@@ -168,10 +192,18 @@ function App() {
         </motion.p>
       </motion.div>
 
-      {/* Tiled Gallery Layout - 4 cards per row */}
+      {/* Tiled Gallery Layout - 4 cards per row with fade animation */}
       <div className="absolute inset-0 flex items-center justify-center px-12 pt-24">
-        <div className="grid grid-cols-4 gap-6 w-full max-w-6xl">
-          {panels.slice(0, 4).map((panel, index) => {
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pageGroup}
+            className="grid grid-cols-4 gap-6 w-full max-w-6xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {currentPanels.map((panel, index) => {
             // 随机进场顺序
             const delay = 3.3 + randomOrder.indexOf(index) * 0.15
             const isSelected = selectedId === panel.id
@@ -254,7 +286,8 @@ function App() {
               </motion.div>
             )
           })}
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Focus View - selected panel expanded */}
