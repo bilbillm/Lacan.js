@@ -127,9 +127,9 @@ function App() {
 
       e.preventDefault()
 
-      if (e.deltaY > 100) {
+      if (e.deltaY > 30) {
         setPageGroup((prev) => (prev + 1) % totalPages)
-      } else if (e.deltaY < -100) {
+      } else if (e.deltaY < -30) {
         setPageGroup((prev) => (prev - 1 + totalPages) % totalPages)
       }
     }
