@@ -7,11 +7,13 @@ import {
   type InteractiveSchemaComponent,
   type NonInteractiveSchemaComponent,
 } from './panelSchemaRegistry'
+import { FOCUS_EXIT_MS, FOCUS_PANEL_MAX_HEIGHT, FOCUS_PANEL_MAX_WIDTH } from './uiConstants'
 
 interface FocusViewProps {
   selectedId: string | null
   selectedPanel?: PanelData
   selectedNodes: [string, string] | null
+  isExitingFocus: boolean
   onExitFocus: () => void
   onNodesSelected: (node1: string, node2: string) => void
   SchemaL: InteractiveSchemaComponent
@@ -24,6 +26,7 @@ export default function FocusView({
   selectedId,
   selectedPanel,
   selectedNodes,
+  isExitingFocus,
   onExitFocus,
   onNodesSelected,
   SchemaL,
@@ -48,9 +51,10 @@ export default function FocusView({
           <motion.div
             className="absolute inset-0 z-40"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isExitingFocus ? 0 : 1 }}
             exit={{ opacity: 0 }}
             onClick={onExitFocus}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             style={{
               background: 'rgba(0, 0, 0, 0.2)',
             }}
@@ -74,8 +78,8 @@ export default function FocusView({
                 disableParallax={true}
                 style={{
                   // 保持原始卡片 288:416 比例 (0.6923)，同时放大尺寸
-                  maxWidth: 540,
-                  maxHeight: 780,
+                  maxWidth: FOCUS_PANEL_MAX_WIDTH,
+                  maxHeight: FOCUS_PANEL_MAX_HEIGHT,
                 }}
                 >
                 {resolvedSchema ? (
@@ -114,7 +118,7 @@ export default function FocusView({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 100 }}
                 transition={{
-                  duration: 0.6,
+                  duration: FOCUS_EXIT_MS / 1000,
                   ease: [0.4, 0, 0.2, 1],
                 }}
                 style={{ paddingRight: '10vw' }}
@@ -126,8 +130,8 @@ export default function FocusView({
                   onClick={() => {}}
                   disableParallax={true}
                   style={{
-                    maxWidth: 540,
-                    maxHeight: 780,
+                    maxWidth: FOCUS_PANEL_MAX_WIDTH,
+                    maxHeight: FOCUS_PANEL_MAX_HEIGHT,
                   }}
                 >
                   <div className="w-full h-full flex items-center justify-center p-8">
