@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 interface AppHeaderProps {
   selectedId: string | null
   shouldAnimateEntry: boolean
+  entryDelayMs: number
 }
 
 // Global Header Variants - h1 标题
@@ -55,27 +56,29 @@ const pVariants = {
   },
 }
 
-export default function AppHeader({ selectedId, shouldAnimateEntry }: AppHeaderProps) {
+export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs }: AppHeaderProps) {
+  const entryDelaySeconds = entryDelayMs / 1000
+
   return (
     <motion.div
-      className={`absolute top-8 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none ${selectedId ? 'z-0' : 'z-10'}`}
+      className={`absolute top-12 left-0 right-0 flex flex-col items-center gap-3 pointer-events-none ${selectedId ? 'z-0' : 'z-10'}`}
       animate={selectedId ? { opacity: 0 } : { opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
       <motion.h1
-        className="text-3xl font-light tracking-[0.35em] text-white/70 leading-none"
+        className="text-[2.35rem] font-light tracking-[0.35em] text-white/70 leading-none"
         initial="initial"
         variants={h1Variants}
         animate={selectedId ? 'blurred' : 'visible'}
         transition={{
           opacity: shouldAnimateEntry
-            ? { delay: 0.3, duration: 0.6, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds, duration: 0.8, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           filter: shouldAnimateEntry
-            ? { delay: 0.3, duration: 0.6, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds, duration: 0.8, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           y: shouldAnimateEntry
-            ? { delay: 0.3, duration: 0.6, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds, duration: 0.8, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
           textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity },
@@ -84,19 +87,19 @@ export default function AppHeader({ selectedId, shouldAnimateEntry }: AppHeaderP
         LACAN.JS
       </motion.h1>
       <motion.p
-        className="text-base font-light tracking-[0.35em] text-white/40"
+        className="text-lg font-light tracking-[0.35em] text-white/40"
         initial="initial"
         variants={pVariants}
         animate={selectedId ? 'blurred' : 'visible'}
         transition={{
           opacity: shouldAnimateEntry
-            ? { delay: 0.5, duration: 0.5, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds + 0.25, duration: 0.7, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           filter: shouldAnimateEntry
-            ? { delay: 2.5, duration: 0.8, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds + 0.25, duration: 0.7, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           y: shouldAnimateEntry
-            ? { delay: 2.5, duration: 0.8, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds + 0.25, duration: 0.7, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
           textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity, delay: 0.5 },

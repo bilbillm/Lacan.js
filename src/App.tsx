@@ -5,6 +5,12 @@ import AppHeader from './components/app/AppHeader'
 import PanelGallery from './components/app/PanelGallery'
 import FocusView from './components/app/FocusView'
 import { panels } from './components/app/panels'
+import {
+  CARD_ENTRY_START_DELAY_MS,
+  FOCUS_EXIT_MS,
+  HEADER_ENTRY_DELAY_MS,
+  WHEEL_NAV_THRESHOLD,
+} from './components/app/uiConstants'
 
 // 懒加载 SchemaL、SchemaR、SchemaI 和 SchemaD 组件
 const SchemaL = lazy(() => import('./components/SchemaL'))
@@ -17,6 +23,7 @@ function App() {
   const [isAppLoaded, setIsAppLoaded] = useState(false)
   const [selectedNodes, setSelectedNodes] = useState<[string, string] | null>(null)
   const [pageGroup, setPageGroup] = useState(0)
+  const [isExitingFocus, setIsExitingFocus] = useState(false)
 
   const panelsPerPage = 4
   const totalPages = Math.ceil(panels.length / panelsPerPage)
@@ -32,11 +39,12 @@ function App() {
 
   // 处理退出聚焦（先清除节点选择，触发退场动画后再退出聚焦）
   const handleExitFocus = () => {
+    setIsExitingFocus(true)
     setSelectedNodes(null)
-    // 延迟 600ms 后再退出聚焦，让右侧面板有时间播放退场动画
+    setSelectedId(null)
     setTimeout(() => {
-      setSelectedId(null)
-    }, 600)
+      setIsExitingFocus(false)
+    }, FOCUS_EXIT_MS)
   }
 
   // 判断是否应该使用延迟入场动画：首次加载时
@@ -52,33 +60,25 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsAppLoaded(true)
-    }, 1000)
+    }, CARD_ENTRY_START_DELAY_MS)
     return () => clearTimeout(timer)
   }, [])
 
-  // 滚轮控制页面切换
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (selectedId) return
+  const handleGalleryWheel = (deltaY: number) => {
+    if (selectedId) return
 
-      e.preventDefault()
-
-      if (e.deltaY > 30) {
-        setPageGroup((prev) => (prev + 1) % totalPages)
-      } else if (e.deltaY < -30) {
-        setPageGroup((prev) => (prev - 1 + totalPages) % totalPages)
-      }
+    if (deltaY > WHEEL_NAV_THRESHOLD) {
+      setPageGroup((prev) => (prev + 1) % totalPages)
+    } else if (deltaY < -WHEEL_NAV_THRESHOLD) {
+      setPageGroup((prev) => (prev - 1 + totalPages) % totalPages)
     }
-
-    window.addEventListener('wheel', handleWheel, { passive: false })
-    return () => window.removeEventListener('wheel', handleWheel)
-  }, [selectedId, totalPages])
+  }
 
   return (
     <div className="app-container">
       <DeepEnvironment />
 
-      <AppHeader selectedId={selectedId} shouldAnimateEntry={shouldAnimateEntry} />
+      <AppHeader selectedId={selectedId} shouldAnimateEntry={shouldAnimateEntry} entryDelayMs={HEADER_ENTRY_DELAY_MS} />
 
       <PanelGallery
         pageGroup={pageGroup}
@@ -86,18 +86,21 @@ function App() {
         randomOrder={randomOrder}
         selectedId={selectedId}
         isAppLoaded={isAppLoaded}
+        cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
         onSelectPanel={setSelectedId}
         onNodesSelected={handleNodesSelected}
         SchemaL={SchemaL}
         SchemaR={SchemaR}
         SchemaI={SchemaI}
         SchemaD={SchemaD}
+        onWheelNavigate={handleGalleryWheel}
       />
 
       <FocusView
         selectedId={selectedId}
         selectedPanel={selectedPanel}
         selectedNodes={selectedNodes}
+        isExitingFocus={isExitingFocus}
         onExitFocus={handleExitFocus}
         onNodesSelected={handleNodesSelected}
         SchemaL={SchemaL}

@@ -78,7 +78,7 @@ export default function GlassPanel({
       ref={panelRef}
       layoutId={layoutId}
       className={`relative ${className}`}
-      style={{ width, height, perspective: 1000, ...style }}
+      style={{ width, height, perspective: 1000, transformStyle: 'preserve-3d', ...style }}
       onClick={onClick}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
@@ -138,6 +138,8 @@ export default function GlassPanel({
           <svg
             className="w-full h-full"
             preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
           >
             <filter id="noise">
               <feTurbulence

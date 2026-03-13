@@ -1,0 +1,11 @@
+export const HEADER_ENTRY_DELAY_MS = 2000
+export const CARD_ENTRY_START_DELAY_MS = HEADER_ENTRY_DELAY_MS + 950
+
+export const FOCUS_EXIT_MS = 600
+export const WHEEL_NAV_THRESHOLD = 30
+
+export const GALLERY_CARD_WIDTH = 252
+export const GALLERY_CARD_HEIGHT = 368
+
+export const FOCUS_PANEL_MAX_WIDTH = 540
+export const FOCUS_PANEL_MAX_HEIGHT = 780
