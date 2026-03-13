@@ -10,7 +10,6 @@ export default defineConfig({
     tailwindcss(),
     svgr({
       svgrOptions: {
-        viewBox: true,
         dimensions: true,
         // 减少转换，保留原始结构
         expandProps: false,

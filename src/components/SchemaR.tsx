@@ -1,4 +1,3 @@
-import { useState, useCallback } from 'react'
 import schemaRUrl from '../svgs/lacan schema R_1.svg?url'
 
 interface SchemaRProps {
