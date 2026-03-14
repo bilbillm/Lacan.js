@@ -65,6 +65,11 @@ export default function PanelGallery({
             // 随机进场顺序
             const delay = cardEntryStartDelayMs / 1000 + randomOrder.indexOf(index) * 0.15
             const isSelected = selectedId === panel.id
+            const cardTransition = {
+              delay: isAppLoaded ? 0 : delay,
+              duration: isAppLoaded ? 0.32 : 0.5,
+              ease: 'easeOut' as const,
+            }
             const resolvedSchema = resolvePanelSchema(panel.id, {
               SchemaL,
               SchemaR,
@@ -82,11 +87,7 @@ export default function PanelGallery({
                     : { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }
                 }
                 exit={{ opacity: 0, y: 60, filter: 'blur(5px)' }}
-                transition={{
-                  delay: isAppLoaded ? 0 : delay,
-                  duration: isAppLoaded ? 0.32 : 0.5,
-                  ease: 'easeOut',
-                }}
+                transition={cardTransition}
               >
                 {/* 包裹容器 */}
                 <div
@@ -128,19 +129,28 @@ export default function PanelGallery({
                   </GlassPanel>
 
                   <div
-                    className="absolute top-full left-1/2 pointer-events-none rounded-[1.6rem]"
-                    style={{
-                      width: GALLERY_CARD_WIDTH,
-                      height: Math.round(GALLERY_CARD_HEIGHT * 0.41),
-                      transform: 'translateX(-50%) translateY(112px) scaleX(-1)',
-                      transformOrigin: 'top center',
-                      opacity: 0.34,
-                      background: 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.08) 22%, rgba(255,255,255,0.02) 46%, transparent 82%)',
-                      filter: 'blur(12px)',
-                      maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
-                      WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
-                    }}
-                  />
+                    className="absolute top-full left-1/2 pointer-events-none"
+                    style={{ transform: 'translateX(-50%) translateY(112px)' }}
+                  >
+                    <motion.div
+                      className="rounded-[1.6rem]"
+                      initial={isAppLoaded ? false : { y: -60 }}
+                      animate={{ y: 0 }}
+                      exit={{ y: -120 }}
+                      transition={cardTransition}
+                      style={{
+                        width: GALLERY_CARD_WIDTH,
+                        height: Math.round(GALLERY_CARD_HEIGHT * 0.41),
+                        transform: 'scaleX(-1)',
+                        transformOrigin: 'top center',
+                        opacity: 0.34,
+                        background: 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.08) 22%, rgba(255,255,255,0.02) 46%, transparent 82%)',
+                        filter: 'blur(12px)',
+                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
+                      }}
+                    />
+                  </div>
                 </div>
               </motion.div>
             )
