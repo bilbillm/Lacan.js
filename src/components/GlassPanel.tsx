@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
 interface GlassPanelProps {
@@ -10,6 +10,7 @@ interface GlassPanelProps {
   onClick?: () => void
   style?: React.CSSProperties
   disableParallax?: boolean
+  deferVisualEnhancement?: boolean
 }
 
 export default function GlassPanel({
@@ -20,7 +21,8 @@ export default function GlassPanel({
   layoutId,
   onClick,
   style,
-  disableParallax = false
+  disableParallax = false,
+  deferVisualEnhancement = false,
 }: GlassPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -45,6 +47,8 @@ export default function GlassPanel({
 
   const [isHovered, setIsHovered] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
+  const rafIdRef = useRef<number | null>(null)
+  const pendingMousePosRef = useRef<{ x: number; y: number } | null>(null)
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!panelRef.current) return
@@ -53,7 +57,29 @@ export default function GlassPanel({
     const mouseX = ((e.clientX - rect.left) / rect.width) * 100
     const mouseY = ((e.clientY - rect.top) / rect.height) * 100
 
-    setMousePos({ x: mouseX, y: mouseY })
+    pendingMousePosRef.current = { x: mouseX, y: mouseY }
+
+    if (rafIdRef.current === null) {
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafIdRef.current = null
+
+        const next = pendingMousePosRef.current
+        if (!next) return
+
+        pendingMousePosRef.current = null
+
+        setMousePos(prev => {
+          const deltaX = Math.abs(prev.x - next.x)
+          const deltaY = Math.abs(prev.y - next.y)
+
+          if (deltaX < 1.5 && deltaY < 1.5) {
+            return prev
+          }
+
+          return next
+        })
+      })
+    }
 
     if (disableParallax) return
 
@@ -68,17 +94,31 @@ export default function GlassPanel({
   }, [disableParallax, x, y])
 
   const handleMouseLeave = () => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current)
+      rafIdRef.current = null
+    }
+
+    pendingMousePosRef.current = null
     x.set(0)
     y.set(0)
     setIsHovered(false)
   }
+
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+      }
+    }
+  }, [])
 
   return (
     <motion.div
       ref={panelRef}
       layoutId={layoutId}
       className={`relative ${className}`}
-      style={{ width, height, perspective: 1000, ...style }}
+      style={{ width, height, perspective: 1000, transformStyle: 'preserve-3d', ...style }}
       onClick={onClick}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
@@ -108,8 +148,8 @@ export default function GlassPanel({
           className="absolute inset-0 rounded-2xl"
           style={{
             background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+            backdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
+            WebkitBackdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
             boxShadow: `
               0 4px 24px rgba(0, 0, 0, 0.3),
@@ -128,44 +168,35 @@ export default function GlassPanel({
         />
 
         {/* Noise texture layer */}
-        <div
-          className="absolute inset-0 rounded-2xl pointer-events-none select-none z-10"
-          style={{
-            opacity: 0.05,
-            mixBlendMode: 'overlay',
-          }}
-        >
-          <svg
-            className="w-full h-full"
-            preserveAspectRatio="none"
-          >
-            <filter id="noise">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="0.7"
-                numOctaves="3"
-                stitchTiles="stitch"
-              />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect
-              width="100%"
-              height="100%"
-              filter="url(#noise)"
-            />
-          </svg>
-        </div>
+        {!deferVisualEnhancement && (
+          <div
+            className="absolute inset-0 rounded-2xl pointer-events-none select-none z-10"
+            style={{
+              opacity: 0.035,
+              mixBlendMode: 'overlay',
+              backgroundImage: `
+                radial-gradient(rgba(255,255,255,0.08) 0.6px, transparent 0.6px),
+                radial-gradient(rgba(255,255,255,0.04) 0.5px, transparent 0.5px)
+              `,
+              backgroundPosition: '0 0, 8px 8px',
+              backgroundSize: '16px 16px, 20px 20px',
+            }}
+          />
+        )}
 
         {/* Dynamic light reflection - follows mouse position */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 30%, transparent 60%)`,
-          }}
-        />
+        {isHovered && !deferVisualEnhancement && (
+          <motion.div
+            className="absolute inset-0 rounded-2xl pointer-events-none z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 30%, transparent 60%)`,
+            }}
+          />
+        )}
 
         {/* Glare effect */}
         <motion.div

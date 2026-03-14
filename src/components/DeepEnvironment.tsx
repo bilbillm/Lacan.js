@@ -1,7 +1,29 @@
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 // Perspective Wireframe Room Component
 function PerspectiveRoom() {
+  const [showMediumLayer, setShowMediumLayer] = useState(false)
+  const [showBlurLayer, setShowBlurLayer] = useState(false)
+
+  useEffect(() => {
+    let mediumFrameId = 0
+    let blurFrameId = 0
+
+    mediumFrameId = requestAnimationFrame(() => {
+      setShowMediumLayer(true)
+
+      blurFrameId = requestAnimationFrame(() => {
+        setShowBlurLayer(true)
+      })
+    })
+
+    return () => {
+      cancelAnimationFrame(mediumFrameId)
+      cancelAnimationFrame(blurFrameId)
+    }
+  }, [])
+
   // 动画时序
   const verticalDuration = 2
   const perspectiveDuration = 6
@@ -141,33 +163,40 @@ function PerspectiveRoom() {
 
   return (
     <div className="absolute inset-0 z-0 pointer-events-none">
-      {/* 底层 - 最模糊，边缘呈光晕散开 */}
-      <svg
-        className="absolute inset-0 w-full h-full"
-        preserveAspectRatio="none"
-        viewBox="0 0 100 100"
-        style={{ filter: 'blur(5px)' }}
-      >
-        {renderLines()}
-      </svg>
+      {showBlurLayer && (
+        /* 底层 - 最模糊，边缘呈光晕散开 */
+        <svg
+          className="absolute inset-0 w-full h-full"
+          aria-hidden="true"
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+          style={{ filter: 'blur(5px)' }}
+        >
+          {renderLines()}
+        </svg>
+      )}
 
-      {/* 中层 - 轻微模糊 + 径向遮罩 */}
-      <svg
-        className="absolute inset-0 w-full h-full"
-        preserveAspectRatio="none"
-        viewBox="0 0 100 100"
-        style={{
-          filter: 'blur(1px)',
-          WebkitMaskImage: 'radial-gradient(circle at center, black 50%, transparent 90%)',
-          maskImage: 'radial-gradient(circle at center, black 50%, transparent 90%)',
-        }}
-      >
-        {renderLines()}
-      </svg>
+      {showMediumLayer && (
+        /* 中层 - 轻微模糊 + 径向遮罩 */
+        <svg
+          className="absolute inset-0 w-full h-full"
+          aria-hidden="true"
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+          style={{
+            filter: 'blur(1px)',
+            WebkitMaskImage: 'radial-gradient(circle at center, black 50%, transparent 90%)',
+            maskImage: 'radial-gradient(circle at center, black 50%, transparent 90%)',
+          }}
+        >
+          {renderLines()}
+        </svg>
+      )}
 
       {/* 顶层 - 清晰 + 紧凑遮罩 */}
       <svg
         className="absolute inset-0 w-full h-full"
+        aria-hidden="true"
         preserveAspectRatio="none"
         viewBox="0 0 100 100"
         style={{
