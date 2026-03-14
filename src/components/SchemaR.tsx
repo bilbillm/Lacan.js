@@ -1,10 +1,13 @@
 import schemaRUrl from '../svgs/lacan schema R_1.svg?url'
+import schemaRGalleryUrl from '../pngs/lacan-schema-R_1.png'
 
 interface SchemaRProps {
   isExpanded?: boolean
 }
 
 export default function SchemaR({ isExpanded = false }: SchemaRProps) {
+  const imageUrl = isExpanded ? schemaRUrl : schemaRGalleryUrl
+
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2">
       <div className="text-center mb-2">
@@ -13,10 +16,10 @@ export default function SchemaR({ isExpanded = false }: SchemaRProps) {
         </span>
       </div>
       <img 
-        src={schemaRUrl} 
+        src={imageUrl} 
         alt="Schema R" 
-        className="flex-1 w-full max-w-full max-h-full"
-        style={{ display: 'block', filter: 'invert(1) opacity(0.8)' }}
+        className="flex-1 w-full h-full object-contain"
+        style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', filter: 'invert(1) opacity(0.8)' }}
       />
     </div>
   )

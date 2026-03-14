@@ -1,4 +1,5 @@
 import schemaDUrl from '../svgs/lacan graph of desire_4.svg?url'
+import schemaDGalleryUrl from '../pngs/lacan-graph-of-desire_4.png'
 import { InteractiveSchemaFrame, type SchemaNodeConfig } from './schema/InteractiveSchemaFrame'
 import { useSchemaInteraction } from './schema/useSchemaInteraction'
 
@@ -20,12 +21,13 @@ const NODES: SchemaNodeConfig<NodeId>[] = [
 
 export default function SchemaD({ isExpanded = false, onNodesSelected }: SchemaDProps) {
   const { selectedNodes, hoveredNode, setHoveredNode, handleNodeClick } = useSchemaInteraction<NodeId>(onNodesSelected)
+  const imageUrl = isExpanded ? schemaDUrl : schemaDGalleryUrl
 
   return (
     <InteractiveSchemaFrame
       isExpanded={isExpanded}
       title="Graph of Desire"
-      imageUrl={schemaDUrl}
+      imageUrl={imageUrl}
       imageAlt="Graph of Desire"
       viewBox="0 0 207.658 194.922"
       nodes={NODES}

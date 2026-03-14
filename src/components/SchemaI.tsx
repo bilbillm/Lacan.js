@@ -1,4 +1,5 @@
 import schemaIUrl from '../svgs/lacan schema I_1.svg?url'
+import schemaIGalleryUrl from '../pngs/lacan-schema-I_1.png'
 import { InteractiveSchemaFrame, type SchemaNodeConfig } from './schema/InteractiveSchemaFrame'
 import { useSchemaInteraction } from './schema/useSchemaInteraction'
 
@@ -20,12 +21,13 @@ const NODES: SchemaNodeConfig<NodeId>[] = [
 
 export default function SchemaI({ isExpanded = false, onNodesSelected }: SchemaIProps) {
   const { selectedNodes, hoveredNode, setHoveredNode, handleNodeClick } = useSchemaInteraction<NodeId>(onNodesSelected)
+  const imageUrl = isExpanded ? schemaIUrl : schemaIGalleryUrl
 
   return (
     <InteractiveSchemaFrame
       isExpanded={isExpanded}
       title="Schema I"
-      imageUrl={schemaIUrl}
+      imageUrl={imageUrl}
       imageAlt="Schema I"
       viewBox="0 0 227.757 150.84"
       nodes={NODES}
