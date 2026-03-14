@@ -82,6 +82,7 @@ function App() {
 
       <PanelGallery
         pageGroup={pageGroup}
+        totalPages={totalPages}
         currentPanels={currentPanels}
         randomOrder={randomOrder}
         selectedId={selectedId}
