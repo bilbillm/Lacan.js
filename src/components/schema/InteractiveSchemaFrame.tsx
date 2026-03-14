@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 interface SchemaNodeConfig<NodeId extends string> {
   id: NodeId
   cx: number
@@ -44,9 +46,11 @@ export function InteractiveSchemaFrame<NodeId extends string>({
         <img
           src={imageUrl}
           alt={imageAlt}
-          className="w-full h-full max-w-full max-h-full"
+          className="w-full h-full object-contain"
           style={{
             display: 'block',
+            maxWidth: '100%',
+            maxHeight: '100%',
             filter: 'invert(1) opacity(0.8)',
           }}
         />
@@ -66,9 +70,8 @@ export function InteractiveSchemaFrame<NodeId extends string>({
             const isHovered = hoveredNode === node.id
 
             return (
-              <>
+              <Fragment key={node.id}>
                 <circle
-                  key={`${node.id}-circle`}
                   cx={node.cx}
                   cy={node.cy}
                   r={node.r}
@@ -79,7 +82,6 @@ export function InteractiveSchemaFrame<NodeId extends string>({
                   strokeDasharray={isHovered && !isSelected ? '4 2' : '0'}
                 />
                 <foreignObject
-                  key={`${node.id}-button`}
                   x={node.cx - node.r}
                   y={node.cy - node.r}
                   width={node.r * 2}
@@ -95,7 +97,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
                     onClick={() => onNodeClick(node.id)}
                   />
                 </foreignObject>
-              </>
+              </Fragment>
             )
           })}
         </svg>
