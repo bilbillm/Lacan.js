@@ -1,4 +1,9 @@
 import { motion } from 'framer-motion'
+import {
+  HEADER_SUBTITLE_DURATION_MS,
+  HEADER_SUBTITLE_STAGGER_MS,
+  HEADER_TITLE_DURATION_MS,
+} from './uiConstants'
 
 interface AppHeaderProps {
   selectedId: string | null
@@ -72,13 +77,13 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
         animate={selectedId ? 'blurred' : 'visible'}
         transition={{
           opacity: shouldAnimateEntry
-            ? { delay: entryDelaySeconds, duration: 0.8, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           filter: shouldAnimateEntry
-            ? { delay: entryDelaySeconds, duration: 0.8, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           y: shouldAnimateEntry
-            ? { delay: entryDelaySeconds, duration: 0.8, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
           textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity },
@@ -93,13 +98,13 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
         animate={selectedId ? 'blurred' : 'visible'}
         transition={{
           opacity: shouldAnimateEntry
-            ? { delay: entryDelaySeconds + 0.25, duration: 0.7, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           filter: shouldAnimateEntry
-            ? { delay: entryDelaySeconds + 0.25, duration: 0.7, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           y: shouldAnimateEntry
-            ? { delay: entryDelaySeconds + 0.25, duration: 0.7, ease: 'easeOut' }
+            ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
           textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity, delay: 0.5 },
