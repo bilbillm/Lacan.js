@@ -1,26 +1,23 @@
 import { useCallback, useState } from 'react'
 
+export function getNextSelectedNodes<NodeId extends string>(currentSelectedNodes: NodeId[], nodeId: NodeId) {
+  return currentSelectedNodes.includes(nodeId)
+    ? currentSelectedNodes.filter(node => node !== nodeId)
+    : currentSelectedNodes.length >= 2
+      ? [nodeId]
+      : [...currentSelectedNodes, nodeId]
+}
+
 export function useSchemaInteraction<NodeId extends string>(
-  onNodesSelected?: (node1: NodeId, node2: NodeId) => void,
+  selectedNodes: NodeId[],
+  onSelectionChange?: (nodeIds: NodeId[]) => void,
 ) {
-  const [selectedNodes, setSelectedNodes] = useState<NodeId[]>([])
   const [hoveredNode, setHoveredNode] = useState<NodeId | null>(null)
 
   const handleNodeClick = useCallback((nodeId: NodeId) => {
-    setSelectedNodes(prev => {
-      const newSelected = prev.includes(nodeId)
-        ? prev.filter(node => node !== nodeId)
-        : prev.length >= 2
-          ? [nodeId]
-          : [...prev, nodeId]
-
-      if (newSelected.length === 2 && onNodesSelected) {
-        onNodesSelected(newSelected[0], newSelected[1])
-      }
-
-      return newSelected
-    })
-  }, [onNodesSelected])
+    const newSelected = getNextSelectedNodes(selectedNodes, nodeId)
+    onSelectionChange?.(newSelected)
+  }, [onSelectionChange, selectedNodes])
 
   return {
     selectedNodes,

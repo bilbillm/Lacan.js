@@ -7,7 +7,19 @@ import {
   type InteractiveSchemaComponent,
   type NonInteractiveSchemaComponent,
 } from './panelSchemaRegistry'
-import { GALLERY_CARD_HEIGHT, GALLERY_CARD_WIDTH } from './uiConstants'
+import {
+  GALLERY_CARD_ENTRY_DURATION_S,
+  GALLERY_CARD_HEIGHT,
+  GALLERY_CARD_REENTER_DURATION_S,
+  GALLERY_CARD_STAGGER_S,
+  GALLERY_CARD_WIDTH,
+  GALLERY_PAGE_FADE_DURATION_S,
+  PROGRESS_BAR_ENTRY_DURATION_S,
+  PROGRESS_BAR_TRACK_DURATION_S,
+  PROGRESS_BAR_UPDATE_DURATION_S,
+  PROGRESS_LABEL_ENTRY_DURATION_S,
+  PROGRESS_LABEL_STAGGER_S,
+} from './uiConstants'
 
 interface PanelGalleryProps {
   pageGroup: number
@@ -15,10 +27,11 @@ interface PanelGalleryProps {
   currentPanels: PanelData[]
   randomOrder: number[]
   selectedId: string | null
+  selectedNodeState: { panelId: string; nodeIds: string[] } | null
   isAppLoaded: boolean
   cardEntryStartDelayMs: number
   onSelectPanel: (id: string) => void
-  onNodesSelected: (node1: string, node2: string) => void
+  onSelectionChange: (panelId: string, nodeIds: string[]) => void
   SchemaL: InteractiveSchemaComponent
   SchemaR: NonInteractiveSchemaComponent
   SchemaI: InteractiveSchemaComponent
@@ -32,10 +45,11 @@ export default function PanelGallery({
   currentPanels,
   randomOrder,
   selectedId,
+  selectedNodeState,
   isAppLoaded,
   cardEntryStartDelayMs,
   onSelectPanel,
-  onNodesSelected,
+  onSelectionChange,
   SchemaL,
   SchemaR,
   SchemaI,
@@ -43,7 +57,7 @@ export default function PanelGallery({
   onWheelNavigate,
 }: PanelGalleryProps) {
   const progress = ((pageGroup + 1) / totalPages) * 100
-  const cardEntryMaxDelay = Math.max(...currentPanels.map((_, index) => randomOrder.indexOf(index) * 0.15))
+  const cardEntryMaxDelay = Math.max(...currentPanels.map((_, index) => randomOrder.indexOf(index) * GALLERY_CARD_STAGGER_S))
   const progressEntryDelay = cardEntryStartDelayMs / 1000 + cardEntryMaxDelay + 0.5
 
   return (
@@ -55,7 +69,7 @@ export default function PanelGallery({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: GALLERY_PAGE_FADE_DURATION_S }}
           onWheel={(event) => {
             event.preventDefault()
             onWheelNavigate(event.deltaY)
@@ -63,13 +77,14 @@ export default function PanelGallery({
         >
           {currentPanels.map((panel, index) => {
             // 随机进场顺序
-            const delay = cardEntryStartDelayMs / 1000 + randomOrder.indexOf(index) * 0.15
+            const delay = cardEntryStartDelayMs / 1000 + randomOrder.indexOf(index) * GALLERY_CARD_STAGGER_S
             const isSelected = selectedId === panel.id
             const cardTransition = {
               delay: isAppLoaded ? 0 : delay,
-              duration: isAppLoaded ? 0.32 : 0.5,
+              duration: isAppLoaded ? GALLERY_CARD_REENTER_DURATION_S : GALLERY_CARD_ENTRY_DURATION_S,
               ease: 'easeOut' as const,
             }
+            const currentSelectedNodes = selectedNodeState?.panelId === panel.id ? selectedNodeState.nodeIds : []
             const resolvedSchema = resolvePanelSchema(panel.id, {
               SchemaL,
               SchemaR,
@@ -114,7 +129,11 @@ export default function PanelGallery({
                         }
                       >
                         {resolvedSchema.interactive ? (
-                          <resolvedSchema.Component isExpanded={false} onNodesSelected={onNodesSelected} />
+                          <resolvedSchema.Component
+                            isExpanded={false}
+                            selectedNodes={currentSelectedNodes}
+                            onSelectionChange={(nodeIds) => onSelectionChange(panel.id, nodeIds)}
+                          />
                         ) : (
                           <resolvedSchema.Component isExpanded={false} />
                         )}
@@ -178,9 +197,9 @@ export default function PanelGallery({
               animate={{ width: '100%', opacity: 1 }}
               transition={
                 isAppLoaded
-                  ? { width: { duration: 0.24, ease: 'easeOut' }, opacity: { duration: 0.18 } }
+                  ? { width: { duration: PROGRESS_BAR_TRACK_DURATION_S, ease: 'easeOut' }, opacity: { duration: GALLERY_PAGE_FADE_DURATION_S } }
                   : {
-                      width: { delay: progressEntryDelay, duration: 0.65, ease: 'easeOut' },
+                      width: { delay: progressEntryDelay, duration: PROGRESS_BAR_ENTRY_DURATION_S, ease: 'easeOut' },
                       opacity: { delay: progressEntryDelay, duration: 0.2, ease: 'easeOut' },
                     }
               }
@@ -194,9 +213,9 @@ export default function PanelGallery({
               animate={{ width: `${progress}%`, opacity: 1 }}
               transition={
                 isAppLoaded
-                  ? { width: { duration: 0.26, ease: 'easeOut' }, opacity: { duration: 0.2 } }
+                  ? { width: { duration: PROGRESS_BAR_UPDATE_DURATION_S, ease: 'easeOut' }, opacity: { duration: 0.2 } }
                   : {
-                      width: { delay: progressEntryDelay, duration: 0.65, ease: 'easeOut' },
+                      width: { delay: progressEntryDelay, duration: PROGRESS_BAR_ENTRY_DURATION_S, ease: 'easeOut' },
                       opacity: { delay: progressEntryDelay, duration: 0.2, ease: 'easeOut' },
                     }
               }
@@ -211,8 +230,8 @@ export default function PanelGallery({
             initial={isAppLoaded ? false : { opacity: 0, y: 6, filter: 'blur(3px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{
-              delay: isAppLoaded ? 0 : progressEntryDelay + 0.08,
-              duration: 0.35,
+              delay: isAppLoaded ? 0 : progressEntryDelay + PROGRESS_LABEL_STAGGER_S,
+              duration: PROGRESS_LABEL_ENTRY_DURATION_S,
               ease: 'easeOut',
             }}
           >

@@ -7,15 +7,15 @@ import {
   type InteractiveSchemaComponent,
   type NonInteractiveSchemaComponent,
 } from './panelSchemaRegistry'
-import { FOCUS_EXIT_MS, FOCUS_PANEL_MAX_HEIGHT, FOCUS_PANEL_MAX_WIDTH } from './uiConstants'
+import { FOCUS_BACKDROP_FADE_S, FOCUS_EXIT_MS, FOCUS_PANEL_MAX_HEIGHT, FOCUS_PANEL_MAX_WIDTH } from './uiConstants'
 
 interface FocusViewProps {
   selectedId: string | null
   selectedPanel?: PanelData
-  selectedNodes: [string, string] | null
+  selectedNodes: string[]
   isExitingFocus: boolean
   onExitFocus: () => void
-  onNodesSelected: (node1: string, node2: string) => void
+  onSelectionChange: (panelId: string, nodeIds: string[]) => void
   SchemaL: InteractiveSchemaComponent
   SchemaR: NonInteractiveSchemaComponent
   SchemaI: InteractiveSchemaComponent
@@ -28,7 +28,7 @@ export default function FocusView({
   selectedNodes,
   isExitingFocus,
   onExitFocus,
-  onNodesSelected,
+  onSelectionChange,
   SchemaL,
   SchemaR,
   SchemaI,
@@ -54,7 +54,7 @@ export default function FocusView({
             animate={{ opacity: isExitingFocus ? 0 : 1 }}
             exit={{ opacity: 0 }}
             onClick={onExitFocus}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: FOCUS_BACKDROP_FADE_S, ease: 'easeOut' }}
             style={{
               background: 'rgba(0, 0, 0, 0.2)',
             }}
@@ -66,7 +66,7 @@ export default function FocusView({
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-600"
               style={{
                 transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                left: selectedNodes ? '30%' : '50%',
+                left: selectedNodes.length === 2 ? '30%' : '50%',
               }}
             >
               <GlassPanel
@@ -91,12 +91,16 @@ export default function FocusView({
                         </span>
                       </div>
                     }
-                  >
-                    {resolvedSchema.interactive ? (
-                      <resolvedSchema.Component isExpanded={true} onNodesSelected={onNodesSelected} />
-                    ) : (
-                      <resolvedSchema.Component isExpanded={true} />
-                    )}
+                      >
+                        {resolvedSchema.interactive ? (
+                          <resolvedSchema.Component
+                            isExpanded={true}
+                            selectedNodes={selectedNodes}
+                            onSelectionChange={(nodeIds) => onSelectionChange(selectedPanel.id, nodeIds)}
+                          />
+                        ) : (
+                          <resolvedSchema.Component isExpanded={true} />
+                        )}
                   </Suspense>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -111,7 +115,7 @@ export default function FocusView({
 
           {/* Right-side panel - appears when nodes selected */}
           <AnimatePresence>
-            {selectedNodes && (
+            {selectedNodes.length === 2 && (
               <motion.div
                 className="absolute inset-0 z-50 flex items-center justify-end pointer-events-none"
                 initial={{ opacity: 0, x: 100 }}

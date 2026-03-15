@@ -21,7 +21,7 @@ const SchemaD = lazy(() => import('./components/SchemaD'))
 function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [isAppLoaded, setIsAppLoaded] = useState(false)
-  const [selectedNodes, setSelectedNodes] = useState<[string, string] | null>(null)
+  const [selectedNodeState, setSelectedNodeState] = useState<{ panelId: string; nodeIds: string[] } | null>(null)
   const [pageGroup, setPageGroup] = useState(0)
   const [isExitingFocus, setIsExitingFocus] = useState(false)
 
@@ -32,15 +32,16 @@ function App() {
 
   const selectedPanel = panels.find(p => p.id === selectedId)
 
-  // 处理节点选择 - 当选择两个节点时
-  const handleNodesSelected = (node1: string, node2: string) => {
-    setSelectedNodes([node1, node2])
+  const selectedNodes = selectedNodeState?.panelId === selectedId ? selectedNodeState.nodeIds : []
+
+  const handleSelectionChange = (panelId: string, nodeIds: string[]) => {
+    setSelectedNodeState(nodeIds.length > 0 ? { panelId, nodeIds } : null)
   }
 
   // 处理退出聚焦（先清除节点选择，触发退场动画后再退出聚焦）
   const handleExitFocus = () => {
     setIsExitingFocus(true)
-    setSelectedNodes(null)
+    setSelectedNodeState(null)
     setSelectedId(null)
     setTimeout(() => {
       setIsExitingFocus(false)
@@ -86,10 +87,11 @@ function App() {
         currentPanels={currentPanels}
         randomOrder={randomOrder}
         selectedId={selectedId}
+        selectedNodeState={selectedNodeState}
         isAppLoaded={isAppLoaded}
         cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
         onSelectPanel={setSelectedId}
-        onNodesSelected={handleNodesSelected}
+        onSelectionChange={handleSelectionChange}
         SchemaL={SchemaL}
         SchemaR={SchemaR}
         SchemaI={SchemaI}
@@ -103,7 +105,7 @@ function App() {
         selectedNodes={selectedNodes}
         isExitingFocus={isExitingFocus}
         onExitFocus={handleExitFocus}
-        onNodesSelected={handleNodesSelected}
+        onSelectionChange={handleSelectionChange}
         SchemaL={SchemaL}
         SchemaR={SchemaR}
         SchemaI={SchemaI}

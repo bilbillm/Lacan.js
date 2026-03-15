@@ -5,7 +5,8 @@ import { useSchemaInteraction } from './schema/useSchemaInteraction'
 
 interface SchemaDProps {
   isExpanded?: boolean
-  onNodesSelected?: (node1: string, node2: string) => void
+  selectedNodes?: string[]
+  onSelectionChange?: (nodeIds: string[]) => void
 }
 
 type NodeId = 'S' | 'O' | 'D' | 'a'
@@ -19,8 +20,9 @@ const NODES: SchemaNodeConfig<NodeId>[] = [
   { id: 'a', cx: 164.31, cy: 120.51, r: 10 },   // 右下 a
 ]
 
-export default function SchemaD({ isExpanded = false, onNodesSelected }: SchemaDProps) {
-  const { selectedNodes, hoveredNode, setHoveredNode, handleNodeClick } = useSchemaInteraction<NodeId>(onNodesSelected)
+export default function SchemaD({ isExpanded = false, selectedNodes = [], onSelectionChange }: SchemaDProps) {
+  const typedSelectedNodes = selectedNodes.filter((node): node is NodeId => NODES.some(({ id }) => id === node))
+  const { hoveredNode, setHoveredNode, handleNodeClick } = useSchemaInteraction<NodeId>(typedSelectedNodes, onSelectionChange)
   const imageUrl = isExpanded ? schemaDUrl : schemaDGalleryUrl
 
   return (
@@ -31,7 +33,7 @@ export default function SchemaD({ isExpanded = false, onNodesSelected }: SchemaD
       imageAlt="Graph of Desire"
       viewBox="0 0 207.658 194.922"
       nodes={NODES}
-      selectedNodes={selectedNodes}
+      selectedNodes={typedSelectedNodes}
       hoveredNode={hoveredNode}
       onNodeHover={setHoveredNode}
       onNodeClick={handleNodeClick}

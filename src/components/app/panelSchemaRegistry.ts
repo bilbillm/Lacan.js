@@ -1,9 +1,11 @@
 import type { LazyExoticComponent, ComponentType } from 'react'
+import { panels, type PanelDefinition } from './panels'
 
 export type InteractiveSchemaComponent = LazyExoticComponent<
   ComponentType<{
     isExpanded?: boolean
-    onNodesSelected?: (node1: string, node2: string) => void
+    selectedNodes?: string[]
+    onSelectionChange?: (nodeIds: string[]) => void
   }>
 >
 
@@ -20,18 +22,7 @@ export interface PanelSchemaComponents {
   SchemaD: InteractiveSchemaComponent
 }
 
-type PanelSchemaKey = keyof PanelSchemaComponents
-
-interface PanelSchemaRegistryEntry {
-  schema: PanelSchemaKey
-}
-
-const panelSchemaRegistry: Record<string, PanelSchemaRegistryEntry> = {
-  'panel-1': { schema: 'SchemaL' },
-  'panel-2': { schema: 'SchemaR' },
-  'panel-3': { schema: 'SchemaI' },
-  'panel-4': { schema: 'SchemaD' },
-}
+const panelDefinitionMap = new Map<string, PanelDefinition>(panels.map(panel => [panel.id, panel]))
 
 export type ResolvedPanelSchema =
   | { interactive: true; Component: InteractiveSchemaComponent }
@@ -41,21 +32,21 @@ export function resolvePanelSchema(
   panelId: string,
   components: PanelSchemaComponents,
 ): ResolvedPanelSchema | null {
-  const entry = panelSchemaRegistry[panelId]
+  const entry = panelDefinitionMap.get(panelId)
 
-  if (!entry) {
+  if (!entry?.schemaKey) {
     return null
   }
 
-  if (entry.schema === 'SchemaR') {
+  if (!entry.interactive) {
     return {
       interactive: false,
-      Component: components.SchemaR,
+      Component: components[entry.schemaKey] as NonInteractiveSchemaComponent,
     }
   }
 
   return {
     interactive: true,
-    Component: components[entry.schema],
+    Component: components[entry.schemaKey] as InteractiveSchemaComponent,
   }
 }

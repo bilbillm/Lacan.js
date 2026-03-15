@@ -5,7 +5,8 @@ import { useSchemaInteraction } from './schema/useSchemaInteraction'
 
 interface SchemaIProps {
   isExpanded?: boolean
-  onNodesSelected?: (node1: string, node2: string) => void
+  selectedNodes?: string[]
+  onSelectionChange?: (nodeIds: string[]) => void
 }
 
 type NodeId = 'S' | 'O' | 'Sym' | 'Im'
@@ -19,8 +20,9 @@ const NODES: SchemaNodeConfig<NodeId>[] = [
   { id: 'Im', cx: 14.17, cy: 126.18, r: 8 },   // 左下 Im
 ]
 
-export default function SchemaI({ isExpanded = false, onNodesSelected }: SchemaIProps) {
-  const { selectedNodes, hoveredNode, setHoveredNode, handleNodeClick } = useSchemaInteraction<NodeId>(onNodesSelected)
+export default function SchemaI({ isExpanded = false, selectedNodes = [], onSelectionChange }: SchemaIProps) {
+  const typedSelectedNodes = selectedNodes.filter((node): node is NodeId => NODES.some(({ id }) => id === node))
+  const { hoveredNode, setHoveredNode, handleNodeClick } = useSchemaInteraction<NodeId>(typedSelectedNodes, onSelectionChange)
   const imageUrl = isExpanded ? schemaIUrl : schemaIGalleryUrl
 
   return (
@@ -31,7 +33,7 @@ export default function SchemaI({ isExpanded = false, onNodesSelected }: SchemaI
       imageAlt="Schema I"
       viewBox="0 0 227.757 150.84"
       nodes={NODES}
-      selectedNodes={selectedNodes}
+      selectedNodes={typedSelectedNodes}
       hoveredNode={hoveredNode}
       onNodeHover={setHoveredNode}
       onNodeClick={handleNodeClick}
