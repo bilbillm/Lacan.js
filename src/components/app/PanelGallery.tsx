@@ -10,10 +10,14 @@ import {
 import {
   GALLERY_CARD_ENTRY_DURATION_S,
   GALLERY_CARD_HEIGHT,
+  GALLERY_LAYOUT_TOKENS,
+  GALLERY_MOBILE_CARD_HEIGHT,
+  GALLERY_MOBILE_CARD_MAX_WIDTH,
   GALLERY_CARD_REENTER_DURATION_S,
   GALLERY_CARD_STAGGER_S,
   GALLERY_CARD_WIDTH,
   GALLERY_PAGE_FADE_DURATION_S,
+  GALLERY_PROGRESS_TOKENS,
   PROGRESS_BAR_ENTRY_DURATION_S,
   PROGRESS_BAR_TRACK_DURATION_S,
   PROGRESS_BAR_UPDATE_DURATION_S,
@@ -30,6 +34,7 @@ interface PanelGalleryProps {
   selectedNodeState: { panelId: string; nodeIds: string[] } | null
   isAppLoaded: boolean
   cardEntryStartDelayMs: number
+  isMobileViewport: boolean
   onSelectPanel: (id: string) => void
   onSelectionChange: (panelId: string, nodeIds: string[]) => void
   SchemaL: InteractiveSchemaComponent
@@ -48,6 +53,7 @@ export default function PanelGallery({
   selectedNodeState,
   isAppLoaded,
   cardEntryStartDelayMs,
+  isMobileViewport,
   onSelectPanel,
   onSelectionChange,
   SchemaL,
@@ -59,19 +65,32 @@ export default function PanelGallery({
   const progress = ((pageGroup + 1) / totalPages) * 100
   const cardEntryMaxDelay = Math.max(...currentPanels.map((_, index) => randomOrder.indexOf(index) * GALLERY_CARD_STAGGER_S))
   const progressEntryDelay = cardEntryStartDelayMs / 1000 + cardEntryMaxDelay + 0.5
+  const galleryLayout = isMobileViewport ? GALLERY_LAYOUT_TOKENS.mobile : GALLERY_LAYOUT_TOKENS.desktop
+  const progressTokens = isMobileViewport ? GALLERY_PROGRESS_TOKENS.mobile : GALLERY_PROGRESS_TOKENS.desktop
+  const galleryCardWidth = isMobileViewport ? '100%' : GALLERY_CARD_WIDTH
+  const galleryCardHeight = isMobileViewport ? GALLERY_MOBILE_CARD_HEIGHT : GALLERY_CARD_HEIGHT
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center px-12 pt-24">
+    <div className="panel-gallery-shell absolute inset-0 flex items-center justify-center" data-testid="panel-gallery">
       <AnimatePresence mode="wait">
         <motion.div
           key={pageGroup}
-          className="grid grid-cols-4 gap-8 w-full max-w-7xl pointer-events-auto"
+          className="grid w-full pointer-events-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: GALLERY_PAGE_FADE_DURATION_S }}
+          style={{
+            gridTemplateColumns: `repeat(${galleryLayout.columns}, minmax(0, 1fr))`,
+            gap: `${galleryLayout.gap}px`,
+            maxWidth: `${galleryLayout.maxWidth ?? GALLERY_MOBILE_CARD_MAX_WIDTH}px`,
+            justifyItems: isMobileViewport ? 'center' : 'stretch',
+          }}
           onWheel={(event) => {
-            event.preventDefault()
+            if (isMobileViewport) {
+              return
+            }
+
             onWheelNavigate(event.deltaY)
           }}
         >
@@ -94,7 +113,9 @@ export default function PanelGallery({
             return (
               <motion.div
                 key={panel.id}
+                data-testid={`panel-card-${panel.id}`}
                 layout
+                className={isMobileViewport ? 'w-full' : undefined}
                 initial={isAppLoaded ? false : { opacity: 0, y: 30, filter: 'blur(5px)' }}
                 animate={
                   selectedId
@@ -107,26 +128,35 @@ export default function PanelGallery({
                 {/* 包裹容器 */}
                 <div
                   className="relative flex flex-col items-center"
-                  style={{ overflow: 'visible' }}
+                  style={{
+                    overflow: 'visible',
+                    width: '100%',
+                    maxWidth: isMobileViewport ? `${GALLERY_MOBILE_CARD_MAX_WIDTH}px` : undefined,
+                    cursor: isMobileViewport ? 'pointer' : undefined,
+                  }}
                 >
                   {/* 主面板 */}
                   <GlassPanel
                     layoutId={panel.id}
-                    width={GALLERY_CARD_WIDTH}
-                    height={GALLERY_CARD_HEIGHT}
+                    width={galleryCardWidth}
+                    height={galleryCardHeight}
                     onClick={() => onSelectPanel(panel.id)}
                     className="cursor-pointer"
                     deferVisualEnhancement={!isAppLoaded}
+                    isMobileViewport={isMobileViewport}
+                    style={{
+                      maxWidth: isMobileViewport ? GALLERY_MOBILE_CARD_MAX_WIDTH : undefined,
+                    }}
                   >
                     {resolvedSchema ? (
                       <Suspense
                         fallback={
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-xl font-light tracking-widest text-white/40">
-                              {panel.title}
-                            </span>
-                          </div>
-                        }
+                            <div className="w-full h-full flex items-center justify-center">
+                              <span className="text-xl font-light tracking-widest text-white/40">
+                                {panel.galleryLabel ?? panel.title}
+                              </span>
+                            </div>
+                          }
                       >
                         {resolvedSchema.interactive ? (
                           <resolvedSchema.Component
@@ -141,7 +171,7 @@ export default function PanelGallery({
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <span className="text-xl font-light tracking-widest text-white/40">
-                          {panel.title}
+                          {panel.galleryLabel ?? panel.title}
                         </span>
                       </div>
                     )}
@@ -149,7 +179,7 @@ export default function PanelGallery({
 
                   <div
                     className="absolute top-full left-1/2 pointer-events-none"
-                    style={{ transform: 'translateX(-50%) translateY(112px)' }}
+                    style={{ transform: `translateX(-50%) translateY(${galleryLayout.reflectionOffsetY}px)` }}
                   >
                     <motion.div
                       className="rounded-[1.6rem]"
@@ -158,11 +188,11 @@ export default function PanelGallery({
                       exit={{ y: -120 }}
                       transition={cardTransition}
                       style={{
-                        width: GALLERY_CARD_WIDTH,
-                        height: Math.round(GALLERY_CARD_HEIGHT * 0.41),
+                        width: galleryCardWidth,
+                        height: Math.round(galleryCardHeight * galleryLayout.reflectionHeightRatio),
                         transform: 'scaleX(-1)',
                         transformOrigin: 'top center',
-                        opacity: 0.34,
+                        opacity: galleryLayout.reflectionOpacity,
                         background: 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.08) 22%, rgba(255,255,255,0.02) 46%, transparent 82%)',
                         filter: 'blur(12px)',
                         maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
@@ -178,15 +208,16 @@ export default function PanelGallery({
       </AnimatePresence>
 
       <motion.div
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+        className="progress-indicator-shell absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+        data-testid="progress-indicator"
         animate={selectedId ? { opacity: 0, filter: 'blur(5px)' } : { opacity: 1, filter: 'blur(0px)' }}
         transition={{ duration: 0.28, ease: 'easeOut' }}
       >
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2" style={{ width: `min(${progressTokens.widthViewport}vw, ${progressTokens.maxWidth}px)` }}>
           <motion.div
             className="relative overflow-hidden rounded-full"
             style={{
-              width: 'min(38vw, 360px)',
+              width: '100%',
               height: '2px',
               boxShadow: '0 0 10px rgba(255,255,255,0.08)',
             }}
@@ -226,13 +257,17 @@ export default function PanelGallery({
             />
           </motion.div>
           <motion.span
-            className="text-[0.65rem] font-light tracking-[0.28em] text-white/35"
+            className="font-light text-white/35"
             initial={isAppLoaded ? false : { opacity: 0, y: 6, filter: 'blur(3px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{
               delay: isAppLoaded ? 0 : progressEntryDelay + PROGRESS_LABEL_STAGGER_S,
               duration: PROGRESS_LABEL_ENTRY_DURATION_S,
               ease: 'easeOut',
+            }}
+            style={{
+              fontSize: `${progressTokens.labelFontRem}rem`,
+              letterSpacing: `${progressTokens.labelTrackingEm}em`,
             }}
           >
             {String(pageGroup + 1).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
