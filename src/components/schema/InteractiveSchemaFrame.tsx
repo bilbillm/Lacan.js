@@ -56,7 +56,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
         />
 
         <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
+          className="absolute inset-0 w-full h-full"
           viewBox={viewBox}
           preserveAspectRatio="xMidYMid meet"
           style={{
@@ -75,7 +75,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
                   cx={node.cx}
                   cy={node.cy}
                   r={node.r}
-                  className="transition-all duration-200"
+                  className="pointer-events-none transition-all duration-200"
                   fill="transparent"
                   stroke={isSelected ? '#fff' : isHovered ? 'rgba(255,255,255,0.6)' : 'transparent'}
                   strokeWidth={isSelected ? 3 : isHovered ? 2 : 0}
@@ -92,6 +92,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
                     type="button"
                     aria-label={`Select node ${node.id}`}
                     className="w-full h-full cursor-pointer rounded-full bg-transparent border-0 p-0"
+                    onPointerDown={(event) => event.preventDefault()}
                     onMouseEnter={() => onNodeHover(node.id)}
                     onMouseLeave={() => onNodeHover(null)}
                     onClick={() => onNodeClick(node.id)}

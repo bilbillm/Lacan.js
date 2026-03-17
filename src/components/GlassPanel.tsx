@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { GLASS_PANEL_RESPONSIVE_TOKENS } from './app/uiConstants'
 
 interface GlassPanelProps {
   children?: React.ReactNode
@@ -11,6 +12,7 @@ interface GlassPanelProps {
   style?: React.CSSProperties
   disableParallax?: boolean
   deferVisualEnhancement?: boolean
+  isMobileViewport?: boolean
 }
 
 export default function GlassPanel({
@@ -23,6 +25,7 @@ export default function GlassPanel({
   style,
   disableParallax = false,
   deferVisualEnhancement = false,
+  isMobileViewport = false,
 }: GlassPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -208,7 +211,18 @@ export default function GlassPanel({
         />
 
         {/* Inner content area */}
-        <div className="absolute inset-6 rounded-xl overflow-hidden" style={{ transform: 'translateZ(10px)' }}>
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            inset: isMobileViewport
+              ? GLASS_PANEL_RESPONSIVE_TOKENS.contentInset.mobile
+              : GLASS_PANEL_RESPONSIVE_TOKENS.contentInset.desktop,
+            borderRadius: isMobileViewport
+              ? GLASS_PANEL_RESPONSIVE_TOKENS.contentRadius.mobile
+              : GLASS_PANEL_RESPONSIVE_TOKENS.contentRadius.desktop,
+            transform: 'translateZ(10px)',
+          }}
+        >
           {children || (
             <div className="w-full h-full flex items-center justify-center text-white/20">
               <span className="text-sm font-light tracking-widest">CONTENT</span>
