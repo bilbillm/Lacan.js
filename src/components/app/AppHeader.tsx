@@ -72,6 +72,7 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
       ? {
           maxWidth: HEADER_RESPONSIVE_TOKENS.containerMaxWidth.mobile,
           paddingInline: '0.25rem',
+          margin: '0 auto',
         }
       : {
           maxWidth: HEADER_RESPONSIVE_TOKENS.containerMaxWidth.desktop,

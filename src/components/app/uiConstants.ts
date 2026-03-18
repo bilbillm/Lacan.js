@@ -14,7 +14,7 @@ export const RESPONSIVE_SIZE_TOKENS = {
   },
   shellPaddingTop: {
     desktop: 96,
-    mobile: 88,
+    mobile: 148,
   },
   shellPaddingBottom: {
     desktop: 48,
@@ -34,7 +34,7 @@ export const RESPONSIVE_SIZE_TOKENS = {
   },
   focusPaddingBlock: {
     desktop: 0,
-    mobile: 20,
+    mobile: 80,
   },
 } as const
 
@@ -94,8 +94,8 @@ export const WHEEL_NAV_THRESHOLD = 30
 export const GALLERY_CARD_WIDTH = 252
 export const GALLERY_CARD_HEIGHT = 368
 
-export const GALLERY_MOBILE_CARD_MAX_WIDTH = 336
-export const GALLERY_MOBILE_CARD_HEIGHT = 280
+export const GALLERY_MOBILE_CARD_MAX_WIDTH = 164
+export const GALLERY_MOBILE_CARD_HEIGHT = 200
 
 export const GALLERY_LAYOUT_TOKENS = {
   desktop: {
@@ -107,12 +107,12 @@ export const GALLERY_LAYOUT_TOKENS = {
     reflectionOpacity: 0.34,
   },
   mobile: {
-    columns: 1,
-    gap: 20,
-    maxWidth: GALLERY_MOBILE_CARD_MAX_WIDTH,
-    reflectionOffsetY: 56,
-    reflectionHeightRatio: 0.24,
-    reflectionOpacity: 0.18,
+    columns: 2,
+    gap: 12,
+    maxWidth: 360,
+    reflectionOffsetY: 36,
+    reflectionHeightRatio: 0.18,
+    reflectionOpacity: 0.14,
   },
 } as const
 
