@@ -26,3 +26,5 @@ dist-ssr
 # Tool artifacts
 .sisyphus/
 %TEMP%/
+_tmp_refs/react-router/
+_tmp_refs/storybook/
