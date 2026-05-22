@@ -16,7 +16,7 @@ import {
   GALLERY_CARD_REENTER_DURATION_S,
   GALLERY_CARD_STAGGER_S,
   GALLERY_CARD_WIDTH,
-  GALLERY_PAGE_FADE_DURATION_S,
+  GALLERY_PAGE_SLIDE_DURATION_S,
   GALLERY_PROGRESS_TOKENS,
   PROGRESS_BAR_ENTRY_DURATION_S,
   PROGRESS_BAR_TRACK_DURATION_S,
@@ -76,10 +76,9 @@ export default function PanelGallery({
         <motion.div
           key={pageGroup}
           className="grid w-full pointer-events-auto"
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: GALLERY_PAGE_FADE_DURATION_S }}
+          transition={{ duration: 0 }}
           style={{
             gridTemplateColumns: `repeat(${galleryLayout.columns}, minmax(0, 1fr))`,
             gap: `${galleryLayout.gap}px`,
@@ -87,6 +86,7 @@ export default function PanelGallery({
             justifyItems: isMobileViewport ? 'center' : 'stretch',
           }}
           onWheel={(event) => {
+            event.stopPropagation()
             if (isMobileViewport) {
               return
             }
@@ -228,7 +228,7 @@ export default function PanelGallery({
               animate={{ width: '100%', opacity: 1 }}
               transition={
                 isAppLoaded
-                  ? { width: { duration: PROGRESS_BAR_TRACK_DURATION_S, ease: 'easeOut' }, opacity: { duration: GALLERY_PAGE_FADE_DURATION_S } }
+                  ? { width: { duration: PROGRESS_BAR_TRACK_DURATION_S, ease: 'easeOut' }, opacity: { duration: GALLERY_PAGE_SLIDE_DURATION_S } }
                   : {
                       width: { delay: progressEntryDelay, duration: PROGRESS_BAR_ENTRY_DURATION_S, ease: 'easeOut' },
                       opacity: { delay: progressEntryDelay, duration: 0.2, ease: 'easeOut' },

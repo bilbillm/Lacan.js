@@ -1,9 +1,10 @@
-import { useState, useMemo, useEffect, lazy, type CSSProperties } from 'react'
+import { useState, useMemo, useEffect, lazy, Suspense, type CSSProperties } from 'react'
 import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
 import AppHeader from './components/app/AppHeader'
 import PanelGallery from './components/app/PanelGallery'
 import FocusView from './components/app/FocusView'
+import ScrollIndicator from './components/app/ScrollIndicator'
 import { panels } from './components/app/panels'
 import useMobileViewport from './components/app/useMobileViewport'
 import {
@@ -19,6 +20,7 @@ const SchemaL = lazy(() => import('./components/SchemaL'))
 const SchemaR = lazy(() => import('./components/SchemaR'))
 const SchemaI = lazy(() => import('./components/SchemaI'))
 const SchemaD = lazy(() => import('./components/SchemaD'))
+const TimelineView = lazy(() => import('./components/app/TimelineView'))
 
 const createRandomOrder = () => {
   const indices = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -31,6 +33,8 @@ function App() {
   const [selectedNodeState, setSelectedNodeState] = useState<{ panelId: string; nodeIds: string[] } | null>(null)
   const [pageGroup, setPageGroup] = useState(0)
   const [isExitingFocus, setIsExitingFocus] = useState(false)
+  const [showTimeline, setShowTimeline] = useState(false)
+  const [hasVisitedTimeline, setHasVisitedTimeline] = useState(false)
   const [randomOrder] = useState(createRandomOrder)
   const isMobileViewport = useMobileViewport()
 
@@ -43,6 +47,10 @@ function App() {
 
   const selectedNodes = selectedNodeState?.panelId === selectedId ? selectedNodeState.nodeIds : []
 
+  const handleSelectPanel = (panelId: string) => {
+    setSelectedId(panelId)
+  }
+
   const handleSelectionChange = (panelId: string, nodeIds: string[]) => {
     setSelectedNodeState(nodeIds.length > 0 ? { panelId, nodeIds } : null)
   }
@@ -51,6 +59,7 @@ function App() {
   const handleExitFocus = () => {
     setIsExitingFocus(true)
     setSelectedNodeState(null)
+    setShowTimeline(false)
     setSelectedId(null)
     setTimeout(() => {
       setIsExitingFocus(false)
@@ -78,6 +87,16 @@ function App() {
     }
   }
 
+  const handleContainerWheel = (event: React.WheelEvent) => {
+    if (isMobileViewport || selectedId !== null) return
+    if (!showTimeline && event.deltaY > WHEEL_NAV_THRESHOLD) {
+      setShowTimeline(true)
+      setHasVisitedTimeline(true)
+    } else if (showTimeline && event.deltaY < -WHEEL_NAV_THRESHOLD) {
+      setShowTimeline(false)
+    }
+  }
+
   const appShellStyle = useMemo<CSSProperties>(() => ({
     '--app-shell-padding-inline-desktop': `${RESPONSIVE_SIZE_TOKENS.shellPaddingInline.desktop}px`,
     '--app-shell-padding-inline-mobile': `${RESPONSIVE_SIZE_TOKENS.shellPaddingInline.mobile}px`,
@@ -100,48 +119,71 @@ function App() {
       className="app-container"
       data-mobile-layout={isMobileViewport ? 'true' : 'false'}
       style={appShellStyle}
+      onWheel={handleContainerWheel}
     >
-      <DeepEnvironment />
+      <div
+        className="slide-deck"
+        style={{ transform: `translateY(${showTimeline ? '-100vh' : '0'})` }}
+      >
+        <div className="slide">
+          <DeepEnvironment />
 
-      <AppHeader
-        selectedId={selectedId}
-        shouldAnimateEntry={shouldAnimateEntry}
-        entryDelayMs={HEADER_ENTRY_DELAY_MS}
-        isMobileViewport={isMobileViewport}
-      />
+          <AppHeader
+            selectedId={selectedId}
+            shouldAnimateEntry={shouldAnimateEntry}
+            entryDelayMs={HEADER_ENTRY_DELAY_MS}
+            isMobileViewport={isMobileViewport}
+          />
 
-      <PanelGallery
-        pageGroup={pageGroup}
-        totalPages={totalPages}
-        currentPanels={currentPanels}
-        randomOrder={randomOrder}
-        selectedId={selectedId}
-        selectedNodeState={selectedNodeState}
-        isAppLoaded={isAppLoaded}
-        cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
-        isMobileViewport={isMobileViewport}
-        onSelectPanel={setSelectedId}
-        onSelectionChange={handleSelectionChange}
-        SchemaL={SchemaL}
-        SchemaR={SchemaR}
-        SchemaI={SchemaI}
-        SchemaD={SchemaD}
-        onWheelNavigate={handleGalleryWheel}
-      />
+          <PanelGallery
+            pageGroup={pageGroup}
+            totalPages={totalPages}
+            currentPanels={currentPanels}
+            randomOrder={randomOrder}
+            selectedId={selectedId}
+            selectedNodeState={selectedNodeState}
+            isAppLoaded={isAppLoaded}
+            cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
+            isMobileViewport={isMobileViewport}
+            onSelectPanel={handleSelectPanel}
+            onSelectionChange={handleSelectionChange}
+            SchemaL={SchemaL}
+            SchemaR={SchemaR}
+            SchemaI={SchemaI}
+            SchemaD={SchemaD}
+            onWheelNavigate={handleGalleryWheel}
+          />
+        </div>
 
-      <FocusView
-        selectedId={selectedId}
-        selectedPanel={selectedPanel}
-        selectedNodes={selectedNodes}
-        isExitingFocus={isExitingFocus}
-        isMobileViewport={isMobileViewport}
-        onExitFocus={handleExitFocus}
-        onSelectionChange={handleSelectionChange}
-        SchemaL={SchemaL}
-        SchemaR={SchemaR}
-        SchemaI={SchemaI}
-        SchemaD={SchemaD}
-      />
+        <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
+          <DeepEnvironment />
+          {(showTimeline || hasVisitedTimeline) && (
+            <Suspense fallback={null}>
+              <TimelineView isMobileViewport={isMobileViewport} />
+            </Suspense>
+          )}
+        </div>
+      </div>
+
+      {!selectedId && !isMobileViewport && (
+        <ScrollIndicator timelineActive={showTimeline} />
+      )}
+
+      {selectedId && selectedPanel && !showTimeline && (
+        <FocusView
+          selectedId={selectedId}
+          selectedPanel={selectedPanel}
+          selectedNodes={selectedNodes}
+          isExitingFocus={isExitingFocus}
+          isMobileViewport={isMobileViewport}
+          onExitFocus={handleExitFocus}
+          onSelectionChange={handleSelectionChange}
+          SchemaL={SchemaL}
+          SchemaR={SchemaR}
+          SchemaI={SchemaI}
+          SchemaD={SchemaD}
+        />
+      )}
     </div>
   )
 }

@@ -76,7 +76,7 @@ export const GLASS_PANEL_RESPONSIVE_TOKENS = {
   },
 } as const
 
-export const GALLERY_PAGE_FADE_DURATION_S = 0.18
+export const GALLERY_PAGE_SLIDE_DURATION_S = 0.45
 export const GALLERY_CARD_ENTRY_DURATION_S = 0.5
 export const GALLERY_CARD_REENTER_DURATION_S = 0.32
 export const GALLERY_CARD_STAGGER_S = 0.15
@@ -150,3 +150,10 @@ export const FOCUS_PANEL_VIEWPORT_SIZES = {
     stackGap: 20,
   },
 } as const
+
+// Timeline animation constants
+export const TIMELINE_LINE_DRAW_DURATION_S = 2.0
+export const TIMELINE_NODE_STAGGER_S = 0.18
+export const TIMELINE_NODE_ENTRY_DURATION_S = 0.5
+export const TIMELINE_TITLE_DURATION_MS = 800
+export const TIMELINE_TITLE_STAGGER_MS = 200
