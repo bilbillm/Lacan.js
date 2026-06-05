@@ -39,14 +39,26 @@ export function resolvePanelSchema(
   }
 
   if (!entry.interactive) {
+    const Component = components[entry.schemaKey] as NonInteractiveSchemaComponent | undefined
+
+    if (!Component) {
+      return null
+    }
+
     return {
       interactive: false,
-      Component: components[entry.schemaKey] as NonInteractiveSchemaComponent,
+      Component,
     }
+  }
+
+  const Component = components[entry.schemaKey] as InteractiveSchemaComponent | undefined
+
+  if (!Component) {
+    return null
   }
 
   return {
     interactive: true,
-    Component: components[entry.schemaKey] as InteractiveSchemaComponent,
+    Component,
   }
 }

@@ -1,6 +1,101 @@
 .app-container {
   width: 100%;
   height: 100%;
+  min-height: 100vh;
   position: relative;
   overflow: hidden;
 }
+
+@supports (min-height: 100dvh) {
+  .app-container {
+    min-height: 100dvh;
+  }
+}
+
+.app-container[data-mobile-layout='true'] {
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-header {
+  top: var(--app-header-top-desktop);
+}
+
+.panel-gallery-shell {
+  padding-top: calc(var(--app-shell-padding-top-desktop) + var(--safe-area-top));
+  padding-right: var(--app-shell-padding-inline-desktop);
+  padding-bottom: calc(var(--app-shell-padding-bottom-desktop) + var(--safe-area-bottom));
+  padding-left: var(--app-shell-padding-inline-desktop);
+}
+
+.progress-indicator-shell {
+  bottom: calc(var(--app-progress-bottom-desktop) + var(--safe-area-bottom));
+}
+
+.focus-view-shell {
+  padding: var(--app-focus-padding-block-desktop) var(--app-focus-padding-inline-desktop);
+}
+
+.app-container[data-mobile-layout='true'] .app-header {
+  top: calc(var(--app-header-top-mobile) + var(--safe-area-top));
+}
+
+.app-container[data-mobile-layout='true'] .panel-gallery-shell {
+  min-height: 100vh;
+  align-items: flex-start;
+  padding-top: calc(var(--app-shell-padding-top-mobile) + var(--safe-area-top));
+  padding-right: var(--app-shell-padding-inline-mobile);
+  padding-bottom: calc(var(--app-shell-padding-bottom-mobile) + var(--safe-area-bottom));
+  padding-left: var(--app-shell-padding-inline-mobile);
+}
+
+@supports (min-height: 100dvh) {
+  .app-container[data-mobile-layout='true'] .panel-gallery-shell {
+    min-height: 100dvh;
+  }
+}
+
+.app-container[data-mobile-layout='true'] .progress-indicator-shell {
+  bottom: calc(var(--app-progress-bottom-mobile) + var(--safe-area-bottom));
+}
+
+.app-container[data-mobile-layout='true'] .focus-view-shell {
+  min-height: 100vh;
+  padding-top: calc(var(--app-focus-padding-block-mobile) + var(--safe-area-top));
+  padding-right: var(--app-focus-padding-inline-mobile);
+  padding-bottom: calc(var(--app-focus-padding-block-mobile) + var(--safe-area-bottom));
+  padding-left: var(--app-focus-padding-inline-mobile);
+}
+
+@supports (min-height: 100dvh) {
+  .app-container[data-mobile-layout='true'] .focus-view-shell {
+    min-height: 100dvh;
+  }
+}
+
+.slide-deck {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.slide-deck > .slide {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+@supports (min-height: 100dvh) {
+  .slide-deck > .slide {
+    height: 100dvh;
+  }
+}
+

@@ -7,13 +7,20 @@ import {
   type InteractiveSchemaComponent,
   type NonInteractiveSchemaComponent,
 } from './panelSchemaRegistry'
-import { FOCUS_BACKDROP_FADE_S, FOCUS_EXIT_MS, FOCUS_PANEL_MAX_HEIGHT, FOCUS_PANEL_MAX_WIDTH } from './uiConstants'
+import {
+  FOCUS_BACKDROP_FADE_S,
+  FOCUS_EXIT_MS,
+  FOCUS_PANEL_MAX_HEIGHT,
+  FOCUS_PANEL_MAX_WIDTH,
+  FOCUS_PANEL_VIEWPORT_SIZES,
+} from './uiConstants'
 
 interface FocusViewProps {
   selectedId: string | null
   selectedPanel?: PanelData
   selectedNodes: string[]
   isExitingFocus: boolean
+  isMobileViewport: boolean
   onExitFocus: () => void
   onSelectionChange: (panelId: string, nodeIds: string[]) => void
   SchemaL: InteractiveSchemaComponent
@@ -27,6 +34,7 @@ export default function FocusView({
   selectedPanel,
   selectedNodes,
   isExitingFocus,
+  isMobileViewport,
   onExitFocus,
   onSelectionChange,
   SchemaL,
@@ -42,6 +50,37 @@ export default function FocusView({
         SchemaD,
       })
     : null
+
+  const hasSecondaryPanel = selectedNodes.length === 2
+  const secondaryPanelContent = hasSecondaryPanel
+    ? `${selectedPanel?.title ?? ''} · ${selectedNodes.join(' · ')}`
+    : ''
+
+  const focusPanelContent = resolvedSchema ? (
+    <Suspense
+      fallback={
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="text-3xl font-light tracking-widest text-white/40">
+            {selectedPanel?.title}
+          </span>
+        </div>
+      }
+    >
+      {resolvedSchema.interactive ? (
+        <resolvedSchema.Component
+          isExpanded={true}
+          selectedNodes={selectedNodes}
+          onSelectionChange={(nodeIds) => onSelectionChange(selectedPanel!.id, nodeIds)}
+        />
+      ) : (
+        <resolvedSchema.Component isExpanded={true} />
+      )}
+    </Suspense>
+  ) : (
+    <div className="w-full h-full flex items-center justify-center">
+      <span className="text-3xl font-light tracking-widest text-white/40">{selectedPanel?.title}</span>
+    </div>
+  )
 
   return (
     <AnimatePresence>
@@ -60,91 +99,137 @@ export default function FocusView({
             }}
           />
 
-          {/* Expanded Panel - moves to left when nodes selected */}
           <div className="absolute inset-0 z-50 pointer-events-none">
-            <div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-600"
-              style={{
-                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                left: selectedNodes.length === 2 ? '30%' : '50%',
-              }}
-            >
-              <GlassPanel
-                layoutId={selectedId}
-                width="60vw"
-                height="80vh"
-                className="pointer-events-auto"
-                onClick={() => {}}
-                disableParallax={true}
-                style={{
-                  // 保持原始卡片 288:416 比例 (0.6923)，同时放大尺寸
-                  maxWidth: FOCUS_PANEL_MAX_WIDTH,
-                  maxHeight: FOCUS_PANEL_MAX_HEIGHT,
-                }}
-                >
-                {resolvedSchema ? (
-                  <Suspense
-                    fallback={
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-3xl font-light tracking-widest text-white/40">
-                          {selectedPanel.title}
-                        </span>
-                      </div>
-                    }
-                      >
-                        {resolvedSchema.interactive ? (
-                          <resolvedSchema.Component
-                            isExpanded={true}
-                            selectedNodes={selectedNodes}
-                            onSelectionChange={(nodeIds) => onSelectionChange(selectedPanel.id, nodeIds)}
-                          />
-                        ) : (
-                          <resolvedSchema.Component isExpanded={true} />
-                        )}
-                  </Suspense>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-3xl font-light tracking-widest text-white/40">
-                      {selectedPanel.title}
-                    </span>
-                  </div>
-                )}
-              </GlassPanel>
-            </div>
-          </div>
-
-          {/* Right-side panel - appears when nodes selected */}
-          <AnimatePresence>
-            {selectedNodes.length === 2 && (
-              <motion.div
-                className="absolute inset-0 z-50 flex items-center justify-end pointer-events-none"
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 100 }}
-                transition={{
-                  duration: FOCUS_EXIT_MS / 1000,
-                  ease: [0.4, 0, 0.2, 1],
-                }}
-                style={{ paddingRight: '10vw' }}
+            {isMobileViewport ? (
+              <div
+                className="focus-view-shell absolute inset-0 z-50 pointer-events-none"
+                data-testid="focus-view"
               >
-                <GlassPanel
-                  width="50vw"
-                  height="80vh"
-                  className="pointer-events-auto"
-                  onClick={() => {}}
-                  disableParallax={true}
+                <div
+                  className="mx-auto flex h-full w-full flex-col items-center overflow-y-auto pointer-events-auto"
                   style={{
                     maxWidth: FOCUS_PANEL_MAX_WIDTH,
-                    maxHeight: FOCUS_PANEL_MAX_HEIGHT,
+                    gap: `${FOCUS_PANEL_VIEWPORT_SIZES.mobile.stackGap}px`,
                   }}
                 >
-                  <div className="w-full h-full flex items-center justify-center p-8">
-                    <span className="text-2xl font-light tracking-widest text-white/60">Sample Text</span>
+                  <GlassPanel
+                    layoutId={selectedId}
+                    width={FOCUS_PANEL_VIEWPORT_SIZES.mobile.panelWidth}
+                    height={FOCUS_PANEL_VIEWPORT_SIZES.mobile.mainHeight}
+                    className="pointer-events-auto"
+                    onClick={() => {}}
+                    disableParallax={true}
+                    isMobileViewport={isMobileViewport}
+                    style={{
+                      maxWidth: FOCUS_PANEL_MAX_WIDTH,
+                      maxHeight: FOCUS_PANEL_MAX_HEIGHT,
+                    }}
+                  >
+                    {focusPanelContent}
+                  </GlassPanel>
+
+                  <AnimatePresence>
+                    {hasSecondaryPanel && (
+                      <motion.div
+                        className="w-full flex justify-center"
+                        data-testid="focus-secondary"
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 40 }}
+                        transition={{
+                          duration: FOCUS_EXIT_MS / 1000,
+                          ease: [0.4, 0, 0.2, 1],
+                        }}
+                      >
+                        <GlassPanel
+                          width={FOCUS_PANEL_VIEWPORT_SIZES.mobile.panelWidth}
+                          height={FOCUS_PANEL_VIEWPORT_SIZES.mobile.secondaryHeight}
+                          className="pointer-events-auto"
+                          onClick={() => {}}
+                          disableParallax={true}
+                          isMobileViewport={isMobileViewport}
+                          style={{
+                            maxWidth: FOCUS_PANEL_MAX_WIDTH,
+                            maxHeight: FOCUS_PANEL_MAX_HEIGHT,
+                          }}
+                        >
+                          <div className="w-full h-full flex items-center justify-center p-8">
+                            <span className="text-2xl font-light tracking-widest text-white/60">{secondaryPanelContent}</span>
+                          </div>
+                        </GlassPanel>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Expanded Panel - moves to left when nodes selected */}
+                <div className="focus-view-shell absolute inset-0 z-50 pointer-events-none" data-testid="focus-view">
+                  <div
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-600"
+                    style={{
+                      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                      left: hasSecondaryPanel
+                        ? FOCUS_PANEL_VIEWPORT_SIZES.desktop.mainShiftedLeft
+                        : FOCUS_PANEL_VIEWPORT_SIZES.desktop.mainCenteredLeft,
+                    }}
+                  >
+                    <GlassPanel
+                      layoutId={selectedId}
+                      width={FOCUS_PANEL_VIEWPORT_SIZES.desktop.mainWidth}
+                      height={FOCUS_PANEL_VIEWPORT_SIZES.desktop.panelHeight}
+                      className="pointer-events-auto"
+                      onClick={() => {}}
+                      disableParallax={true}
+                      isMobileViewport={isMobileViewport}
+                      style={{
+                        maxWidth: FOCUS_PANEL_MAX_WIDTH,
+                        maxHeight: FOCUS_PANEL_MAX_HEIGHT,
+                      }}
+                    >
+                      {focusPanelContent}
+                    </GlassPanel>
                   </div>
-                </GlassPanel>
-              </motion.div>
+                </div>
+
+                {/* Right-side panel - appears when nodes selected */}
+                <AnimatePresence>
+                  {hasSecondaryPanel && (
+                    <motion.div
+                      className="focus-secondary-shell absolute inset-0 z-50 flex items-center justify-end pointer-events-none"
+                      data-testid="focus-secondary"
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 100 }}
+                      transition={{
+                        duration: FOCUS_EXIT_MS / 1000,
+                        ease: [0.4, 0, 0.2, 1],
+                      }}
+                      style={{ paddingRight: FOCUS_PANEL_VIEWPORT_SIZES.desktop.secondaryPaddingRight }}
+                    >
+                      <GlassPanel
+                        width={FOCUS_PANEL_VIEWPORT_SIZES.desktop.secondaryWidth}
+                        height={FOCUS_PANEL_VIEWPORT_SIZES.desktop.panelHeight}
+                        className="pointer-events-auto"
+                        onClick={() => {}}
+                        disableParallax={true}
+                        isMobileViewport={isMobileViewport}
+                        style={{
+                          maxWidth: FOCUS_PANEL_MAX_WIDTH,
+                          maxHeight: FOCUS_PANEL_MAX_HEIGHT,
+                        }}
+                      >
+                        <div className="w-full h-full flex items-center justify-center p-8">
+                          <span className="text-2xl font-light tracking-widest text-white/60">{secondaryPanelContent}</span>
+                        </div>
+                      </GlassPanel>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
             )}
-          </AnimatePresence>
+          </div>
         </>
       )}
     </AnimatePresence>
