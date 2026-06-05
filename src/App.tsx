@@ -21,6 +21,7 @@ const SchemaR = lazy(() => import('./components/SchemaR'))
 const SchemaI = lazy(() => import('./components/SchemaI'))
 const SchemaD = lazy(() => import('./components/SchemaD'))
 const TimelineView = lazy(() => import('./components/app/TimelineView'))
+const BorromeanKnot2D = lazy(() => import('./components/BorromeanKnot2D'))
 
 const createRandomOrder = () => {
   const indices = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -33,8 +34,8 @@ function App() {
   const [selectedNodeState, setSelectedNodeState] = useState<{ panelId: string; nodeIds: string[] } | null>(null)
   const [pageGroup, setPageGroup] = useState(0)
   const [isExitingFocus, setIsExitingFocus] = useState(false)
-  const [showTimeline, setShowTimeline] = useState(false)
-  const [hasVisitedTimeline, setHasVisitedTimeline] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [maxVisitedSlide, setMaxVisitedSlide] = useState(0)
   const [randomOrder] = useState(createRandomOrder)
   const isMobileViewport = useMobileViewport()
 
@@ -59,7 +60,7 @@ function App() {
   const handleExitFocus = () => {
     setIsExitingFocus(true)
     setSelectedNodeState(null)
-    setShowTimeline(false)
+    setCurrentSlide(0)
     setSelectedId(null)
     setTimeout(() => {
       setIsExitingFocus(false)
@@ -77,6 +78,26 @@ function App() {
     return () => clearTimeout(timer)
   }, [])
 
+  // 键盘上下键翻页
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isMobileViewport || selectedId !== null) return
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        setCurrentSlide((prev) => {
+          const next = Math.min(prev + 1, SLIDE_COUNT - 1)
+          setMaxVisitedSlide((m) => Math.max(m, next))
+          return next
+        })
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        setCurrentSlide((prev) => Math.max(prev - 1, 0))
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isMobileViewport, selectedId])
+
   const handleGalleryWheel = (deltaY: number) => {
     if (selectedId) return
 
@@ -87,13 +108,18 @@ function App() {
     }
   }
 
+  const SLIDE_COUNT = 3
+
   const handleContainerWheel = (event: React.WheelEvent) => {
     if (isMobileViewport || selectedId !== null) return
-    if (!showTimeline && event.deltaY > WHEEL_NAV_THRESHOLD) {
-      setShowTimeline(true)
-      setHasVisitedTimeline(true)
-    } else if (showTimeline && event.deltaY < -WHEEL_NAV_THRESHOLD) {
-      setShowTimeline(false)
+    if (event.deltaY > WHEEL_NAV_THRESHOLD) {
+      setCurrentSlide((prev) => {
+        const next = Math.min(prev + 1, SLIDE_COUNT - 1)
+        setMaxVisitedSlide((m) => Math.max(m, next))
+        return next
+      })
+    } else if (event.deltaY < -WHEEL_NAV_THRESHOLD) {
+      setCurrentSlide((prev) => Math.max(prev - 1, 0))
     }
   }
 
@@ -123,7 +149,7 @@ function App() {
     >
       <div
         className="slide-deck"
-        style={{ transform: `translateY(${showTimeline ? '-100vh' : '0'})` }}
+        style={{ transform: `translateY(${-currentSlide * 100}vh)` }}
       >
         <div className="slide">
           <DeepEnvironment />
@@ -157,19 +183,28 @@ function App() {
 
         <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
           <DeepEnvironment />
-          {(showTimeline || hasVisitedTimeline) && (
+          {(currentSlide >= 1 || maxVisitedSlide >= 1) && (
             <Suspense fallback={null}>
               <TimelineView isMobileViewport={isMobileViewport} />
+            </Suspense>
+          )}
+        </div>
+
+        <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
+          <DeepEnvironment />
+          {(currentSlide >= 2 || maxVisitedSlide >= 2) && (
+            <Suspense fallback={null}>
+              <BorromeanKnot2D isMobileViewport={isMobileViewport} />
             </Suspense>
           )}
         </div>
       </div>
 
       {!selectedId && !isMobileViewport && (
-        <ScrollIndicator timelineActive={showTimeline} />
+        <ScrollIndicator currentSlide={currentSlide} totalSlides={SLIDE_COUNT} />
       )}
 
-      {selectedId && selectedPanel && !showTimeline && (
+      {selectedId && selectedPanel && currentSlide === 0 && (
         <FocusView
           selectedId={selectedId}
           selectedPanel={selectedPanel}

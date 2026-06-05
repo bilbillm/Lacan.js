@@ -1,13 +1,11 @@
 import { motion } from 'framer-motion'
 
 interface ScrollIndicatorProps {
-  /** true = timeline (slide 2), false = gallery (slide 1) */
-  timelineActive: boolean
+  currentSlide: number
+  totalSlides: number
 }
 
-const slides = [0, 1]
-
-export default function ScrollIndicator({ timelineActive }: ScrollIndicatorProps) {
+export default function ScrollIndicator({ currentSlide, totalSlides }: ScrollIndicatorProps) {
   return (
     <motion.div
       data-testid="scroll-indicator"
@@ -25,8 +23,8 @@ export default function ScrollIndicator({ timelineActive }: ScrollIndicatorProps
         zIndex: 15,
       }}
     >
-      {slides.map((slide) => {
-        const isActive = (slide === 0 && !timelineActive) || (slide === 1 && timelineActive)
+      {Array.from({ length: totalSlides }, (_, slide) => {
+        const isActive = slide === currentSlide
         return (
           <motion.div
             key={slide}

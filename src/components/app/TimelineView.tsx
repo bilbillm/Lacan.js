@@ -14,8 +14,6 @@ interface TimelineViewProps {
 }
 
 export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
-  if (isMobileViewport) return null
-
   const eventCount = timelineEvents.length
   const titleDurationS = TIMELINE_TITLE_DURATION_MS / 1000
   const subtitleDelayS = TIMELINE_TITLE_STAGGER_MS / 1000
@@ -23,6 +21,8 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
   const expandedEvent = expandedYear
     ? timelineEvents.find((e) => e.year === expandedYear) ?? null
     : null
+
+  if (isMobileViewport) return null
 
   return (
     <motion.div
