@@ -6,15 +6,15 @@ interface BorromeanKnot2DProps {
 }
 
 const RINGS = [
-  { key: 'S', cx: 200, cy: 148, r: 75, color: 'rgba(96,165,250,0.85)', glow: 'rgba(96,165,250,0.4)', label: '符号界' },
-  { key: 'I', cx: 152, cy: 242, r: 75, color: 'rgba(234,179,8,0.85)', glow: 'rgba(234,179,8,0.4)', label: '想象界' },
-  { key: 'R', cx: 248, cy: 242, r: 75, color: 'rgba(220,72,72,0.85)', glow: 'rgba(220,72,72,0.4)', label: '实在界' },
+  { key: 'S', cx: 200, cy: 148, r: 75, color: '#6b1d0e', glow: 'rgba(107,29,14,0.18)', label: '符号界' },
+  { key: 'I', cx: 152, cy: 242, r: 75, color: '#b58a45', glow: 'rgba(181,138,69,0.2)', label: '想象界' },
+  { key: 'R', cx: 248, cy: 242, r: 75, color: '#1a1613', glow: 'rgba(26,22,19,0.12)', label: '实在界' },
 ] as const
 
 type RingKey = (typeof RINGS)[number]['key']
 
 const RING_BY_KEY = new Map(RINGS.map((ring) => [ring.key, ring]))
-const BACKGROUND = 'rgb(5,5,7)'
+const BACKGROUND = '#f8f2e8'
 
 const CROSSINGS: Array<{
   over: RingKey
@@ -53,22 +53,23 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
   return (
     <motion.div
       className="absolute inset-0 z-30 flex flex-col items-center overflow-hidden"
-      data-testid="borromean-view" style={{ background: 'rgb(5,5,7)' }}
+      data-testid="borromean-view" style={{ background: 'var(--lacan-paper)' }}
       exit={{ opacity: 0, filter: 'blur(10px)' }} transition={{ duration: 0.4, ease: 'easeInOut' }}
     >
       <div className="flex flex-col items-center gap-2.5" style={{ paddingTop: 96 }}>
         <motion.h1
-          className="text-center font-light text-white/70"
+          className="text-center"
           style={{ fontSize: '2.35rem', letterSpacing: '0.35em', lineHeight: 0.96,
-            textShadow: '0 0 8px rgba(255,255,255,0.3),0 0 25px rgba(255,255,255,0.15)' }}
+            color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700,
+            textShadow: '0 1px 0 rgba(255,254,250,0.82)' }}
           initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >波罗米结</motion.h1>
         <motion.p
-          className="text-center font-light text-white/40"
+          className="text-center font-light"
           style={{ fontSize: '1.125rem', letterSpacing: '0.35em',
-            textShadow: '0 0 3px rgba(255,255,255,0.15),0 0 8px rgba(255,255,255,0.08)' }}
+            color: 'var(--lacan-muted)' }}
           initial={{ opacity: 0, filter: 'blur(8px)', y: -20 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ delay: 0.2, duration: 0.7, ease: 'easeOut' }}
@@ -98,7 +99,7 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
                 animate={{ opacity: dim ? 0.3 : 1, strokeWidth: isHov ? 7 : 5 }}
                 transition={{ opacity: { delay: 0.3 + i * 0.35, duration: 0.8 }, strokeWidth: { duration: 0.3 } }}
                 style={{
-                  filter: isHov ? `drop-shadow(0 0 14px ${ring.glow})` : `drop-shadow(0 0 4px ${ring.glow})`,
+                  filter: isHov ? `drop-shadow(0 6px 10px ${ring.glow})` : `drop-shadow(0 2px 3px ${ring.glow})`,
                   cursor: 'pointer',
                 }}
                 onMouseEnter={() => setHoveredKey(ring.key)}
@@ -137,7 +138,7 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
                 animate={{ opacity: dim ? 0.3 : 1, strokeWidth: isHov ? 8 : 6 }}
                 transition={{ duration: 0.3 }}
                 style={{
-                  filter: isHov ? `drop-shadow(0 0 14px ${ring.glow})` : `drop-shadow(0 0 4px ${ring.glow})`,
+                  filter: isHov ? `drop-shadow(0 6px 10px ${ring.glow})` : `drop-shadow(0 2px 3px ${ring.glow})`,
                   pointerEvents: 'none',
                 }}
               />
@@ -150,10 +151,10 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
             return (
               <motion.g key={`lbl-${ring.key}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8, duration: 0.6 }}>
                 <rect x={lx - 38} y={ly - 17} width={76} height={34} rx={6}
-                  fill="rgba(0,0,0,0.55)" stroke={ring.color} strokeWidth={0.5} />
+                  fill="rgba(255,254,250,0.86)" stroke={ring.color} strokeWidth={0.8} />
                 <text x={lx} y={ly + 2} textAnchor="middle" dominantBaseline="central"
-                  fill="rgba(255,255,255,0.75)" fontSize={11}
-                  fontFamily="Inter,system-ui,sans-serif" fontWeight={300} letterSpacing="0.08em">
+                  fill="var(--lacan-ink)" fontSize={11}
+                  fontFamily="var(--lacan-title-font)" fontWeight={700} letterSpacing="0.08em">
                   {ring.label}
                 </text>
               </motion.g>
@@ -165,8 +166,8 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
       <motion.div className="w-full max-w-lg px-8 pb-12"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.2, duration: 0.6, ease: 'easeOut' }}>
-        <p className="text-center font-light leading-relaxed text-white/35"
-          style={{ fontSize: '0.85rem', letterSpacing: '0.04em', lineHeight: 1.9 }}>
+        <p className="text-center font-light leading-relaxed"
+          style={{ fontSize: '0.85rem', letterSpacing: '0.04em', lineHeight: 1.9, color: 'var(--lacan-muted)' }}>
           三枚完整圆环，两两不相连——但三者交织，任取其一，其余便散。
           <br />交叉处上下交替：每个环与另两环各交叉一次，形成拓扑锁合。
         </p>

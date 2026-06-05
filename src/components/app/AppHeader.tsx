@@ -26,11 +26,7 @@ const h1Variants = {
     filter: 'blur(0px)',
     y: 0,
     scale: 1,
-    textShadow: [
-      '0 0 5px rgba(255,255,255,0.3), 0 0 15px rgba(255,255,255,0.15), 0 0 25px rgba(255,255,255,0.08)',
-      '0 0 8px rgba(255,255,255,0.5), 0 0 25px rgba(255,255,255,0.25), 0 0 40px rgba(255,255,255,0.12)',
-      '0 0 5px rgba(255,255,255,0.3), 0 0 15px rgba(255,255,255,0.15), 0 0 25px rgba(255,255,255,0.08)',
-    ],
+    textShadow: '0 1px 0 rgba(255,254,250,0.82)',
   },
   blurred: {
     opacity: 0,
@@ -51,11 +47,7 @@ const pVariants = {
     filter: 'blur(0px)',
     y: 0,
     scale: 1,
-    textShadow: [
-      '0 0 3px rgba(255,255,255,0.15), 0 0 8px rgba(255,255,255,0.08)',
-      '0 0 5px rgba(255,255,255,0.25), 0 0 12px rgba(255,255,255,0.12)',
-      '0 0 3px rgba(255,255,255,0.15), 0 0 8px rgba(255,255,255,0.08)',
-    ],
+    textShadow: '0 1px 0 rgba(255,254,250,0.68)',
   },
   blurred: {
     opacity: 0,
@@ -87,6 +79,9 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
       ? HEADER_RESPONSIVE_TOKENS.titleTracking.mobile
       : HEADER_RESPONSIVE_TOKENS.titleTracking.desktop,
     lineHeight: 0.96,
+    color: 'var(--lacan-ink-strong)',
+    fontFamily: 'var(--lacan-title-font)',
+    fontWeight: 700,
   }), [isMobileViewport])
 
   const subtitleStyle = useMemo<CSSProperties>(() => ({
@@ -101,6 +96,9 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
       : HEADER_RESPONSIVE_TOKENS.subtitleMaxWidth.desktop,
     lineHeight: isMobileViewport ? 1.45 : undefined,
     textWrap: isMobileViewport ? 'balance' : undefined,
+    color: 'var(--lacan-muted)',
+    fontFamily: '"Source Sans 3", "Segoe UI", system-ui, sans-serif',
+    fontWeight: 400,
   }), [isMobileViewport])
 
   return (
@@ -112,7 +110,7 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
       style={containerStyle}
     >
       <motion.h1
-        className="text-center font-light text-white/70"
+        className="text-center"
         initial="initial"
         variants={h1Variants}
         animate={selectedId ? 'blurred' : 'visible'}
@@ -128,13 +126,13 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
             ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
-          textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity },
+          textShadow: { duration: 0.4, ease: 'easeOut' },
         }}
       >
         LACAN.JS
       </motion.h1>
       <motion.p
-        className="text-center font-light text-white/40"
+        className="text-center"
         initial="initial"
         variants={pVariants}
         animate={selectedId ? 'blurred' : 'visible'}
@@ -150,7 +148,7 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
             ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
-          textShadow: { duration: 4, ease: 'easeInOut', repeat: Infinity, delay: 0.5 },
+          textShadow: { duration: 0.4, ease: 'easeOut' },
         }}
       >
         The Spatial Architecture of Psychoanalysis

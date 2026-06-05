@@ -29,11 +29,11 @@ function PerspectiveRoom() {
   const perspectiveDuration = 6
   const bottomDuration = 1
 
-  // 呼吸光晕效果 - 线条绘制完成后开始
+  // Subtle paper-room line work, aligned with the forum's quiet editorial tone.
   const glowFilter = [
-    'drop-shadow(0 0 3px rgba(255,255,255,0.5))',
-    'drop-shadow(0 0 8px rgba(255,255,255,0.8))',
-    'drop-shadow(0 0 3px rgba(255,255,255,0.5))',
+    'drop-shadow(0 0 0 rgba(181,138,69,0))',
+    'drop-shadow(0 1px 2px rgba(181,138,69,0.18))',
+    'drop-shadow(0 0 0 rgba(181,138,69,0))',
   ]
 
   // Helper: 渲染所有线条
@@ -43,12 +43,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="15" y1="0"
         x2="15" y2="75"
-        stroke="rgba(255, 255, 255, 0.7)"
+        stroke="rgba(107, 29, 14, 0.22)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -63,12 +63,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="85" y1="0"
         x2="85" y2="75"
-        stroke="rgba(255, 255, 255, 0.7)"
+        stroke="rgba(107, 29, 14, 0.22)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -83,12 +83,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="3" y1="100"
         x2="15" y2="75"
-        stroke="rgba(255, 255, 255, 0.7)"
+        stroke="rgba(107, 29, 14, 0.22)"
         strokeWidth="0.6"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -103,12 +103,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="97" y1="100"
         x2="85" y2="75"
-        stroke="rgba(255, 255, 255, 0.7)"
+        stroke="rgba(107, 29, 14, 0.22)"
         strokeWidth="0.6"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -123,12 +123,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="15" y1="75"
         x2="50" y2="75"
-        stroke="rgba(255, 255, 255, 0.35)"
+        stroke="rgba(181, 138, 69, 0.2)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -143,12 +143,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="85" y1="75"
         x2="50" y2="75"
-        stroke="rgba(255, 255, 255, 0.35)"
+        stroke="rgba(181, 138, 69, 0.2)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(255,255,255,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -212,23 +212,25 @@ function PerspectiveRoom() {
 
 export default function DeepEnvironment() {
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: 'rgb(5, 5, 7)' }}>
-      {/* Deep black background with subtle gradient */}
+    <div className="absolute inset-0 overflow-hidden" style={{ background: 'var(--lacan-paper)' }}>
+      {/* Warm paper field with restrained scholarly depth */}
       <div
         className="absolute inset-0"
         style={{
-          background: 'radial-gradient(ellipse 100% 100% at 50% 0%, oklch(0.08 0 0 / 0.5) 0%, oklch(0.02 0 0 / 0.3) 60%)',
+          background:
+            'radial-gradient(ellipse 80% 60% at 50% 4%, rgba(255,254,250,0.92) 0%, rgba(248,242,232,0.84) 45%, rgba(239,226,207,0.56) 100%)',
         }}
       />
 
       {/* Perspective wireframe room */}
       <PerspectiveRoom />
 
-      {/* Vignette with proper alpha channel - allows light to bleed through */}
+      {/* Paper edge depth */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 100% 100% at 50% 50%, oklch(0 0 0 / 0) 40%, oklch(0 0 0 / 0.6) 100%)',
+          background:
+            'radial-gradient(ellipse 100% 100% at 50% 50%, rgba(255,254,250,0) 44%, rgba(181,138,69,0.12) 100%)',
         }}
       />
     </div>

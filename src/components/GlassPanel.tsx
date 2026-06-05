@@ -41,11 +41,10 @@ export default function GlassPanel({
   const rotateX = useTransform(ySpring, [-0.5, 0.5], [10, -10])
   const rotateY = useTransform(xSpring, [-0.5, 0.5], [-10, 10])
 
-  // Glare effect opacity
-  const glareOpacity = useTransform(
+  const paperSheenOpacity = useTransform(
     xSpring,
     [-0.5, -0.25, 0, 0.25, 0.5],
-    [0, 0.05, 0.08, 0.05, 0]
+    [0, 0.04, 0.07, 0.04, 0]
   )
 
   const [isHovered, setIsHovered] = useState(false)
@@ -130,7 +129,7 @@ export default function GlassPanel({
       animate={{
         opacity: 1,
         y: 0,
-        scale: isHovered ? 1.02 : 1,
+        scale: isHovered ? 1.015 : 1,
       }}
       transition={{
         opacity: { duration: 0.5 },
@@ -139,47 +138,48 @@ export default function GlassPanel({
       }}
     >
       <motion.div
-        className="absolute inset-0 rounded-2xl"
+        className="absolute inset-0"
         style={{
           rotateX: disableParallax ? 0 : rotateX,
           rotateY: disableParallax ? 0 : rotateY,
           transformStyle: 'preserve-3d',
         }}
       >
-        {/* Main glass surface */}
+        {/* Main paper surface */}
         <div
-          className="absolute inset-0 rounded-2xl"
+          className="absolute inset-0"
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            backdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
-            WebkitBackdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background:
+              'linear-gradient(180deg, rgba(255,254,250,0.96) 0%, rgba(251,246,236,0.94) 100%)',
+            border: '1px solid var(--lacan-border)',
+            borderRadius: isMobileViewport ? 10 : 12,
             boxShadow: `
-              0 4px 24px rgba(0, 0, 0, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+              var(--lacan-paper-shadow),
+              inset 0 1px 0 rgba(255, 254, 250, 0.82)
             `,
           }}
         />
 
-        {/* Edge highlight - simple gradient */}
+        {/* Gilded edge highlight */}
         <div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%)',
+            borderRadius: isMobileViewport ? 10 : 12,
+            background: 'linear-gradient(135deg, rgba(181,138,69,0.18) 0%, transparent 42%)',
           }}
         />
 
         {/* Noise texture layer */}
         {!deferVisualEnhancement && (
           <div
-            className="absolute inset-0 rounded-2xl pointer-events-none select-none z-10"
+            className="absolute inset-0 pointer-events-none select-none z-10"
             style={{
-              opacity: 0.035,
-              mixBlendMode: 'overlay',
+              opacity: 0.18,
+              borderRadius: isMobileViewport ? 10 : 12,
+              mixBlendMode: 'multiply',
               backgroundImage: `
-                radial-gradient(rgba(255,255,255,0.08) 0.6px, transparent 0.6px),
-                radial-gradient(rgba(255,255,255,0.04) 0.5px, transparent 0.5px)
+                radial-gradient(rgba(181,138,69,0.12) 0.5px, transparent 0.5px),
+                radial-gradient(rgba(107,29,14,0.05) 0.4px, transparent 0.4px)
               `,
               backgroundPosition: '0 0, 8px 8px',
               backgroundSize: '16px 16px, 20px 20px',
@@ -190,23 +190,25 @@ export default function GlassPanel({
         {/* Dynamic light reflection - follows mouse position */}
         {isHovered && !deferVisualEnhancement && (
           <motion.div
-            className="absolute inset-0 rounded-2xl pointer-events-none z-10"
+            className="absolute inset-0 pointer-events-none z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             style={{
-              background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 30%, transparent 60%)`,
+              borderRadius: isMobileViewport ? 10 : 12,
+              background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(181,138,69,0.12) 0%, rgba(255,254,250,0.26) 36%, transparent 66%)`,
             }}
           />
         )}
 
-        {/* Glare effect */}
+        {/* Paper sheen */}
         <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 80%)',
-            opacity: glareOpacity,
+            borderRadius: isMobileViewport ? 10 : 12,
+            background: 'radial-gradient(circle at 50% 45%, rgba(255,254,250,0.72) 0%, transparent 78%)',
+            opacity: paperSheenOpacity,
           }}
         />
 
@@ -224,7 +226,7 @@ export default function GlassPanel({
           }}
         >
           {children || (
-            <div className="w-full h-full flex items-center justify-center text-white/20">
+            <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--lacan-muted-soft)' }}>
               <span className="text-sm font-light tracking-widest">CONTENT</span>
             </div>
           )}

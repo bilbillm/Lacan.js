@@ -1,16 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: var(--lacan-ink);
+  background-color: var(--lacan-paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --lacan-paper: #f8f2e8;
+  --lacan-paper-deep: #efe2cf;
+  --lacan-surface: #fffefa;
+  --lacan-surface-soft: #fbf6ec;
+  --lacan-ink: #1a1613;
+  --lacan-ink-strong: #120f0c;
+  --lacan-muted: #4a4540;
+  --lacan-muted-soft: #766b5f;
+  --lacan-vermilion: #6b1d0e;
+  --lacan-vermilion-soft: rgba(107, 29, 14, 0.12);
+  --lacan-gold: #b58a45;
+  --lacan-border: rgba(181, 138, 69, 0.3);
+  --lacan-border-strong: rgba(107, 29, 14, 0.32);
+  --lacan-paper-shadow: rgba(26, 22, 19, 0.28) 0 18px 42px -30px;
+  --lacan-paper-shadow-strong: rgba(26, 22, 19, 0.42) 0 18px 46px -28px;
+  --lacan-title-font: FZKai-Z03, STKaiti, "Kaiti SC", KaiTi, "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, serif;
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -37,4 +53,5 @@ html, body, #root {
 
 body, #root {
   overflow: hidden;
+  background: var(--lacan-paper);
 }

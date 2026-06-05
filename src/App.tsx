@@ -184,7 +184,7 @@ function App() {
           />
         </div>
 
-        <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
+        <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
           <DeepEnvironment />
           {!isMobileViewport && (currentSlide >= 1 || maxVisitedSlide >= 1) && (
             <Suspense fallback={null}>
@@ -193,7 +193,7 @@ function App() {
           )}
         </div>
 
-        <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
+        <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
           <DeepEnvironment />
           {!isMobileViewport && (currentSlide >= 2 || maxVisitedSlide >= 2) && (
             <Suspense fallback={null}>

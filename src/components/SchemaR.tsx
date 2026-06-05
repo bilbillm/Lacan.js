@@ -11,7 +11,14 @@ export default function SchemaR({ isExpanded = false }: SchemaRProps) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2">
       <div className="text-center mb-2">
-        <span className={`font-light tracking-widest text-white/40 ${isExpanded ? 'text-xl' : 'text-base'}`}>
+        <span
+          className={`tracking-widest ${isExpanded ? 'text-xl' : 'text-base'}`}
+          style={{
+            color: 'var(--lacan-muted)',
+            fontFamily: 'var(--lacan-title-font)',
+            fontWeight: 700,
+          }}
+        >
           Schema R
         </span>
       </div>
@@ -19,7 +26,12 @@ export default function SchemaR({ isExpanded = false }: SchemaRProps) {
         src={imageUrl} 
         alt="Schema R" 
         className="flex-1 w-full h-full object-contain"
-        style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', filter: 'invert(1) opacity(0.8)' }}
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          filter: 'sepia(0.35) saturate(0.78) contrast(1.08) brightness(0.86) opacity(0.88)',
+        }}
       />
     </div>
   )

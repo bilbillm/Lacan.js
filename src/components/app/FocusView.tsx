@@ -60,7 +60,10 @@ export default function FocusView({
     <Suspense
       fallback={
         <div className="w-full h-full flex items-center justify-center">
-          <span className="text-3xl font-light tracking-widest text-white/40">
+          <span
+            className="text-3xl tracking-widest"
+            style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+          >
             {selectedPanel?.title}
           </span>
         </div>
@@ -78,7 +81,12 @@ export default function FocusView({
     </Suspense>
   ) : (
     <div className="w-full h-full flex items-center justify-center">
-      <span className="text-3xl font-light tracking-widest text-white/40">{selectedPanel?.title}</span>
+      <span
+        className="text-3xl tracking-widest"
+        style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+      >
+        {selectedPanel?.title}
+      </span>
     </div>
   )
 
@@ -95,7 +103,8 @@ export default function FocusView({
             onClick={onExitFocus}
             transition={{ duration: FOCUS_BACKDROP_FADE_S, ease: 'easeOut' }}
             style={{
-              background: 'rgba(0, 0, 0, 0.2)',
+              background: 'rgba(239, 226, 207, 0.68)',
+              backdropFilter: 'blur(1px)',
             }}
           />
 
@@ -154,7 +163,12 @@ export default function FocusView({
                           }}
                         >
                           <div className="w-full h-full flex items-center justify-center p-8">
-                            <span className="text-2xl font-light tracking-widest text-white/60">{secondaryPanelContent}</span>
+                            <span
+                              className="text-2xl tracking-widest"
+                              style={{ color: 'var(--lacan-vermilion)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+                            >
+                              {secondaryPanelContent}
+                            </span>
                           </div>
                         </GlassPanel>
                       </motion.div>
@@ -221,7 +235,12 @@ export default function FocusView({
                         }}
                       >
                         <div className="w-full h-full flex items-center justify-center p-8">
-                          <span className="text-2xl font-light tracking-widest text-white/60">{secondaryPanelContent}</span>
+                          <span
+                            className="text-2xl tracking-widest"
+                            style={{ color: 'var(--lacan-vermilion)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+                          >
+                            {secondaryPanelContent}
+                          </span>
                         </div>
                       </GlassPanel>
                     </motion.div>
