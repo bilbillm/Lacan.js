@@ -53,6 +53,7 @@ test('title fonts stay aligned across themes and timeline cards', async ({ page 
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
   await expect(headerTitle).toHaveCSS('font-family', dayFontFamily)
   await expect(headerTitle).toHaveCSS('font-weight', dayFontWeight)
+  await expect(page.locator('.theme-ripple')).toBeHidden()
 
   await page.mouse.wheel(0, 1_000)
   await expect(page.getByTestId('timeline-view')).toBeVisible()

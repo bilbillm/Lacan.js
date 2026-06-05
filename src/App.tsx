@@ -44,7 +44,7 @@ function App() {
 
     return window.localStorage.getItem('lacan-theme') === 'night' ? 'night' : 'day'
   })
-  const [themeRipple, setThemeRipple] = useState<{ id: number; x: number; y: number; targetTheme: 'day' | 'night' } | null>(null)
+  const [themeRipple, setThemeRipple] = useState<{ id: number; x: number; y: number; radius: number; targetTheme: 'day' | 'night' } | null>(null)
   const themeToggleRef = useRef<HTMLButtonElement>(null)
   const themeRippleTimerRef = useRef<number | null>(null)
   const [randomOrder] = useState(createRandomOrder)
@@ -152,16 +152,18 @@ function App() {
     const buttonRect = themeToggleRef.current?.getBoundingClientRect()
     const x = buttonRect ? buttonRect.left + buttonRect.width / 2 : window.innerWidth - 45
     const y = buttonRect ? buttonRect.top + buttonRect.height / 2 : 45
+    const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
 
     setThemeRipple({
       id: Date.now(),
       x,
       y,
+      radius,
       targetTheme: nextTheme,
     })
-    setTheme(nextTheme)
 
     themeRippleTimerRef.current = window.setTimeout(() => {
+      setTheme(nextTheme)
       setThemeRipple(null)
       themeRippleTimerRef.current = null
     }, THEME_RIPPLE_MS)
@@ -184,41 +186,8 @@ function App() {
     '--app-focus-padding-block-mobile': `${RESPONSIVE_SIZE_TOKENS.focusPaddingBlock.mobile}px`,
   }) as CSSProperties, [])
 
-  return (
-    <div
-      className="app-container"
-      data-theme={theme}
-      data-mobile-layout={isMobileViewport ? 'true' : 'false'}
-      style={appShellStyle}
-      onWheel={handleContainerWheel}
-    >
-      <button
-        ref={themeToggleRef}
-        type="button"
-        className="theme-toggle"
-        data-testid="theme-toggle"
-        aria-label={theme === 'day' ? '切换到夜间模式' : '切换到昼间模式'}
-        aria-pressed={theme === 'night'}
-        disabled={themeRipple !== null}
-        onClick={toggleTheme}
-      >
-        <span aria-hidden="true">{theme === 'day' ? '◐' : '☼'}</span>
-      </button>
-
-      {themeRipple && (
-        <div
-          key={themeRipple.id}
-          className="theme-ripple"
-          data-ripple-theme={themeRipple.targetTheme}
-          aria-hidden="true"
-          style={{
-            '--theme-ripple-x': `${themeRipple.x}px`,
-            '--theme-ripple-y': `${themeRipple.y}px`,
-            '--theme-ripple-duration': `${THEME_RIPPLE_MS}ms`,
-          } as CSSProperties}
-        />
-      )}
-
+  const renderSceneContent = () => (
+    <>
       <div
         className="slide-deck"
         style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
@@ -291,6 +260,56 @@ function App() {
           SchemaD={SchemaD}
         />
       )}
+    </>
+  )
+
+  return (
+    <div
+      className="app-container"
+      data-theme={theme}
+      data-mobile-layout={isMobileViewport ? 'true' : 'false'}
+      style={appShellStyle}
+      onWheel={handleContainerWheel}
+    >
+      {renderSceneContent()}
+
+      {themeRipple && (
+        <div
+          key={themeRipple.id}
+          className="theme-ripple"
+          data-ripple-theme={themeRipple.targetTheme}
+          aria-hidden="true"
+          style={{
+            '--theme-ripple-x': `${themeRipple.x}px`,
+            '--theme-ripple-y': `${themeRipple.y}px`,
+            '--theme-ripple-radius': `${themeRipple.radius}px`,
+            '--theme-ripple-duration': `${THEME_RIPPLE_MS}ms`,
+          } as CSSProperties}
+        >
+          <div
+            className="theme-preview"
+            data-theme={themeRipple.targetTheme}
+            data-mobile-layout={isMobileViewport ? 'true' : 'false'}
+            style={appShellStyle}
+          >
+            {renderSceneContent()}
+          </div>
+          <div className="theme-ripple-glow" />
+        </div>
+      )}
+
+      <button
+        ref={themeToggleRef}
+        type="button"
+        className="theme-toggle"
+        data-testid="theme-toggle"
+        aria-label={theme === 'day' ? '切换到夜间模式' : '切换到昼间模式'}
+        aria-pressed={theme === 'night'}
+        disabled={themeRipple !== null}
+        onClick={toggleTheme}
+      >
+        <span aria-hidden="true">{theme === 'day' ? '◐' : '☼'}</span>
+      </button>
     </div>
   )
 }

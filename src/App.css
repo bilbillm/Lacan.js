@@ -80,11 +80,23 @@
   z-index: 70;
   pointer-events: none;
   overflow: hidden;
-  isolation: isolate;
 }
 
-.theme-ripple::before {
-  content: '';
+.theme-preview {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--lacan-paper);
+  color: var(--lacan-ink);
+  animation: theme-radial-reveal var(--theme-ripple-duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  clip-path: circle(0 at var(--theme-ripple-x) var(--theme-ripple-y));
+}
+
+.theme-preview .slide-deck {
+  pointer-events: none;
+}
+
+.theme-ripple-glow {
   position: absolute;
   left: var(--theme-ripple-x);
   top: var(--theme-ripple-y);
@@ -92,24 +104,33 @@
   height: 220vmax;
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
-  transform-origin: center;
   animation: theme-ripple-expand var(--theme-ripple-duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  opacity: 0;
   filter: blur(1px);
+  opacity: 0;
   mix-blend-mode: screen;
+}
+
+.theme-ripple[data-ripple-theme='day'] .theme-ripple-glow {
+  background:
+    radial-gradient(circle, transparent 0%, rgba(255, 254, 250, 0.12) 34%, rgba(255, 254, 250, 0.44) 46%, rgba(181, 138, 69, 0.14) 57%, transparent 70%);
   box-shadow: 0 0 56px rgba(255, 254, 250, 0.22);
 }
 
-.theme-ripple[data-ripple-theme='day']::before {
-  background:
-    radial-gradient(circle, transparent 0%, rgba(255, 254, 250, 0.12) 34%, rgba(255, 254, 250, 0.44) 46%, rgba(181, 138, 69, 0.14) 57%, transparent 70%);
-}
-
-.theme-ripple[data-ripple-theme='night']::before {
+.theme-ripple[data-ripple-theme='night'] .theme-ripple-glow {
   background:
     radial-gradient(circle, transparent 0%, rgba(5, 5, 7, 0.08) 34%, rgba(5, 5, 7, 0.38) 47%, rgba(255, 255, 255, 0.08) 58%, transparent 71%);
   mix-blend-mode: multiply;
   box-shadow: 0 0 56px rgba(0, 0, 0, 0.22);
+}
+
+@keyframes theme-radial-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-ripple-x) var(--theme-ripple-y));
+  }
+
+  to {
+    clip-path: circle(var(--theme-ripple-radius) at var(--theme-ripple-x) var(--theme-ripple-y));
+  }
 }
 
 @keyframes theme-ripple-expand {
@@ -163,7 +184,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-ripple::before,
+  .theme-preview,
+  .theme-ripple-glow,
   .app-header h1,
   .app-header p {
     animation: none;
