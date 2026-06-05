@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('desktop slide deck supports gallery, focus, timeline, and Borromean views', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear())
   await page.goto('/')
 
   await expect(page.getByTestId('panel-gallery')).toBeVisible()
@@ -24,12 +25,15 @@ test('desktop slide deck supports gallery, focus, timeline, and Borromean views'
 
 test('theme toggle switches to night mode and persists the choice', async ({ page }) => {
   await page.goto('/')
+  await page.evaluate(() => window.localStorage.clear())
+  await page.reload()
 
   const toggle = page.getByTestId('theme-toggle')
   await expect(toggle).toBeVisible()
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'day')
 
   await toggle.click()
+  await expect(page.locator('.theme-ripple')).toBeVisible()
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
 
@@ -37,7 +41,29 @@ test('theme toggle switches to night mode and persists the choice', async ({ pag
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
 })
 
+test('title fonts stay aligned across themes and timeline cards', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear())
+  await page.goto('/')
+
+  const headerTitle = page.getByRole('heading', { name: 'LACAN.JS' })
+  const dayFontFamily = await headerTitle.evaluate((element) => getComputedStyle(element).fontFamily)
+  const dayFontWeight = await headerTitle.evaluate((element) => getComputedStyle(element).fontWeight)
+
+  await page.getByTestId('theme-toggle').click()
+  await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
+  await expect(headerTitle).toHaveCSS('font-family', dayFontFamily)
+  await expect(headerTitle).toHaveCSS('font-weight', dayFontWeight)
+
+  await page.mouse.wheel(0, 1_000)
+  await expect(page.getByTestId('timeline-view')).toBeVisible()
+
+  const cardTitle = page.getByRole('heading', { name: '弗洛伊德赴巴黎学习' })
+  await expect(cardTitle).toHaveCSS('font-family', dayFontFamily)
+  await expect(cardTitle).toHaveCSS('font-weight', dayFontWeight)
+})
+
 test('mobile viewport resets to gallery instead of an empty desktop-only slide', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear())
   await page.goto('/')
 
   await page.mouse.wheel(0, 1_000)

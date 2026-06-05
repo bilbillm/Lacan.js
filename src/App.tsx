@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, lazy, Suspense, type CSSProperties } from 'react'
+import { useState, useMemo, useEffect, useRef, lazy, Suspense, type CSSProperties } from 'react'
 import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
 import AppHeader from './components/app/AppHeader'
@@ -16,6 +16,7 @@ import {
 } from './components/app/uiConstants'
 
 const SLIDE_COUNT = 3
+const THEME_RIPPLE_MS = 760
 
 // 懒加载 SchemaL、SchemaR、SchemaI 和 SchemaD 组件
 const SchemaL = lazy(() => import('./components/SchemaL'))
@@ -43,6 +44,9 @@ function App() {
 
     return window.localStorage.getItem('lacan-theme') === 'night' ? 'night' : 'day'
   })
+  const [themeRipple, setThemeRipple] = useState<{ id: number; x: number; y: number; targetTheme: 'day' | 'night' } | null>(null)
+  const themeToggleRef = useRef<HTMLButtonElement>(null)
+  const themeRippleTimerRef = useRef<number | null>(null)
   const [randomOrder] = useState(createRandomOrder)
   const isMobileViewport = useMobileViewport()
 
@@ -92,6 +96,12 @@ function App() {
     window.localStorage.setItem('lacan-theme', theme)
   }, [theme])
 
+  useEffect(() => () => {
+    if (themeRippleTimerRef.current !== null) {
+      window.clearTimeout(themeRippleTimerRef.current)
+    }
+  }, [])
+
   // 键盘上下键翻页
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -136,7 +146,25 @@ function App() {
   }
 
   const toggleTheme = () => {
-    setTheme((current) => current === 'day' ? 'night' : 'day')
+    if (themeRippleTimerRef.current !== null) return
+
+    const nextTheme = theme === 'day' ? 'night' : 'day'
+    const buttonRect = themeToggleRef.current?.getBoundingClientRect()
+    const x = buttonRect ? buttonRect.left + buttonRect.width / 2 : window.innerWidth - 45
+    const y = buttonRect ? buttonRect.top + buttonRect.height / 2 : 45
+
+    setThemeRipple({
+      id: Date.now(),
+      x,
+      y,
+      targetTheme: nextTheme,
+    })
+
+    themeRippleTimerRef.current = window.setTimeout(() => {
+      setTheme(nextTheme)
+      setThemeRipple(null)
+      themeRippleTimerRef.current = null
+    }, THEME_RIPPLE_MS)
   }
 
   const appShellStyle = useMemo<CSSProperties>(() => ({
@@ -165,15 +193,31 @@ function App() {
       onWheel={handleContainerWheel}
     >
       <button
+        ref={themeToggleRef}
         type="button"
         className="theme-toggle"
         data-testid="theme-toggle"
         aria-label={theme === 'day' ? '切换到夜间模式' : '切换到昼间模式'}
         aria-pressed={theme === 'night'}
+        disabled={themeRipple !== null}
         onClick={toggleTheme}
       >
         <span aria-hidden="true">{theme === 'day' ? '◐' : '☼'}</span>
       </button>
+
+      {themeRipple && (
+        <div
+          key={themeRipple.id}
+          className="theme-ripple"
+          data-ripple-theme={themeRipple.targetTheme}
+          aria-hidden="true"
+          style={{
+            '--theme-ripple-x': `${themeRipple.x}px`,
+            '--theme-ripple-y': `${themeRipple.y}px`,
+            '--theme-ripple-duration': `${THEME_RIPPLE_MS}ms`,
+          } as CSSProperties}
+        />
+      )}
 
       <div
         className="slide-deck"

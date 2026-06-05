@@ -58,7 +58,7 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
     >
       <div className="flex flex-col items-center gap-2.5" style={{ paddingTop: 96 }}>
         <motion.h1
-          className="text-center"
+          className="lacan-page-title text-center"
           style={{ fontSize: '2.35rem', letterSpacing: '0.35em', lineHeight: 0.96,
             color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)',
             textShadow: 'var(--lacan-title-shadow)' }}
@@ -67,7 +67,7 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >波罗米结</motion.h1>
         <motion.p
-          className="text-center font-light"
+          className="lacan-page-subtitle text-center font-light"
           style={{ fontSize: '1.125rem', letterSpacing: '0.35em',
             color: 'var(--lacan-muted)' }}
           initial={{ opacity: 0, filter: 'blur(8px)', y: -20 }}

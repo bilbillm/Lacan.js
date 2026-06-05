@@ -64,9 +64,97 @@
   border-color: var(--lacan-border-strong);
 }
 
+.theme-toggle:disabled {
+  cursor: default;
+  opacity: 0.86;
+}
+
 .theme-toggle:focus-visible {
   outline: 2px solid var(--lacan-vermilion);
   outline-offset: 3px;
+}
+
+.theme-ripple {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.theme-ripple::before {
+  content: '';
+  position: absolute;
+  left: var(--theme-ripple-x);
+  top: var(--theme-ripple-y);
+  width: 220vmax;
+  height: 220vmax;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transform-origin: center;
+  animation: theme-ripple-expand var(--theme-ripple-duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  box-shadow: 0 0 42px rgba(255, 254, 250, 0.24);
+}
+
+.theme-ripple[data-ripple-theme='day']::before {
+  background:
+    radial-gradient(circle, rgba(255, 254, 250, 0.98) 0%, rgba(248, 242, 232, 0.96) 48%, rgba(239, 226, 207, 0.92) 100%);
+}
+
+.theme-ripple[data-ripple-theme='night']::before {
+  background:
+    radial-gradient(circle, rgba(40, 40, 48, 0.96) 0%, rgba(17, 17, 21, 0.98) 44%, rgba(5, 5, 7, 0.99) 100%);
+  box-shadow: 0 0 42px rgba(255, 255, 255, 0.12);
+}
+
+@keyframes theme-ripple-expand {
+  0% {
+    opacity: 0.98;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.app-header h1,
+.lacan-page-title {
+  animation: lacan-title-breath 5.2s ease-in-out infinite;
+}
+
+.app-header p,
+.lacan-page-subtitle {
+  animation: lacan-subtitle-breath 5.8s ease-in-out 0.35s infinite;
+}
+
+@keyframes lacan-title-breath {
+  0%, 100% {
+    text-shadow: var(--lacan-title-shadow);
+  }
+
+  50% {
+    text-shadow: var(--lacan-title-shadow-breathing);
+  }
+}
+
+@keyframes lacan-subtitle-breath {
+  0%, 100% {
+    text-shadow: var(--lacan-subtitle-shadow);
+  }
+
+  50% {
+    text-shadow: var(--lacan-subtitle-shadow-breathing);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-ripple::before,
+  .app-header h1,
+  .app-header p {
+    animation: none;
+  }
 }
 
 .focus-view-shell {

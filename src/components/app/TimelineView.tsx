@@ -35,7 +35,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
       {/* Title block — positioned like AppHeader, top center */}
       <div className="flex flex-col items-center gap-2.5" style={{ paddingTop: 96 }}>
         <motion.h1
-          className="text-center"
+          className="lacan-page-title text-center"
           style={{
             fontSize: '2.35rem',
             letterSpacing: '0.35em',
@@ -57,7 +57,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
         </motion.h1>
 
         <motion.p
-          className="text-center font-light"
+          className="lacan-page-subtitle text-center font-light"
           style={{
             fontSize: '1.125rem',
             letterSpacing: '0.35em',
@@ -202,7 +202,14 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                           'var(--lacan-timeline-divider)',
                       }}
                     />
-                    <h3 className="text-sm font-semibold tracking-wide mt-1 mb-1" style={{ color: 'var(--lacan-ink)' }}>
+                    <h3
+                      className="text-sm tracking-wide mt-1 mb-1"
+                      style={{
+                        color: 'var(--lacan-ink)',
+                        fontFamily: 'var(--lacan-title-font)',
+                        fontWeight: 'var(--lacan-title-weight)',
+                      }}
+                    >
                       {event.title}
                     </h3>
                     <p

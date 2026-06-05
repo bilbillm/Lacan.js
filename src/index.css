@@ -66,8 +66,10 @@
   --lacan-borromean-label-surface: rgba(255,254,250,0.86);
   --lacan-title-font: FZKai-Z03, STKaiti, "Kaiti SC", KaiTi, "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, serif;
   --lacan-title-weight: 700;
-  --lacan-title-shadow: 0 1px 0 rgba(255,254,250,0.82);
-  --lacan-subtitle-shadow: 0 1px 0 rgba(255,254,250,0.68);
+  --lacan-title-shadow: 0 1px 0 rgba(255,254,250,0.82), 0 0 12px rgba(181,138,69,0.2);
+  --lacan-title-shadow-breathing: 0 1px 0 rgba(255,254,250,0.88), 0 0 20px rgba(181,138,69,0.28), 0 0 32px rgba(107,29,14,0.12);
+  --lacan-subtitle-shadow: 0 1px 0 rgba(255,254,250,0.68), 0 0 10px rgba(181,138,69,0.14);
+  --lacan-subtitle-shadow-breathing: 0 1px 0 rgba(255,254,250,0.76), 0 0 16px rgba(181,138,69,0.2);
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -156,8 +158,8 @@ body, #root {
   --lacan-focus-backdrop: rgba(0, 0, 0, 0.2);
   --lacan-modal-backdrop: rgba(0, 0, 0, 0.35);
   --lacan-borromean-label-surface: rgba(0,0,0,0.55);
-  --lacan-title-font: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --lacan-title-weight: 300;
   --lacan-title-shadow: 0 0 5px rgba(255,255,255,0.3), 0 0 15px rgba(255,255,255,0.15), 0 0 25px rgba(255,255,255,0.08);
+  --lacan-title-shadow-breathing: 0 0 8px rgba(255,255,255,0.42), 0 0 22px rgba(255,255,255,0.2), 0 0 38px rgba(255,255,255,0.1);
   --lacan-subtitle-shadow: 0 0 3px rgba(255,255,255,0.15), 0 0 8px rgba(255,255,255,0.08);
+  --lacan-subtitle-shadow-breathing: 0 0 5px rgba(255,255,255,0.24), 0 0 14px rgba(255,255,255,0.12);
 }
