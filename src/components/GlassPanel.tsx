@@ -149,13 +149,14 @@ export default function GlassPanel({
         <div
           className="absolute inset-0"
           style={{
-            background:
-              'linear-gradient(180deg, rgba(255,254,250,0.96) 0%, rgba(251,246,236,0.94) 100%)',
+            background: 'var(--lacan-panel-background)',
+            backdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
+            WebkitBackdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
             border: '1px solid var(--lacan-border)',
             borderRadius: isMobileViewport ? 10 : 12,
             boxShadow: `
               var(--lacan-paper-shadow),
-              inset 0 1px 0 rgba(255, 254, 250, 0.82)
+              inset 0 1px 0 var(--lacan-panel-inset-highlight)
             `,
           }}
         />
@@ -165,7 +166,7 @@ export default function GlassPanel({
           className="absolute inset-0 pointer-events-none"
           style={{
             borderRadius: isMobileViewport ? 10 : 12,
-            background: 'linear-gradient(135deg, rgba(181,138,69,0.18) 0%, transparent 42%)',
+            background: 'var(--lacan-panel-edge)',
           }}
         />
 
@@ -176,10 +177,10 @@ export default function GlassPanel({
             style={{
               opacity: 0.18,
               borderRadius: isMobileViewport ? 10 : 12,
-              mixBlendMode: 'multiply',
+              mixBlendMode: 'var(--lacan-panel-noise-blend)' as React.CSSProperties['mixBlendMode'],
               backgroundImage: `
-                radial-gradient(rgba(181,138,69,0.12) 0.5px, transparent 0.5px),
-                radial-gradient(rgba(107,29,14,0.05) 0.4px, transparent 0.4px)
+                radial-gradient(var(--lacan-panel-noise-a) 0.5px, transparent 0.5px),
+                radial-gradient(var(--lacan-panel-noise-b) 0.4px, transparent 0.4px)
               `,
               backgroundPosition: '0 0, 8px 8px',
               backgroundSize: '16px 16px, 20px 20px',
@@ -197,7 +198,7 @@ export default function GlassPanel({
             transition={{ duration: 0.3 }}
             style={{
               borderRadius: isMobileViewport ? 10 : 12,
-              background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(181,138,69,0.12) 0%, rgba(255,254,250,0.26) 36%, transparent 66%)`,
+              background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, var(--lacan-panel-hover) 0%, var(--lacan-panel-sheen) 36%, transparent 66%)`,
             }}
           />
         )}
@@ -207,7 +208,7 @@ export default function GlassPanel({
           className="absolute inset-0 pointer-events-none"
           style={{
             borderRadius: isMobileViewport ? 10 : 12,
-            background: 'radial-gradient(circle at 50% 45%, rgba(255,254,250,0.72) 0%, transparent 78%)',
+            background: 'radial-gradient(circle at 50% 45%, var(--lacan-panel-sheen) 0%, transparent 78%)',
             opacity: paperSheenOpacity,
           }}
         />

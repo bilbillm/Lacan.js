@@ -6,15 +6,15 @@ interface BorromeanKnot2DProps {
 }
 
 const RINGS = [
-  { key: 'S', cx: 200, cy: 148, r: 75, color: '#6b1d0e', glow: 'rgba(107,29,14,0.18)', label: '符号界' },
-  { key: 'I', cx: 152, cy: 242, r: 75, color: '#b58a45', glow: 'rgba(181,138,69,0.2)', label: '想象界' },
-  { key: 'R', cx: 248, cy: 242, r: 75, color: '#1a1613', glow: 'rgba(26,22,19,0.12)', label: '实在界' },
+  { key: 'S', cx: 200, cy: 148, r: 75, color: 'var(--lacan-borromean-s)', glow: 'var(--lacan-borromean-glow-s)', label: '符号界' },
+  { key: 'I', cx: 152, cy: 242, r: 75, color: 'var(--lacan-borromean-i)', glow: 'var(--lacan-borromean-glow-i)', label: '想象界' },
+  { key: 'R', cx: 248, cy: 242, r: 75, color: 'var(--lacan-borromean-r)', glow: 'var(--lacan-borromean-glow-r)', label: '实在界' },
 ] as const
 
 type RingKey = (typeof RINGS)[number]['key']
 
 const RING_BY_KEY = new Map(RINGS.map((ring) => [ring.key, ring]))
-const BACKGROUND = '#f8f2e8'
+const BACKGROUND = 'var(--lacan-borromean-gap)'
 
 const CROSSINGS: Array<{
   over: RingKey
@@ -60,8 +60,8 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
         <motion.h1
           className="text-center"
           style={{ fontSize: '2.35rem', letterSpacing: '0.35em', lineHeight: 0.96,
-            color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700,
-            textShadow: '0 1px 0 rgba(255,254,250,0.82)' }}
+            color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)',
+            textShadow: 'var(--lacan-title-shadow)' }}
           initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -151,10 +151,10 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
             return (
               <motion.g key={`lbl-${ring.key}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8, duration: 0.6 }}>
                 <rect x={lx - 38} y={ly - 17} width={76} height={34} rx={6}
-                  fill="rgba(255,254,250,0.86)" stroke={ring.color} strokeWidth={0.8} />
+                  fill="var(--lacan-borromean-label-surface)" stroke={ring.color} strokeWidth={0.8} />
                 <text x={lx} y={ly + 2} textAnchor="middle" dominantBaseline="central"
                   fill="var(--lacan-ink)" fontSize={11}
-                  fontFamily="var(--lacan-title-font)" fontWeight={700} letterSpacing="0.08em">
+                  fontFamily="var(--lacan-title-font)" fontWeight="var(--lacan-title-weight)" letterSpacing="0.08em">
                   {ring.label}
                 </text>
               </motion.g>

@@ -26,7 +26,6 @@ const h1Variants = {
     filter: 'blur(0px)',
     y: 0,
     scale: 1,
-    textShadow: '0 1px 0 rgba(255,254,250,0.82)',
   },
   blurred: {
     opacity: 0,
@@ -47,7 +46,6 @@ const pVariants = {
     filter: 'blur(0px)',
     y: 0,
     scale: 1,
-    textShadow: '0 1px 0 rgba(255,254,250,0.68)',
   },
   blurred: {
     opacity: 0,
@@ -81,7 +79,8 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
     lineHeight: 0.96,
     color: 'var(--lacan-ink-strong)',
     fontFamily: 'var(--lacan-title-font)',
-    fontWeight: 700,
+    fontWeight: 'var(--lacan-title-weight)',
+    textShadow: 'var(--lacan-title-shadow)',
   }), [isMobileViewport])
 
   const subtitleStyle = useMemo<CSSProperties>(() => ({
@@ -99,6 +98,7 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
     color: 'var(--lacan-muted)',
     fontFamily: '"Source Sans 3", "Segoe UI", system-ui, sans-serif',
     fontWeight: 400,
+    textShadow: 'var(--lacan-subtitle-shadow)',
   }), [isMobileViewport])
 
   return (
@@ -126,7 +126,6 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
             ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
-          textShadow: { duration: 0.4, ease: 'easeOut' },
         }}
       >
         LACAN.JS
@@ -148,7 +147,6 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
             ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           scale: { duration: 0.4 },
-          textShadow: { duration: 0.4, ease: 'easeOut' },
         }}
       >
         The Spatial Architecture of Psychoanalysis

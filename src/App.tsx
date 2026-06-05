@@ -38,6 +38,11 @@ function App() {
   const [isExitingFocus, setIsExitingFocus] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [maxVisitedSlide, setMaxVisitedSlide] = useState(0)
+  const [theme, setTheme] = useState<'day' | 'night'>(() => {
+    if (typeof window === 'undefined') return 'day'
+
+    return window.localStorage.getItem('lacan-theme') === 'night' ? 'night' : 'day'
+  })
   const [randomOrder] = useState(createRandomOrder)
   const isMobileViewport = useMobileViewport()
 
@@ -83,6 +88,10 @@ function App() {
     return () => clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    window.localStorage.setItem('lacan-theme', theme)
+  }, [theme])
+
   // 键盘上下键翻页
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -126,6 +135,10 @@ function App() {
     }
   }
 
+  const toggleTheme = () => {
+    setTheme((current) => current === 'day' ? 'night' : 'day')
+  }
+
   const appShellStyle = useMemo<CSSProperties>(() => ({
     '--app-shell-padding-inline-desktop': `${RESPONSIVE_SIZE_TOKENS.shellPaddingInline.desktop}px`,
     '--app-shell-padding-inline-mobile': `${RESPONSIVE_SIZE_TOKENS.shellPaddingInline.mobile}px`,
@@ -146,10 +159,22 @@ function App() {
   return (
     <div
       className="app-container"
+      data-theme={theme}
       data-mobile-layout={isMobileViewport ? 'true' : 'false'}
       style={appShellStyle}
       onWheel={handleContainerWheel}
     >
+      <button
+        type="button"
+        className="theme-toggle"
+        data-testid="theme-toggle"
+        aria-label={theme === 'day' ? '切换到夜间模式' : '切换到昼间模式'}
+        aria-pressed={theme === 'night'}
+        onClick={toggleTheme}
+      >
+        <span aria-hidden="true">{theme === 'day' ? '◐' : '☼'}</span>
+      </button>
+
       <div
         className="slide-deck"
         style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}

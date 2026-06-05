@@ -16,7 +16,7 @@ export default function SchemaR({ isExpanded = false }: SchemaRProps) {
           style={{
             color: 'var(--lacan-muted)',
             fontFamily: 'var(--lacan-title-font)',
-            fontWeight: 700,
+            fontWeight: 'var(--lacan-title-weight)',
           }}
         >
           Schema R
@@ -30,7 +30,7 @@ export default function SchemaR({ isExpanded = false }: SchemaRProps) {
           display: 'block',
           maxWidth: '100%',
           maxHeight: '100%',
-          filter: 'sepia(0.35) saturate(0.78) contrast(1.08) brightness(0.86) opacity(0.88)',
+          filter: 'var(--lacan-schema-filter)',
         }}
       />
     </div>

@@ -22,6 +22,21 @@ test('desktop slide deck supports gallery, focus, timeline, and Borromean views'
   await expect(page.getByRole('img', { name: /波罗米结/ })).toBeVisible()
 })
 
+test('theme toggle switches to night mode and persists the choice', async ({ page }) => {
+  await page.goto('/')
+
+  const toggle = page.getByTestId('theme-toggle')
+  await expect(toggle).toBeVisible()
+  await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'day')
+
+  await toggle.click()
+  await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+
+  await page.reload()
+  await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
+})
+
 test('mobile viewport resets to gallery instead of an empty desktop-only slide', async ({ page }) => {
   await page.goto('/')
 

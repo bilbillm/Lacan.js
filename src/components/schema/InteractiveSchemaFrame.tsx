@@ -42,7 +42,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
           style={{
             color: 'var(--lacan-muted)',
             fontFamily: 'var(--lacan-title-font)',
-            fontWeight: 700,
+            fontWeight: 'var(--lacan-title-weight)',
           }}
         >
           {title}
@@ -58,7 +58,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
             display: 'block',
             maxWidth: '100%',
             maxHeight: '100%',
-            filter: 'sepia(0.35) saturate(0.78) contrast(1.08) brightness(0.86) opacity(0.88)',
+            filter: 'var(--lacan-schema-filter)',
           }}
         />
 
@@ -84,7 +84,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
                   r={node.r}
                   className="pointer-events-none transition-all duration-200"
                   fill="transparent"
-                  stroke={isSelected ? 'var(--lacan-vermilion)' : isHovered ? 'rgba(107,29,14,0.56)' : 'transparent'}
+                  stroke={isSelected ? 'var(--lacan-vermilion)' : isHovered ? 'var(--lacan-schema-hover-stroke)' : 'transparent'}
                   strokeWidth={isSelected ? 3 : isHovered ? 2 : 0}
                   strokeDasharray={isHovered && !isSelected ? '4 2' : '0'}
                 />

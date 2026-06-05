@@ -42,8 +42,8 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
             lineHeight: 0.96,
             color: 'var(--lacan-ink-strong)',
             fontFamily: 'var(--lacan-title-font)',
-            fontWeight: 700,
-            textShadow: '0 1px 0 rgba(255,254,250,0.82)',
+            fontWeight: 'var(--lacan-title-weight)',
+            textShadow: 'var(--lacan-title-shadow)',
           }}
           initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
@@ -84,7 +84,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
           {/* Horizontal line */}
           <div
             className="absolute left-0 right-0"
-            style={{ top: '50%', height: 1, background: 'rgba(181,138,69,0.22)' }}
+            style={{ top: '50%', height: 1, background: 'var(--lacan-timeline-line)' }}
           >
             <motion.div
               className="absolute inset-y-0 left-0"
@@ -96,8 +96,8 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
               }}
               style={{
                 background:
-                  'linear-gradient(90deg, var(--lacan-vermilion), rgba(181,138,69,0.58))',
-                boxShadow: '0 4px 12px rgba(107,29,14,0.12)',
+                  'var(--lacan-timeline-fill)',
+                boxShadow: 'var(--lacan-timeline-shadow)',
               }}
             />
           </div>
@@ -147,7 +147,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                       ? { top: 'calc(50% - 30px)', height: 30 }
                       : { top: '50%', height: 30 }),
                     background:
-                      'linear-gradient(to bottom, rgba(107,29,14,0.32), rgba(181,138,69,0.16))',
+                      'var(--lacan-timeline-connector)',
                     transform: 'translateX(-50%)',
                     zIndex: 1,
                   }}
@@ -199,7 +199,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                         marginTop: 6,
                         marginBottom: 8,
                         background:
-                          'linear-gradient(to right, rgba(181,138,69,0.28), rgba(181,138,69,0.06))',
+                          'var(--lacan-timeline-divider)',
                       }}
                     />
                     <h3 className="text-sm font-semibold tracking-wide mt-1 mb-1" style={{ color: 'var(--lacan-ink)' }}>
@@ -238,7 +238,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
               transition={{ duration: 0.3 }}
               onClick={() => setExpandedYear(null)}
               style={{
-                background: 'rgba(26, 22, 19, 0.28)',
+                background: 'var(--lacan-modal-backdrop)',
                 backdropFilter: 'blur(2px)',
                 WebkitBackdropFilter: 'blur(2px)',
               }}
@@ -281,12 +281,12 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                       width: '100%',
                       marginBottom: 20,
                       background:
-                        'linear-gradient(to right, rgba(181,138,69,0.3), rgba(181,138,69,0.06))',
+                        'var(--lacan-timeline-divider)',
                     }}
                   />
                   <h3
                     className="tracking-wide mb-5"
-                    style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+                    style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                   >
                     {expandedEvent.title}
                   </h3>

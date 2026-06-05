@@ -31,9 +31,9 @@ function PerspectiveRoom() {
 
   // Subtle paper-room line work, aligned with the forum's quiet editorial tone.
   const glowFilter = [
-    'drop-shadow(0 0 0 rgba(181,138,69,0))',
-    'drop-shadow(0 1px 2px rgba(181,138,69,0.18))',
-    'drop-shadow(0 0 0 rgba(181,138,69,0))',
+    'var(--lacan-room-glow-rest)',
+    'var(--lacan-room-glow-active)',
+    'var(--lacan-room-glow-rest)',
   ]
 
   // Helper: 渲染所有线条
@@ -43,12 +43,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="15" y1="0"
         x2="15" y2="75"
-        stroke="rgba(107, 29, 14, 0.22)"
+        stroke="var(--lacan-room-line)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'var(--lacan-room-glow-rest)' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -63,12 +63,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="85" y1="0"
         x2="85" y2="75"
-        stroke="rgba(107, 29, 14, 0.22)"
+        stroke="var(--lacan-room-line)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'var(--lacan-room-glow-rest)' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -83,12 +83,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="3" y1="100"
         x2="15" y2="75"
-        stroke="rgba(107, 29, 14, 0.22)"
+        stroke="var(--lacan-room-line)"
         strokeWidth="0.6"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'var(--lacan-room-glow-rest)' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -103,12 +103,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="97" y1="100"
         x2="85" y2="75"
-        stroke="rgba(107, 29, 14, 0.22)"
+        stroke="var(--lacan-room-line)"
         strokeWidth="0.6"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'var(--lacan-room-glow-rest)' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -123,12 +123,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="15" y1="75"
         x2="50" y2="75"
-        stroke="rgba(181, 138, 69, 0.2)"
+        stroke="var(--lacan-room-line-soft)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'var(--lacan-room-glow-rest)' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -143,12 +143,12 @@ function PerspectiveRoom() {
       <motion.line
         x1="85" y1="75"
         x2="50" y2="75"
-        stroke="rgba(181, 138, 69, 0.2)"
+        stroke="var(--lacan-room-line-soft)"
         strokeWidth="0.5"
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
-        initial={{ strokeDashoffset: 1000, filter: 'drop-shadow(0 0 0px rgba(181,138,69,0))' }}
+        initial={{ strokeDashoffset: 1000, filter: 'var(--lacan-room-glow-rest)' }}
         animate={{
           strokeDashoffset: 0,
           filter: glowFilter,
@@ -217,8 +217,7 @@ export default function DeepEnvironment() {
       <div
         className="absolute inset-0"
         style={{
-          background:
-            'radial-gradient(ellipse 80% 60% at 50% 4%, rgba(255,254,250,0.92) 0%, rgba(248,242,232,0.84) 45%, rgba(239,226,207,0.56) 100%)',
+          background: 'var(--lacan-environment-gradient)',
         }}
       />
 
@@ -229,8 +228,7 @@ export default function DeepEnvironment() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            'radial-gradient(ellipse 100% 100% at 50% 50%, rgba(255,254,250,0) 44%, rgba(181,138,69,0.12) 100%)',
+          background: 'var(--lacan-environment-vignette)',
         }}
       />
     </div>

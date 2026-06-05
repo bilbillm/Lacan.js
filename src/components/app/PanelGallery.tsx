@@ -154,7 +154,7 @@ export default function PanelGallery({
                             <div className="w-full h-full flex items-center justify-center">
                               <span
                                 className="text-xl tracking-widest"
-                                style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+                                style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                               >
                                 {panel.galleryLabel ?? panel.title}
                               </span>
@@ -175,7 +175,7 @@ export default function PanelGallery({
                       <div className="w-full h-full flex items-center justify-center">
                         <span
                           className="text-xl tracking-widest"
-                          style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 700 }}
+                          style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                         >
                           {panel.galleryLabel ?? panel.title}
                         </span>
@@ -199,7 +199,7 @@ export default function PanelGallery({
                         transform: 'scaleX(-1)',
                         transformOrigin: 'top center',
                         opacity: Math.min(galleryLayout.reflectionOpacity, 0.16),
-                        background: 'linear-gradient(to bottom, rgba(181,138,69,0.18), rgba(107,29,14,0.06) 34%, transparent 82%)',
+                        background: 'var(--lacan-gallery-reflection)',
                         filter: 'blur(18px)',
                         maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
                         WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
@@ -226,7 +226,7 @@ export default function PanelGallery({
               width: '100%',
               height: '2px',
               boxShadow: 'inset 0 0 0 1px var(--lacan-border)',
-              background: 'rgba(255,254,250,0.52)',
+              background: 'var(--lacan-progress-track)',
             }}
           >
             <motion.div
@@ -242,7 +242,7 @@ export default function PanelGallery({
                     }
               }
               style={{
-                background: 'linear-gradient(90deg, rgba(181,138,69,0.12) 0%, rgba(181,138,69,0.24) 100%)',
+                background: 'var(--lacan-progress-base)',
               }}
             />
             <motion.div
@@ -258,8 +258,8 @@ export default function PanelGallery({
                     }
               }
               style={{
-                background: 'linear-gradient(90deg, var(--lacan-vermilion) 0%, rgba(181,138,69,0.86) 100%)',
-                boxShadow: '0 4px 14px rgba(107,29,14,0.18)',
+                background: 'var(--lacan-progress-fill)',
+                boxShadow: 'var(--lacan-progress-shadow)',
               }}
             />
           </motion.div>
