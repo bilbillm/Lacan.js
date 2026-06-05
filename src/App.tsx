@@ -159,9 +159,9 @@ function App() {
       y,
       targetTheme: nextTheme,
     })
+    setTheme(nextTheme)
 
     themeRippleTimerRef.current = window.setTimeout(() => {
-      setTheme(nextTheme)
       setThemeRipple(null)
       themeRippleTimerRef.current = null
     }, THEME_RIPPLE_MS)

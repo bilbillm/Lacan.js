@@ -80,6 +80,7 @@
   z-index: 70;
   pointer-events: none;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .theme-ripple::before {
@@ -93,28 +94,40 @@
   transform: translate(-50%, -50%) scale(0);
   transform-origin: center;
   animation: theme-ripple-expand var(--theme-ripple-duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  box-shadow: 0 0 42px rgba(255, 254, 250, 0.24);
+  opacity: 0;
+  filter: blur(1px);
+  mix-blend-mode: screen;
+  box-shadow: 0 0 56px rgba(255, 254, 250, 0.22);
 }
 
 .theme-ripple[data-ripple-theme='day']::before {
   background:
-    radial-gradient(circle, rgba(255, 254, 250, 0.98) 0%, rgba(248, 242, 232, 0.96) 48%, rgba(239, 226, 207, 0.92) 100%);
+    radial-gradient(circle, transparent 0%, rgba(255, 254, 250, 0.12) 34%, rgba(255, 254, 250, 0.44) 46%, rgba(181, 138, 69, 0.14) 57%, transparent 70%);
 }
 
 .theme-ripple[data-ripple-theme='night']::before {
   background:
-    radial-gradient(circle, rgba(40, 40, 48, 0.96) 0%, rgba(17, 17, 21, 0.98) 44%, rgba(5, 5, 7, 0.99) 100%);
-  box-shadow: 0 0 42px rgba(255, 255, 255, 0.12);
+    radial-gradient(circle, transparent 0%, rgba(5, 5, 7, 0.08) 34%, rgba(5, 5, 7, 0.38) 47%, rgba(255, 255, 255, 0.08) 58%, transparent 71%);
+  mix-blend-mode: multiply;
+  box-shadow: 0 0 56px rgba(0, 0, 0, 0.22);
 }
 
 @keyframes theme-ripple-expand {
   0% {
-    opacity: 0.98;
+    opacity: 0;
     transform: translate(-50%, -50%) scale(0);
   }
 
+  12% {
+    opacity: 0.64;
+  }
+
+  62% {
+    opacity: 0.28;
+  }
+
   100% {
-    opacity: 1;
+    opacity: 0;
     transform: translate(-50%, -50%) scale(1);
   }
 }
