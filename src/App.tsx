@@ -15,6 +15,8 @@ import {
   WHEEL_NAV_THRESHOLD,
 } from './components/app/uiConstants'
 
+const SLIDE_COUNT = 3
+
 // 懒加载 SchemaL、SchemaR、SchemaI 和 SchemaD 组件
 const SchemaL = lazy(() => import('./components/SchemaL'))
 const SchemaR = lazy(() => import('./components/SchemaR'))
@@ -44,6 +46,7 @@ function App() {
 
   const currentPanels = panels.slice(pageGroup * panelsPerPage, (pageGroup + 1) * panelsPerPage)
 
+  const visibleSlide = isMobileViewport ? 0 : currentSlide
   const selectedPanel = panels.find(p => p.id === selectedId)
 
   const selectedNodes = selectedNodeState?.panelId === selectedId ? selectedNodeState.nodeIds : []
@@ -58,11 +61,13 @@ function App() {
 
   // 处理退出聚焦（先清除节点选择，触发退场动画后再退出聚焦）
   const handleExitFocus = () => {
+    if (isExitingFocus) return
+
     setIsExitingFocus(true)
     setSelectedNodeState(null)
     setCurrentSlide(0)
-    setSelectedId(null)
     setTimeout(() => {
+      setSelectedId(null)
       setIsExitingFocus(false)
     }, FOCUS_EXIT_MS)
   }
@@ -108,8 +113,6 @@ function App() {
     }
   }
 
-  const SLIDE_COUNT = 3
-
   const handleContainerWheel = (event: React.WheelEvent) => {
     if (isMobileViewport || selectedId !== null) return
     if (event.deltaY > WHEEL_NAV_THRESHOLD) {
@@ -149,7 +152,7 @@ function App() {
     >
       <div
         className="slide-deck"
-        style={{ transform: `translateY(${-currentSlide * 100}vh)` }}
+        style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
       >
         <div className="slide">
           <DeepEnvironment />
@@ -183,7 +186,7 @@ function App() {
 
         <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
           <DeepEnvironment />
-          {(currentSlide >= 1 || maxVisitedSlide >= 1) && (
+          {!isMobileViewport && (currentSlide >= 1 || maxVisitedSlide >= 1) && (
             <Suspense fallback={null}>
               <TimelineView isMobileViewport={isMobileViewport} />
             </Suspense>
@@ -192,7 +195,7 @@ function App() {
 
         <div className="slide" style={{ background: 'rgb(5, 5, 7)' }}>
           <DeepEnvironment />
-          {(currentSlide >= 2 || maxVisitedSlide >= 2) && (
+          {!isMobileViewport && (currentSlide >= 2 || maxVisitedSlide >= 2) && (
             <Suspense fallback={null}>
               <BorromeanKnot2D isMobileViewport={isMobileViewport} />
             </Suspense>
@@ -201,10 +204,10 @@ function App() {
       </div>
 
       {!selectedId && !isMobileViewport && (
-        <ScrollIndicator currentSlide={currentSlide} totalSlides={SLIDE_COUNT} />
+        <ScrollIndicator currentSlide={visibleSlide} totalSlides={SLIDE_COUNT} />
       )}
 
-      {selectedId && selectedPanel && currentSlide === 0 && (
+      {selectedId && selectedPanel && visibleSlide === 0 && (
         <FocusView
           selectedId={selectedId}
           selectedPanel={selectedPanel}

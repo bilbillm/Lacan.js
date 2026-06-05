@@ -25,6 +25,10 @@ dist-ssr
 
 # Tool artifacts
 .sisyphus/
+.omo/
+.playwright-mcp/
+playwright-report/
+test-results/
 %TEMP%/
 _tmp_refs/react-router/
 _tmp_refs/storybook/

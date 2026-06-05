@@ -9,7 +9,41 @@ const RINGS = [
   { key: 'S', cx: 200, cy: 148, r: 75, color: 'rgba(96,165,250,0.85)', glow: 'rgba(96,165,250,0.4)', label: '符号界' },
   { key: 'I', cx: 152, cy: 242, r: 75, color: 'rgba(234,179,8,0.85)', glow: 'rgba(234,179,8,0.4)', label: '想象界' },
   { key: 'R', cx: 248, cy: 242, r: 75, color: 'rgba(220,72,72,0.85)', glow: 'rgba(220,72,72,0.4)', label: '实在界' },
+] as const
+
+type RingKey = (typeof RINGS)[number]['key']
+
+const RING_BY_KEY = new Map(RINGS.map((ring) => [ring.key, ring]))
+const BACKGROUND = 'rgb(5,5,7)'
+
+const CROSSINGS: Array<{
+  over: RingKey
+  under: RingKey
+  overAngle: number
+  underAngle: number
+}> = [
+  { over: 'S', under: 'I', overAngle: 162.3, underAngle: -108.2 },
+  { over: 'I', under: 'S', overAngle: -17.7, underAngle: 71.8 },
+  { over: 'R', under: 'S', overAngle: -71.8, underAngle: 17.7 },
+  { over: 'S', under: 'R', overAngle: 108.2, underAngle: -162.3 },
+  { over: 'I', under: 'R', overAngle: -50.2, underAngle: -129.8 },
+  { over: 'R', under: 'I', overAngle: 129.8, underAngle: 50.2 },
 ]
+
+function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
+  const radians = (angle * Math.PI) / 180
+  return {
+    x: cx + r * Math.cos(radians),
+    y: cy + r * Math.sin(radians),
+  }
+}
+
+function describeArc(ring: (typeof RINGS)[number], angle: number, spread: number) {
+  const start = polarToCartesian(ring.cx, ring.cy, ring.r, angle - spread)
+  const end = polarToCartesian(ring.cx, ring.cy, ring.r, angle + spread)
+
+  return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${ring.r} ${ring.r} 0 0 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`
+}
 
 export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DProps) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null)
@@ -42,7 +76,14 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
       </div>
 
       <div className="flex-1 flex items-center justify-center w-full">
-        <svg viewBox="0 0 400 440" className="w-full max-w-lg" style={{ maxHeight: '60vh' }}>
+        <svg
+          viewBox="0 0 400 440"
+          className="w-full max-w-lg"
+          style={{ maxHeight: '60vh' }}
+          role="img"
+          aria-labelledby="borromean-title"
+        >
+          <title id="borromean-title">波罗米结：符号界、想象界、实在界交错锁合</title>
           {RINGS.map((ring, i) => {
             const isHov = hoveredKey === ring.key
             const dim = hoveredKey !== null && hoveredKey !== ring.key
@@ -62,6 +103,43 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
                 }}
                 onMouseEnter={() => setHoveredKey(ring.key)}
                 onMouseLeave={() => setHoveredKey(null)}
+              />
+            )
+          })}
+
+          {CROSSINGS.map((crossing) => {
+            const ring = RING_BY_KEY.get(crossing.under)!
+            return (
+              <path
+                key={`gap-${crossing.under}-${crossing.underAngle}`}
+                d={describeArc(ring, crossing.underAngle, 8)}
+                fill="none"
+                stroke={BACKGROUND}
+                strokeWidth={16}
+                strokeLinecap="round"
+              />
+            )
+          })}
+
+          {CROSSINGS.map((crossing) => {
+            const ring = RING_BY_KEY.get(crossing.over)!
+            const isHov = hoveredKey === crossing.over
+            const dim = hoveredKey !== null && hoveredKey !== crossing.over
+
+            return (
+              <motion.path
+                key={`over-${crossing.over}-${crossing.overAngle}`}
+                d={describeArc(ring, crossing.overAngle, 9)}
+                fill="none"
+                stroke={ring.color}
+                strokeWidth={isHov ? 8 : 6}
+                strokeLinecap="round"
+                animate={{ opacity: dim ? 0.3 : 1, strokeWidth: isHov ? 8 : 6 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  filter: isHov ? `drop-shadow(0 0 14px ${ring.glow})` : `drop-shadow(0 0 4px ${ring.glow})`,
+                  pointerEvents: 'none',
+                }}
               />
             )
           })}

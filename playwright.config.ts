@@ -1,12 +1,15 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const previewPort = 4373
+const previewBaseUrl = `http://127.0.0.1:${previewPort}/Lacan.js`
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: false,
   workers: 1,
   reporter: 'html',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: previewBaseUrl,
     trace: 'on-first-retry',
   },
   projects: [
@@ -16,8 +19,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173',
-    url: 'http://127.0.0.1:4173',
+    command: `npm run build && npm run preview -- --host 127.0.0.1 --port ${previewPort}`,
+    port: previewPort,
     reuseExistingServer: false,
   },
 })
