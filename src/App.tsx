@@ -16,7 +16,7 @@ import {
 } from './components/app/uiConstants'
 
 const SLIDE_COUNT = 3
-const THEME_RIPPLE_MS = 760
+const THEME_TRANSITION_MS = 520
 
 // 懒加载 SchemaL、SchemaR、SchemaI 和 SchemaD 组件
 const SchemaL = lazy(() => import('./components/SchemaL'))
@@ -44,9 +44,9 @@ function App() {
 
     return window.localStorage.getItem('lacan-theme') === 'night' ? 'night' : 'day'
   })
-  const [themeRipple, setThemeRipple] = useState<{ id: number; x: number; y: number; radius: number; targetTheme: 'day' | 'night' } | null>(null)
+  const [themeTransition, setThemeTransition] = useState<{ id: number; targetTheme: 'day' | 'night' } | null>(null)
   const themeToggleRef = useRef<HTMLButtonElement>(null)
-  const themeRippleTimerRef = useRef<number | null>(null)
+  const themeTransitionTimerRef = useRef<number | null>(null)
   const [randomOrder] = useState(createRandomOrder)
   const isMobileViewport = useMobileViewport()
 
@@ -97,8 +97,8 @@ function App() {
   }, [theme])
 
   useEffect(() => () => {
-    if (themeRippleTimerRef.current !== null) {
-      window.clearTimeout(themeRippleTimerRef.current)
+    if (themeTransitionTimerRef.current !== null) {
+      window.clearTimeout(themeTransitionTimerRef.current)
     }
   }, [])
 
@@ -146,27 +146,20 @@ function App() {
   }
 
   const toggleTheme = () => {
-    if (themeRippleTimerRef.current !== null) return
+    if (themeTransitionTimerRef.current !== null) return
 
     const nextTheme = theme === 'day' ? 'night' : 'day'
-    const buttonRect = themeToggleRef.current?.getBoundingClientRect()
-    const x = buttonRect ? buttonRect.left + buttonRect.width / 2 : window.innerWidth - 45
-    const y = buttonRect ? buttonRect.top + buttonRect.height / 2 : 45
-    const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
 
-    setThemeRipple({
+    setThemeTransition({
       id: Date.now(),
-      x,
-      y,
-      radius,
       targetTheme: nextTheme,
     })
+    setTheme(nextTheme)
 
-    themeRippleTimerRef.current = window.setTimeout(() => {
-      setTheme(nextTheme)
-      setThemeRipple(null)
-      themeRippleTimerRef.current = null
-    }, THEME_RIPPLE_MS)
+    themeTransitionTimerRef.current = window.setTimeout(() => {
+      setThemeTransition(null)
+      themeTransitionTimerRef.current = null
+    }, THEME_TRANSITION_MS)
   }
 
   const appShellStyle = useMemo<CSSProperties>(() => ({
@@ -186,116 +179,97 @@ function App() {
     '--app-focus-padding-block-mobile': `${RESPONSIVE_SIZE_TOKENS.focusPaddingBlock.mobile}px`,
   }) as CSSProperties, [])
 
-  const renderSceneContent = () => (
-    <>
-      <div
-        className="slide-deck"
-        style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
-      >
-        <div className="slide">
-          <DeepEnvironment />
+  return (
+    <div
+      className="app-container"
+      data-theme={theme}
+      data-theme-transition={themeTransition?.targetTheme ?? undefined}
+      data-mobile-layout={isMobileViewport ? 'true' : 'false'}
+      style={appShellStyle}
+      onWheel={handleContainerWheel}
+    >
+      <div className="theme-content">
+        <div
+          className="slide-deck"
+          style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
+        >
+          <div className="slide">
+            <DeepEnvironment />
 
-          <AppHeader
-            selectedId={selectedId}
-            shouldAnimateEntry={shouldAnimateEntry}
-            entryDelayMs={HEADER_ENTRY_DELAY_MS}
-            isMobileViewport={isMobileViewport}
-          />
+            <AppHeader
+              selectedId={selectedId}
+              shouldAnimateEntry={shouldAnimateEntry}
+              entryDelayMs={HEADER_ENTRY_DELAY_MS}
+              isMobileViewport={isMobileViewport}
+            />
 
-          <PanelGallery
-            pageGroup={pageGroup}
-            totalPages={totalPages}
-            currentPanels={currentPanels}
-            randomOrder={randomOrder}
+            <PanelGallery
+              pageGroup={pageGroup}
+              totalPages={totalPages}
+              currentPanels={currentPanels}
+              randomOrder={randomOrder}
+              selectedId={selectedId}
+              selectedNodeState={selectedNodeState}
+              isAppLoaded={isAppLoaded}
+              cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
+              isMobileViewport={isMobileViewport}
+              onSelectPanel={handleSelectPanel}
+              onSelectionChange={handleSelectionChange}
+              SchemaL={SchemaL}
+              SchemaR={SchemaR}
+              SchemaI={SchemaI}
+              SchemaD={SchemaD}
+              onWheelNavigate={handleGalleryWheel}
+            />
+          </div>
+
+          <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
+            <DeepEnvironment />
+            {!isMobileViewport && (currentSlide >= 1 || maxVisitedSlide >= 1) && (
+              <Suspense fallback={null}>
+                <TimelineView isMobileViewport={isMobileViewport} />
+              </Suspense>
+            )}
+          </div>
+
+          <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
+            <DeepEnvironment />
+            {!isMobileViewport && (currentSlide >= 2 || maxVisitedSlide >= 2) && (
+              <Suspense fallback={null}>
+                <BorromeanKnot2D isMobileViewport={isMobileViewport} />
+              </Suspense>
+            )}
+          </div>
+        </div>
+
+        {!selectedId && !isMobileViewport && (
+          <ScrollIndicator currentSlide={visibleSlide} totalSlides={SLIDE_COUNT} />
+        )}
+
+        {selectedId && selectedPanel && visibleSlide === 0 && (
+          <FocusView
             selectedId={selectedId}
-            selectedNodeState={selectedNodeState}
-            isAppLoaded={isAppLoaded}
-            cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
+            selectedPanel={selectedPanel}
+            selectedNodes={selectedNodes}
+            isExitingFocus={isExitingFocus}
             isMobileViewport={isMobileViewport}
-            onSelectPanel={handleSelectPanel}
+            onExitFocus={handleExitFocus}
             onSelectionChange={handleSelectionChange}
             SchemaL={SchemaL}
             SchemaR={SchemaR}
             SchemaI={SchemaI}
             SchemaD={SchemaD}
-            onWheelNavigate={handleGalleryWheel}
           />
-        </div>
-
-        <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
-          <DeepEnvironment />
-          {!isMobileViewport && (currentSlide >= 1 || maxVisitedSlide >= 1) && (
-            <Suspense fallback={null}>
-              <TimelineView isMobileViewport={isMobileViewport} />
-            </Suspense>
-          )}
-        </div>
-
-        <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
-          <DeepEnvironment />
-          {!isMobileViewport && (currentSlide >= 2 || maxVisitedSlide >= 2) && (
-            <Suspense fallback={null}>
-              <BorromeanKnot2D isMobileViewport={isMobileViewport} />
-            </Suspense>
-          )}
-        </div>
+        )}
       </div>
 
-      {!selectedId && !isMobileViewport && (
-        <ScrollIndicator currentSlide={visibleSlide} totalSlides={SLIDE_COUNT} />
-      )}
-
-      {selectedId && selectedPanel && visibleSlide === 0 && (
-        <FocusView
-          selectedId={selectedId}
-          selectedPanel={selectedPanel}
-          selectedNodes={selectedNodes}
-          isExitingFocus={isExitingFocus}
-          isMobileViewport={isMobileViewport}
-          onExitFocus={handleExitFocus}
-          onSelectionChange={handleSelectionChange}
-          SchemaL={SchemaL}
-          SchemaR={SchemaR}
-          SchemaI={SchemaI}
-          SchemaD={SchemaD}
-        />
-      )}
-    </>
-  )
-
-  return (
-    <div
-      className="app-container"
-      data-theme={theme}
-      data-mobile-layout={isMobileViewport ? 'true' : 'false'}
-      style={appShellStyle}
-      onWheel={handleContainerWheel}
-    >
-      {renderSceneContent()}
-
-      {themeRipple && (
+      {themeTransition && (
         <div
-          key={themeRipple.id}
-          className="theme-ripple"
-          data-ripple-theme={themeRipple.targetTheme}
+          key={themeTransition.id}
+          className="theme-crossfade"
+          data-crossfade-theme={themeTransition.targetTheme}
           aria-hidden="true"
-          style={{
-            '--theme-ripple-x': `${themeRipple.x}px`,
-            '--theme-ripple-y': `${themeRipple.y}px`,
-            '--theme-ripple-radius': `${themeRipple.radius}px`,
-            '--theme-ripple-duration': `${THEME_RIPPLE_MS}ms`,
-          } as CSSProperties}
-        >
-          <div
-            className="theme-preview"
-            data-theme={themeRipple.targetTheme}
-            data-mobile-layout={isMobileViewport ? 'true' : 'false'}
-            style={appShellStyle}
-          >
-            {renderSceneContent()}
-          </div>
-          <div className="theme-ripple-glow" />
-        </div>
+        />
       )}
 
       <button
@@ -305,7 +279,7 @@ function App() {
         data-testid="theme-toggle"
         aria-label={theme === 'day' ? '切换到夜间模式' : '切换到昼间模式'}
         aria-pressed={theme === 'night'}
-        disabled={themeRipple !== null}
+        disabled={themeTransition !== null}
         onClick={toggleTheme}
       >
         <span aria-hidden="true">{theme === 'day' ? '◐' : '☼'}</span>

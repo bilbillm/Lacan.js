@@ -33,9 +33,10 @@ test('theme toggle switches to night mode and persists the choice', async ({ pag
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'day')
 
   await toggle.click()
-  await expect(page.locator('.theme-ripple')).toBeVisible()
+  await expect(page.locator('.theme-crossfade')).toBeVisible()
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.theme-crossfade')).toBeHidden()
 
   await page.reload()
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
@@ -53,7 +54,7 @@ test('title fonts stay aligned across themes and timeline cards', async ({ page 
   await expect(page.locator('.app-container')).toHaveAttribute('data-theme', 'night')
   await expect(headerTitle).toHaveCSS('font-family', dayFontFamily)
   await expect(headerTitle).toHaveCSS('font-weight', dayFontWeight)
-  await expect(page.locator('.theme-ripple')).toBeHidden()
+  await expect(page.locator('.theme-crossfade')).toBeHidden()
 
   await page.mouse.wheel(0, 1_000)
   await expect(page.getByTestId('timeline-view')).toBeVisible()
