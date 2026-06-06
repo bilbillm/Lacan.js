@@ -245,9 +245,9 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
               transition={{ duration: 0.3 }}
               onClick={() => setExpandedYear(null)}
               style={{
-                background: 'var(--lacan-modal-backdrop)',
-                backdropFilter: 'blur(2px)',
-                WebkitBackdropFilter: 'blur(2px)',
+                background: 'var(--lacan-timeline-modal-backdrop)',
+                backdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
+                WebkitBackdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
               }}
             />
 
@@ -268,11 +268,14 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                 style={{ width: 480, maxWidth: '90vw' }}
               >
                 <div
+                  data-testid="timeline-modal-card"
                   style={{
-                    background: 'var(--lacan-surface)',
-                    border: '1px solid var(--lacan-border)',
+                    background: 'var(--lacan-timeline-modal-surface)',
+                    backdropFilter: 'blur(18px) saturate(110%)',
+                    WebkitBackdropFilter: 'blur(18px) saturate(110%)',
+                    border: '1px solid var(--lacan-timeline-modal-border)',
                     borderRadius: 12,
-                    boxShadow: 'var(--lacan-paper-shadow-strong)',
+                    boxShadow: 'var(--lacan-timeline-modal-shadow)',
                     padding: 32,
                   }}
                 >

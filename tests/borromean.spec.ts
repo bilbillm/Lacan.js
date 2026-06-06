@@ -62,6 +62,12 @@ test('title fonts stay aligned across themes and timeline cards', async ({ page 
   const cardTitle = page.getByRole('heading', { name: '弗洛伊德赴巴黎学习' })
   await expect(cardTitle).toHaveCSS('font-family', dayFontFamily)
   await expect(cardTitle).toHaveCSS('font-weight', dayFontWeight)
+
+  await cardTitle.click()
+  const modalCard = page.getByTestId('timeline-modal-card')
+  await expect(modalCard).toBeVisible()
+  await expect(modalCard).toHaveCSS('backdrop-filter', 'blur(18px) saturate(1.1)')
+  await expect(modalCard).toHaveCSS('background-image', /rgba\(23, 23, 27, 0\.96\)/)
 })
 
 test('mobile viewport resets to gallery instead of an empty desktop-only slide', async ({ page }) => {

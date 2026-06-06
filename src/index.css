@@ -44,6 +44,11 @@
   --lacan-timeline-shadow: 0 4px 12px rgba(107,29,14,0.12);
   --lacan-timeline-connector: linear-gradient(to bottom, rgba(107,29,14,0.32), rgba(181,138,69,0.16));
   --lacan-timeline-divider: linear-gradient(to right, rgba(181,138,69,0.28), rgba(181,138,69,0.06));
+  --lacan-timeline-modal-backdrop: rgba(26, 22, 19, 0.32);
+  --lacan-timeline-modal-backdrop-filter: blur(7px) saturate(0.96);
+  --lacan-timeline-modal-surface: linear-gradient(180deg, rgba(255,254,250,0.98) 0%, rgba(251,246,236,0.96) 100%);
+  --lacan-timeline-modal-border: rgba(181, 138, 69, 0.34);
+  --lacan-timeline-modal-shadow: rgba(26, 22, 19, 0.44) 0 22px 54px -28px;
   --lacan-schema-hover-stroke: rgba(107,29,14,0.56);
   --lacan-environment-gradient: radial-gradient(ellipse 80% 60% at 50% 4%, rgba(255,254,250,0.92) 0%, rgba(248,242,232,0.84) 45%, rgba(239,226,207,0.56) 100%);
   --lacan-environment-vignette: radial-gradient(ellipse 100% 100% at 50% 50%, rgba(255,254,250,0) 44%, rgba(181,138,69,0.12) 100%);
@@ -138,6 +143,11 @@ body, #root {
   --lacan-timeline-shadow: 0 0 18px rgba(255,255,255,0.16);
   --lacan-timeline-connector: linear-gradient(to bottom, rgba(255,255,255,0.28), rgba(255,255,255,0.08));
   --lacan-timeline-divider: linear-gradient(to right, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
+  --lacan-timeline-modal-backdrop: rgba(0, 0, 0, 0.62);
+  --lacan-timeline-modal-backdrop-filter: blur(10px) saturate(0.82);
+  --lacan-timeline-modal-surface: linear-gradient(180deg, rgba(23,23,27,0.96) 0%, rgba(10,10,13,0.94) 100%);
+  --lacan-timeline-modal-border: rgba(255, 255, 255, 0.18);
+  --lacan-timeline-modal-shadow: rgba(0, 0, 0, 0.72) 0 24px 60px -24px;
   --lacan-schema-hover-stroke: rgba(255,255,255,0.46);
   --lacan-environment-gradient: radial-gradient(ellipse 100% 100% at 50% 0%, oklch(0.08 0 0 / 0.5) 0%, oklch(0.02 0 0 / 0.3) 60%);
   --lacan-environment-vignette: radial-gradient(ellipse 100% 100% at 50% 50%, oklch(0 0 0 / 0) 40%, oklch(0 0 0 / 0.6) 100%);
