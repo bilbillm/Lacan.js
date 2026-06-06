@@ -37,7 +37,14 @@ export function InteractiveSchemaFrame<NodeId extends string>({
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2">
       <div className="text-center mb-2">
-        <span className={`font-light tracking-widest text-white/40 ${isExpanded ? 'text-xl' : 'text-base'}`}>
+        <span
+          className={`tracking-widest ${isExpanded ? 'text-xl' : 'text-base'}`}
+          style={{
+            color: 'var(--lacan-muted)',
+            fontFamily: 'var(--lacan-title-font)',
+            fontWeight: 'var(--lacan-title-weight)',
+          }}
+        >
           {title}
         </span>
       </div>
@@ -51,7 +58,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
             display: 'block',
             maxWidth: '100%',
             maxHeight: '100%',
-            filter: 'invert(1) opacity(0.8)',
+            filter: 'var(--lacan-schema-filter)',
           }}
         />
 
@@ -77,7 +84,7 @@ export function InteractiveSchemaFrame<NodeId extends string>({
                   r={node.r}
                   className="pointer-events-none transition-all duration-200"
                   fill="transparent"
-                  stroke={isSelected ? '#fff' : isHovered ? 'rgba(255,255,255,0.6)' : 'transparent'}
+                  stroke={isSelected ? 'var(--lacan-vermilion)' : isHovered ? 'var(--lacan-schema-hover-stroke)' : 'transparent'}
                   strokeWidth={isSelected ? 3 : isHovered ? 2 : 0}
                   strokeDasharray={isHovered && !isSelected ? '4 2' : '0'}
                 />

@@ -60,7 +60,10 @@ export default function FocusView({
     <Suspense
       fallback={
         <div className="w-full h-full flex items-center justify-center">
-          <span className="text-3xl font-light tracking-widest text-white/40">
+          <span
+            className="text-3xl tracking-widest"
+            style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+          >
             {selectedPanel?.title}
           </span>
         </div>
@@ -78,7 +81,12 @@ export default function FocusView({
     </Suspense>
   ) : (
     <div className="w-full h-full flex items-center justify-center">
-      <span className="text-3xl font-light tracking-widest text-white/40">{selectedPanel?.title}</span>
+      <span
+        className="text-3xl tracking-widest"
+        style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+      >
+        {selectedPanel?.title}
+      </span>
     </div>
   )
 
@@ -88,18 +96,19 @@ export default function FocusView({
         <>
           {/* Backdrop mask */}
           <motion.div
-            className="absolute inset-0 z-40"
+            className="focus-backdrop absolute inset-0 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: isExitingFocus ? 0 : 1 }}
             exit={{ opacity: 0 }}
             onClick={onExitFocus}
             transition={{ duration: FOCUS_BACKDROP_FADE_S, ease: 'easeOut' }}
             style={{
-              background: 'rgba(0, 0, 0, 0.2)',
+              background: 'var(--lacan-focus-backdrop)',
+              backdropFilter: 'blur(1px)',
             }}
           />
 
-          <div className="absolute inset-0 z-50 pointer-events-none">
+          <div className="focus-overlay absolute inset-0 z-50 pointer-events-none">
             {isMobileViewport ? (
               <div
                 className="focus-view-shell absolute inset-0 z-50 pointer-events-none"
@@ -112,10 +121,19 @@ export default function FocusView({
                     gap: `${FOCUS_PANEL_VIEWPORT_SIZES.mobile.stackGap}px`,
                   }}
                 >
+                  <button
+                    type="button"
+                    className="mobile-focus-close"
+                    data-testid="mobile-focus-close"
+                    aria-label="关闭聚焦视图"
+                    onClick={onExitFocus}
+                  >
+                    ×
+                  </button>
                   <GlassPanel
                     layoutId={selectedId}
                     width={FOCUS_PANEL_VIEWPORT_SIZES.mobile.panelWidth}
-                    height={FOCUS_PANEL_VIEWPORT_SIZES.mobile.mainHeight}
+                    height="min(82vh, 640px)"
                     className="pointer-events-auto"
                     onClick={() => {}}
                     disableParallax={true}
@@ -154,7 +172,12 @@ export default function FocusView({
                           }}
                         >
                           <div className="w-full h-full flex items-center justify-center p-8">
-                            <span className="text-2xl font-light tracking-widest text-white/60">{secondaryPanelContent}</span>
+                            <span
+                              className="text-2xl tracking-widest"
+                              style={{ color: 'var(--lacan-vermilion)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+                            >
+                              {secondaryPanelContent}
+                            </span>
                           </div>
                         </GlassPanel>
                       </motion.div>
@@ -221,7 +244,12 @@ export default function FocusView({
                         }}
                       >
                         <div className="w-full h-full flex items-center justify-center p-8">
-                          <span className="text-2xl font-light tracking-widest text-white/60">{secondaryPanelContent}</span>
+                          <span
+                            className="text-2xl tracking-widest"
+                            style={{ color: 'var(--lacan-vermilion)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+                          >
+                            {secondaryPanelContent}
+                          </span>
                         </div>
                       </GlassPanel>
                     </motion.div>

@@ -22,26 +22,121 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
     ? timelineEvents.find((e) => e.year === expandedYear) ?? null
     : null
 
-  if (isMobileViewport) return null
+  if (isMobileViewport) {
+    return (
+      <motion.div
+        className="mobile-timeline-view"
+        data-testid="timeline-view"
+        style={{ background: 'transparent' }}
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.16 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
+        <div className="mobile-page-heading">
+          <h1
+            className="lacan-page-title"
+            style={{
+              color: 'var(--lacan-ink-strong)',
+              fontFamily: 'var(--lacan-title-font)',
+              fontWeight: 'var(--lacan-title-weight)',
+              textShadow: 'var(--lacan-title-shadow)',
+            }}
+          >
+            精神分析发展史
+          </h1>
+          <p className="lacan-page-subtitle" style={{ color: 'var(--lacan-muted)' }}>
+            A Timeline of Psychoanalytic Thought
+          </p>
+        </div>
+
+        <div className="mobile-timeline-list">
+          {timelineEvents.map((event, index) => (
+            <motion.button
+              key={event.year}
+              type="button"
+              className="mobile-timeline-card"
+              data-testid={`timeline-event-card-${event.year}`}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.42, ease: 'easeOut' }}
+              onClick={() => setExpandedYear(event.year)}
+            >
+              <span className="mobile-timeline-year">{event.year}</span>
+              <span className="mobile-timeline-divider" aria-hidden="true" />
+              <span className="mobile-timeline-title">{event.title}</span>
+              <span className="mobile-timeline-description">{event.description}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        <AnimatePresence>
+          {expandedYear && expandedEvent && (
+            <>
+              <motion.div
+                className="mobile-timeline-modal-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setExpandedYear(null)}
+                style={{
+                  background: 'var(--lacan-timeline-modal-backdrop)',
+                  backdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
+                  WebkitBackdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
+                }}
+              />
+              <motion.div
+                className="mobile-timeline-modal-shell"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="mobile-timeline-modal"
+                  initial={{ opacity: 0, scale: 0.94, y: 24 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.94, y: 24 }}
+                  transition={{ duration: 0.34, ease: [0.4, 0, 0.2, 1] }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div data-testid="timeline-modal-card">
+                    <span className="mobile-timeline-modal-year">{expandedEvent.year}</span>
+                    <span className="mobile-timeline-divider" aria-hidden="true" />
+                    <h3>{expandedEvent.title}</h3>
+                    <p>{expandedEvent.description}</p>
+                    <button type="button" onClick={() => setExpandedYear(null)}>关闭</button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
       className="absolute inset-0 z-30 flex flex-col items-center overflow-hidden"
       data-testid="timeline-view"
-      style={{ background: 'rgb(5, 5, 7)' }}
+      style={{ background: 'var(--lacan-paper)' }}
       exit={{ opacity: 0, filter: 'blur(10px)' }}
       transition={{ duration: 0.4, ease: 'easeInOut' }}
     >
       {/* Title block — positioned like AppHeader, top center */}
       <div className="flex flex-col items-center gap-2.5" style={{ paddingTop: 96 }}>
         <motion.h1
-          className="text-center font-light text-white/70"
+          className="lacan-page-title text-center"
           style={{
             fontSize: '2.35rem',
             letterSpacing: '0.35em',
             lineHeight: 0.96,
-            textShadow:
-              '0 0 8px rgba(255,255,255,0.3), 0 0 25px rgba(255,255,255,0.15)',
+            color: 'var(--lacan-ink-strong)',
+            fontFamily: 'var(--lacan-title-font)',
+            fontWeight: 'var(--lacan-title-weight)',
+            textShadow: 'var(--lacan-title-shadow)',
           }}
           initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
@@ -55,12 +150,11 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
         </motion.h1>
 
         <motion.p
-          className="text-center font-light text-white/40"
+          className="lacan-page-subtitle text-center font-light"
           style={{
             fontSize: '1.125rem',
             letterSpacing: '0.35em',
-            textShadow:
-              '0 0 3px rgba(255,255,255,0.15), 0 0 8px rgba(255,255,255,0.08)',
+            color: 'var(--lacan-muted)',
           }}
           initial={{ opacity: 0, filter: 'blur(8px)', y: -20 }}
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
@@ -83,7 +177,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
           {/* Horizontal line */}
           <div
             className="absolute left-0 right-0"
-            style={{ top: '50%', height: 1, background: 'rgba(255,255,255,0.08)' }}
+            style={{ top: '50%', height: 1, background: 'var(--lacan-timeline-line)' }}
           >
             <motion.div
               className="absolute inset-y-0 left-0"
@@ -95,8 +189,8 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
               }}
               style={{
                 background:
-                  'linear-gradient(90deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))',
-                boxShadow: '0 0 6px rgba(255,255,255,0.15)',
+                  'var(--lacan-timeline-fill)',
+                boxShadow: 'var(--lacan-timeline-shadow)',
               }}
             />
           </div>
@@ -125,7 +219,9 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.6)',
+                    background: 'var(--lacan-vermilion)',
+                    border: '2px solid var(--lacan-surface)',
+                    boxShadow: '0 0 0 1px var(--lacan-border)',
                     transform: 'translate(-50%, -50%)',
                     zIndex: 2,
                   }}
@@ -144,7 +240,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                       ? { top: 'calc(50% - 30px)', height: 30 }
                       : { top: '50%', height: 30 }),
                     background:
-                      'linear-gradient(to bottom, rgba(255,255,255,0.25), rgba(255,255,255,0.08))',
+                      'var(--lacan-timeline-connector)',
                     transform: 'translateX(-50%)',
                     zIndex: 1,
                   }}
@@ -179,17 +275,14 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                 >
                   <div
                     style={{
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      backdropFilter: 'blur(16px) saturate(130%)',
-                      WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      background: 'var(--lacan-surface)',
+                      border: '1px solid var(--lacan-border)',
                       borderRadius: 12,
-                      boxShadow:
-                        '0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+                      boxShadow: 'var(--lacan-paper-shadow)',
                       padding: 14,
                     }}
                   >
-                    <span className="text-xs font-light tracking-wider text-white/40">
+                    <span className="text-xs font-semibold tracking-wider" style={{ color: 'var(--lacan-vermilion)' }}>
                       {event.year}
                     </span>
                     <div
@@ -199,15 +292,23 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                         marginTop: 6,
                         marginBottom: 8,
                         background:
-                          'linear-gradient(to right, rgba(255,255,255,0.15), rgba(255,255,255,0.03))',
+                          'var(--lacan-timeline-divider)',
                       }}
                     />
-                    <h3 className="text-sm font-medium tracking-wide text-white/80 mt-1 mb-1">
+                    <h3
+                      className="text-sm tracking-wide mt-1 mb-1"
+                      style={{
+                        color: 'var(--lacan-ink)',
+                        fontFamily: 'var(--lacan-title-font)',
+                        fontWeight: 'var(--lacan-title-weight)',
+                      }}
+                    >
                       {event.title}
                     </h3>
                     <p
-                      className="text-xs font-light leading-relaxed text-white/40"
+                      className="text-xs font-light leading-relaxed"
                       style={{
+                        color: 'var(--lacan-muted)',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
@@ -237,9 +338,9 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
               transition={{ duration: 0.3 }}
               onClick={() => setExpandedYear(null)}
               style={{
-                background: 'rgba(0, 0, 0, 0.35)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
+                background: 'var(--lacan-timeline-modal-backdrop)',
+                backdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
+                WebkitBackdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
               }}
             />
 
@@ -260,20 +361,20 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                 style={{ width: 480, maxWidth: '90vw' }}
               >
                 <div
+                  data-testid="timeline-modal-card"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    backdropFilter: 'blur(24px) saturate(140%)',
-                    WebkitBackdropFilter: 'blur(24px) saturate(140%)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: 16,
-                    boxShadow:
-                      '0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    background: 'var(--lacan-timeline-modal-surface)',
+                    backdropFilter: 'blur(18px) saturate(110%)',
+                    WebkitBackdropFilter: 'blur(18px) saturate(110%)',
+                    border: '1px solid var(--lacan-timeline-modal-border)',
+                    borderRadius: 12,
+                    boxShadow: 'var(--lacan-timeline-modal-shadow)',
                     padding: 32,
                   }}
                 >
                   <span
-                    className="block font-light tracking-wider text-white/40 mb-3"
-                    style={{ fontSize: '1.05rem', letterSpacing: '0.2em' }}
+                    className="block font-semibold tracking-wider mb-3"
+                    style={{ fontSize: '1.05rem', letterSpacing: '0.2em', color: 'var(--lacan-vermilion)' }}
                   >
                     {expandedEvent.year}
                   </span>
@@ -283,24 +384,24 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                       width: '100%',
                       marginBottom: 20,
                       background:
-                        'linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.04))',
+                        'var(--lacan-timeline-divider)',
                     }}
                   />
                   <h3
-                    className="font-light tracking-wide text-white/85 mb-5"
-                    style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3 }}
+                    className="tracking-wide mb-5"
+                    style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                   >
                     {expandedEvent.title}
                   </h3>
                   <p
-                    className="font-light leading-relaxed text-white/55"
-                    style={{ fontSize: '1rem', lineHeight: 1.75 }}
+                    className="font-light leading-relaxed"
+                    style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--lacan-muted)' }}
                   >
                     {expandedEvent.description}
                   </p>
                   <p
-                    className="mt-6 font-light tracking-wider text-white/25"
-                    style={{ fontSize: '0.75rem', letterSpacing: '0.2em' }}
+                    className="mt-6 font-light tracking-wider"
+                    style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'var(--lacan-muted-soft)' }}
                   >
                     点击空白处关闭
                   </p>

@@ -33,11 +33,11 @@ export default function ScrollIndicator({ currentSlide, totalSlides }: ScrollInd
               height: isActive ? 8 : 5,
               opacity: isActive ? 1 : 0.35,
               background: isActive
-                ? 'rgba(255, 255, 255, 0.6)'
-                : 'rgba(255, 255, 255, 0.3)',
+                ? 'var(--lacan-vermilion)'
+                : 'rgba(181, 138, 69, 0.45)',
               boxShadow: isActive
-                ? '0 0 8px rgba(255, 255, 255, 0.35)'
-                : '0 0 0px rgba(255, 255, 255, 0)',
+                ? '0 4px 10px rgba(107, 29, 14, 0.22)'
+                : '0 0 0px rgba(107, 29, 14, 0)',
             }}
             transition={{
               duration: 0.5,

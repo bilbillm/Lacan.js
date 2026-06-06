@@ -152,7 +152,10 @@ export default function PanelGallery({
                       <Suspense
                         fallback={
                             <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-xl font-light tracking-widest text-white/40">
+                              <span
+                                className="text-xl tracking-widest"
+                                style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+                              >
                                 {panel.galleryLabel ?? panel.title}
                               </span>
                             </div>
@@ -170,36 +173,41 @@ export default function PanelGallery({
                       </Suspense>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-xl font-light tracking-widest text-white/40">
+                        <span
+                          className="text-xl tracking-widest"
+                          style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+                        >
                           {panel.galleryLabel ?? panel.title}
                         </span>
                       </div>
                     )}
                   </GlassPanel>
 
-                  <div
-                    className="absolute top-full left-1/2 pointer-events-none"
-                    style={{ transform: `translateX(-50%) translateY(${galleryLayout.reflectionOffsetY}px)` }}
-                  >
-                    <motion.div
-                      className="rounded-[1.6rem]"
-                      initial={isAppLoaded ? false : { y: -60 }}
-                      animate={{ y: 0 }}
-                      exit={{ y: -120 }}
-                      transition={cardTransition}
-                      style={{
-                        width: galleryCardWidth,
-                        height: Math.round(galleryCardHeight * galleryLayout.reflectionHeightRatio),
-                        transform: 'scaleX(-1)',
-                        transformOrigin: 'top center',
-                        opacity: galleryLayout.reflectionOpacity,
-                        background: 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.08) 22%, rgba(255,255,255,0.02) 46%, transparent 82%)',
-                        filter: 'blur(12px)',
-                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
-                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
-                      }}
-                    />
-                  </div>
+                  {!isMobileViewport && (
+                    <div
+                      className="absolute top-full left-1/2 pointer-events-none"
+                      style={{ transform: `translateX(-50%) translateY(${galleryLayout.reflectionOffsetY}px)` }}
+                    >
+                      <motion.div
+                        className="rounded-[1.6rem]"
+                        initial={isAppLoaded ? false : { y: -60 }}
+                        animate={{ y: 0 }}
+                        exit={{ y: -120 }}
+                        transition={cardTransition}
+                        style={{
+                          width: galleryCardWidth,
+                          height: Math.round(galleryCardHeight * galleryLayout.reflectionHeightRatio),
+                          transform: 'scaleX(-1)',
+                          transformOrigin: 'top center',
+                          opacity: Math.min(galleryLayout.reflectionOpacity, 0.16),
+                          background: 'var(--lacan-gallery-reflection)',
+                          filter: 'blur(18px)',
+                          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
+                          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )
@@ -219,7 +227,8 @@ export default function PanelGallery({
             style={{
               width: '100%',
               height: '2px',
-              boxShadow: '0 0 10px rgba(255,255,255,0.08)',
+              boxShadow: 'inset 0 0 0 1px var(--lacan-border)',
+              background: 'var(--lacan-progress-track)',
             }}
           >
             <motion.div
@@ -235,7 +244,7 @@ export default function PanelGallery({
                     }
               }
               style={{
-                background: 'linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.18) 100%)',
+                background: 'var(--lacan-progress-base)',
               }}
             />
             <motion.div
@@ -251,13 +260,13 @@ export default function PanelGallery({
                     }
               }
               style={{
-                background: 'linear-gradient(90deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.8) 70%, rgba(255,255,255,0.5) 100%)',
-                boxShadow: '0 0 14px rgba(255,255,255,0.3)',
+                background: 'var(--lacan-progress-fill)',
+                boxShadow: 'var(--lacan-progress-shadow)',
               }}
             />
           </motion.div>
           <motion.span
-            className="font-light text-white/35"
+            className="font-light"
             initial={isAppLoaded ? false : { opacity: 0, y: 6, filter: 'blur(3px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{
@@ -268,6 +277,7 @@ export default function PanelGallery({
             style={{
               fontSize: `${progressTokens.labelFontRem}rem`,
               letterSpacing: `${progressTokens.labelTrackingEm}em`,
+              color: 'var(--lacan-muted)',
             }}
           >
             {String(pageGroup + 1).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
