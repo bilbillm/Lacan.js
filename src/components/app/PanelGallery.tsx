@@ -183,29 +183,31 @@ export default function PanelGallery({
                     )}
                   </GlassPanel>
 
-                  <div
-                    className="absolute top-full left-1/2 pointer-events-none"
-                    style={{ transform: `translateX(-50%) translateY(${galleryLayout.reflectionOffsetY}px)` }}
-                  >
-                    <motion.div
-                      className="rounded-[1.6rem]"
-                      initial={isAppLoaded ? false : { y: -60 }}
-                      animate={{ y: 0 }}
-                      exit={{ y: -120 }}
-                      transition={cardTransition}
-                      style={{
-                        width: galleryCardWidth,
-                        height: Math.round(galleryCardHeight * galleryLayout.reflectionHeightRatio),
-                        transform: 'scaleX(-1)',
-                        transformOrigin: 'top center',
-                        opacity: Math.min(galleryLayout.reflectionOpacity, 0.16),
-                        background: 'var(--lacan-gallery-reflection)',
-                        filter: 'blur(18px)',
-                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
-                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
-                      }}
-                    />
-                  </div>
+                  {!isMobileViewport && (
+                    <div
+                      className="absolute top-full left-1/2 pointer-events-none"
+                      style={{ transform: `translateX(-50%) translateY(${galleryLayout.reflectionOffsetY}px)` }}
+                    >
+                      <motion.div
+                        className="rounded-[1.6rem]"
+                        initial={isAppLoaded ? false : { y: -60 }}
+                        animate={{ y: 0 }}
+                        exit={{ y: -120 }}
+                        transition={cardTransition}
+                        style={{
+                          width: galleryCardWidth,
+                          height: Math.round(galleryCardHeight * galleryLayout.reflectionHeightRatio),
+                          transform: 'scaleX(-1)',
+                          transformOrigin: 'top center',
+                          opacity: Math.min(galleryLayout.reflectionOpacity, 0.16),
+                          background: 'var(--lacan-gallery-reflection)',
+                          filter: 'blur(18px)',
+                          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
+                          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )

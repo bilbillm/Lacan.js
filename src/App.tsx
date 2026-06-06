@@ -5,6 +5,7 @@ import AppHeader from './components/app/AppHeader'
 import PanelGallery from './components/app/PanelGallery'
 import FocusView from './components/app/FocusView'
 import ScrollIndicator from './components/app/ScrollIndicator'
+import HomeSignatureBar from './components/app/HomeSignatureBar'
 import { panels } from './components/app/panels'
 import useMobileViewport from './components/app/useMobileViewport'
 import {
@@ -54,6 +55,8 @@ function App() {
   const totalPages = Math.ceil(panels.length / panelsPerPage)
 
   const currentPanels = panels.slice(pageGroup * panelsPerPage, (pageGroup + 1) * panelsPerPage)
+  const galleryPanels = isMobileViewport ? panels : currentPanels
+  const galleryTotalPages = isMobileViewport ? 1 : totalPages
 
   const visibleSlide = isMobileViewport ? 0 : currentSlide
   const selectedPanel = panels.find(p => p.id === selectedId)
@@ -189,58 +192,110 @@ function App() {
       onWheel={handleContainerWheel}
     >
       <div className="theme-content">
-        <div
-          className="slide-deck"
-          style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
-        >
-          <div className="slide">
-            <DeepEnvironment />
+        {isMobileViewport ? (
+          <div className="mobile-page-stack">
+            <section className="mobile-section mobile-section-home" data-testid="mobile-gallery-section">
+              <DeepEnvironment />
 
-            <AppHeader
-              selectedId={selectedId}
-              shouldAnimateEntry={shouldAnimateEntry}
-              entryDelayMs={HEADER_ENTRY_DELAY_MS}
-              isMobileViewport={isMobileViewport}
-            />
+              <AppHeader
+                selectedId={selectedId}
+                shouldAnimateEntry={shouldAnimateEntry}
+                entryDelayMs={HEADER_ENTRY_DELAY_MS}
+                isMobileViewport={isMobileViewport}
+              />
 
-            <PanelGallery
-              pageGroup={pageGroup}
-              totalPages={totalPages}
-              currentPanels={currentPanels}
-              randomOrder={randomOrder}
-              selectedId={selectedId}
-              selectedNodeState={selectedNodeState}
-              isAppLoaded={isAppLoaded}
-              cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
-              isMobileViewport={isMobileViewport}
-              onSelectPanel={handleSelectPanel}
-              onSelectionChange={handleSelectionChange}
-              SchemaL={SchemaL}
-              SchemaR={SchemaR}
-              SchemaI={SchemaI}
-              SchemaD={SchemaD}
-              onWheelNavigate={handleGalleryWheel}
-            />
-          </div>
+              <PanelGallery
+                pageGroup={0}
+                totalPages={galleryTotalPages}
+                currentPanels={galleryPanels}
+                randomOrder={randomOrder}
+                selectedId={selectedId}
+                selectedNodeState={selectedNodeState}
+                isAppLoaded={isAppLoaded}
+                cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
+                isMobileViewport={isMobileViewport}
+                onSelectPanel={handleSelectPanel}
+                onSelectionChange={handleSelectionChange}
+                SchemaL={SchemaL}
+                SchemaR={SchemaR}
+                SchemaI={SchemaI}
+                SchemaD={SchemaD}
+                onWheelNavigate={handleGalleryWheel}
+              />
 
-          <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
-            <DeepEnvironment />
-            {!isMobileViewport && (currentSlide >= 1 || maxVisitedSlide >= 1) && (
+              <HomeSignatureBar isHidden={selectedId !== null} />
+            </section>
+
+            <section className="mobile-section" data-testid="mobile-timeline-section">
+              <DeepEnvironment />
               <Suspense fallback={null}>
                 <TimelineView isMobileViewport={isMobileViewport} />
               </Suspense>
-            )}
-          </div>
+            </section>
 
-          <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
-            <DeepEnvironment />
-            {!isMobileViewport && (currentSlide >= 2 || maxVisitedSlide >= 2) && (
+            <section className="mobile-section" data-testid="mobile-borromean-section">
+              <DeepEnvironment />
               <Suspense fallback={null}>
                 <BorromeanKnot2D isMobileViewport={isMobileViewport} />
               </Suspense>
-            )}
+            </section>
           </div>
-        </div>
+        ) : (
+          <div
+            className="slide-deck"
+            style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
+          >
+            <div className="slide">
+              <DeepEnvironment />
+
+              <AppHeader
+                selectedId={selectedId}
+                shouldAnimateEntry={shouldAnimateEntry}
+                entryDelayMs={HEADER_ENTRY_DELAY_MS}
+                isMobileViewport={isMobileViewport}
+              />
+
+              <PanelGallery
+                pageGroup={pageGroup}
+                totalPages={totalPages}
+                currentPanels={currentPanels}
+                randomOrder={randomOrder}
+                selectedId={selectedId}
+                selectedNodeState={selectedNodeState}
+                isAppLoaded={isAppLoaded}
+                cardEntryStartDelayMs={CARD_ENTRY_START_DELAY_MS}
+                isMobileViewport={isMobileViewport}
+                onSelectPanel={handleSelectPanel}
+                onSelectionChange={handleSelectionChange}
+                SchemaL={SchemaL}
+                SchemaR={SchemaR}
+                SchemaI={SchemaI}
+                SchemaD={SchemaD}
+                onWheelNavigate={handleGalleryWheel}
+              />
+
+              <HomeSignatureBar isHidden={selectedId !== null} />
+            </div>
+
+            <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
+              <DeepEnvironment />
+              {(currentSlide >= 1 || maxVisitedSlide >= 1) && (
+                <Suspense fallback={null}>
+                  <TimelineView isMobileViewport={isMobileViewport} />
+                </Suspense>
+              )}
+            </div>
+
+            <div className="slide" style={{ background: 'var(--lacan-paper)' }}>
+              <DeepEnvironment />
+              {(currentSlide >= 2 || maxVisitedSlide >= 2) && (
+                <Suspense fallback={null}>
+                  <BorromeanKnot2D isMobileViewport={isMobileViewport} />
+                </Suspense>
+              )}
+            </div>
+          </div>
+        )}
 
         {!selectedId && !isMobileViewport && (
           <ScrollIndicator currentSlide={visibleSlide} totalSlides={SLIDE_COUNT} />

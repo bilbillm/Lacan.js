@@ -96,7 +96,7 @@ export default function FocusView({
         <>
           {/* Backdrop mask */}
           <motion.div
-            className="absolute inset-0 z-40"
+            className="focus-backdrop absolute inset-0 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: isExitingFocus ? 0 : 1 }}
             exit={{ opacity: 0 }}
@@ -108,7 +108,7 @@ export default function FocusView({
             }}
           />
 
-          <div className="absolute inset-0 z-50 pointer-events-none">
+          <div className="focus-overlay absolute inset-0 z-50 pointer-events-none">
             {isMobileViewport ? (
               <div
                 className="focus-view-shell absolute inset-0 z-50 pointer-events-none"
@@ -121,10 +121,19 @@ export default function FocusView({
                     gap: `${FOCUS_PANEL_VIEWPORT_SIZES.mobile.stackGap}px`,
                   }}
                 >
+                  <button
+                    type="button"
+                    className="mobile-focus-close"
+                    data-testid="mobile-focus-close"
+                    aria-label="关闭聚焦视图"
+                    onClick={onExitFocus}
+                  >
+                    ×
+                  </button>
                   <GlassPanel
                     layoutId={selectedId}
                     width={FOCUS_PANEL_VIEWPORT_SIZES.mobile.panelWidth}
-                    height={FOCUS_PANEL_VIEWPORT_SIZES.mobile.mainHeight}
+                    height="min(82vh, 640px)"
                     className="pointer-events-auto"
                     onClick={() => {}}
                     disableParallax={true}

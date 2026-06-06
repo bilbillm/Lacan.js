@@ -22,7 +22,100 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
     ? timelineEvents.find((e) => e.year === expandedYear) ?? null
     : null
 
-  if (isMobileViewport) return null
+  if (isMobileViewport) {
+    return (
+      <motion.div
+        className="mobile-timeline-view"
+        data-testid="timeline-view"
+        style={{ background: 'transparent' }}
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.16 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
+        <div className="mobile-page-heading">
+          <h1
+            className="lacan-page-title"
+            style={{
+              color: 'var(--lacan-ink-strong)',
+              fontFamily: 'var(--lacan-title-font)',
+              fontWeight: 'var(--lacan-title-weight)',
+              textShadow: 'var(--lacan-title-shadow)',
+            }}
+          >
+            精神分析发展史
+          </h1>
+          <p className="lacan-page-subtitle" style={{ color: 'var(--lacan-muted)' }}>
+            A Timeline of Psychoanalytic Thought
+          </p>
+        </div>
+
+        <div className="mobile-timeline-list">
+          {timelineEvents.map((event, index) => (
+            <motion.button
+              key={event.year}
+              type="button"
+              className="mobile-timeline-card"
+              data-testid={`timeline-event-card-${event.year}`}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.42, ease: 'easeOut' }}
+              onClick={() => setExpandedYear(event.year)}
+            >
+              <span className="mobile-timeline-year">{event.year}</span>
+              <span className="mobile-timeline-divider" aria-hidden="true" />
+              <span className="mobile-timeline-title">{event.title}</span>
+              <span className="mobile-timeline-description">{event.description}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        <AnimatePresence>
+          {expandedYear && expandedEvent && (
+            <>
+              <motion.div
+                className="mobile-timeline-modal-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setExpandedYear(null)}
+                style={{
+                  background: 'var(--lacan-timeline-modal-backdrop)',
+                  backdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
+                  WebkitBackdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
+                }}
+              />
+              <motion.div
+                className="mobile-timeline-modal-shell"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="mobile-timeline-modal"
+                  initial={{ opacity: 0, scale: 0.94, y: 24 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.94, y: 24 }}
+                  transition={{ duration: 0.34, ease: [0.4, 0, 0.2, 1] }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div data-testid="timeline-modal-card">
+                    <span className="mobile-timeline-modal-year">{expandedEvent.year}</span>
+                    <span className="mobile-timeline-divider" aria-hidden="true" />
+                    <h3>{expandedEvent.title}</h3>
+                    <p>{expandedEvent.description}</p>
+                    <button type="button" onClick={() => setExpandedYear(null)}>关闭</button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
