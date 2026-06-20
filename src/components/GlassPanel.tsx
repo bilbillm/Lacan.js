@@ -13,6 +13,7 @@ interface GlassPanelProps {
   disableParallax?: boolean
   deferVisualEnhancement?: boolean
   isMobileViewport?: boolean
+  visualMode?: 'full' | 'light'
 }
 
 export default function GlassPanel({
@@ -26,8 +27,11 @@ export default function GlassPanel({
   disableParallax = false,
   deferVisualEnhancement = false,
   isMobileViewport = false,
+  visualMode = 'full',
 }: GlassPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
+  const isLightVisual = visualMode === 'light'
+  const enablePointerEffects = !isMobileViewport && !disableParallax && !deferVisualEnhancement && !isLightVisual
 
   // Mouse position for parallax
   const x = useMotionValue(0)
@@ -53,7 +57,7 @@ export default function GlassPanel({
   const pendingMousePosRef = useRef<{ x: number; y: number } | null>(null)
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!panelRef.current) return
+    if (!enablePointerEffects || !panelRef.current) return
 
     const rect = panelRef.current.getBoundingClientRect()
     const mouseX = ((e.clientX - rect.left) / rect.width) * 100
@@ -83,8 +87,6 @@ export default function GlassPanel({
       })
     }
 
-    if (disableParallax) return
-
     const centerX = rect.width / 2
     const centerY = rect.height / 2
 
@@ -93,7 +95,7 @@ export default function GlassPanel({
 
     x.set(parallaxX / centerX)
     y.set(parallaxY / centerY)
-  }, [disableParallax, x, y])
+  }, [enablePointerEffects, x, y])
 
   const handleMouseLeave = () => {
     if (rafIdRef.current !== null) {
@@ -102,8 +104,10 @@ export default function GlassPanel({
     }
 
     pendingMousePosRef.current = null
-    x.set(0)
-    y.set(0)
+    if (enablePointerEffects) {
+      x.set(0)
+      y.set(0)
+    }
     setIsHovered(false)
   }
 
@@ -122,14 +126,14 @@ export default function GlassPanel({
       className={`relative ${className}`}
       style={{ width, height, perspective: 1000, transformStyle: 'preserve-3d', ...style }}
       onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, y: 20 }}
+      onMouseMove={enablePointerEffects ? handleMouseMove : undefined}
+      onMouseEnter={enablePointerEffects ? () => setIsHovered(true) : undefined}
+      onMouseLeave={enablePointerEffects ? handleMouseLeave : undefined}
+      initial={{ opacity: 0, y: 14 }}
       animate={{
         opacity: 1,
         y: 0,
-        scale: isHovered ? 1.015 : 1,
+        scale: enablePointerEffects && isHovered ? 1.012 : 1,
       }}
       transition={{
         opacity: { duration: 0.5 },
@@ -150,8 +154,16 @@ export default function GlassPanel({
           className="absolute inset-0"
           style={{
             background: 'var(--lacan-panel-background)',
-            backdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
-            WebkitBackdropFilter: deferVisualEnhancement ? 'blur(18px) saturate(125%)' : 'blur(28px) saturate(150%)',
+            backdropFilter: isLightVisual
+              ? 'saturate(118%)'
+              : deferVisualEnhancement
+                ? 'blur(12px) saturate(118%)'
+                : 'blur(20px) saturate(135%)',
+            WebkitBackdropFilter: isLightVisual
+              ? 'saturate(118%)'
+              : deferVisualEnhancement
+                ? 'blur(12px) saturate(118%)'
+                : 'blur(20px) saturate(135%)',
             border: '1px solid var(--lacan-border)',
             borderRadius: isMobileViewport ? 10 : 12,
             boxShadow: `
@@ -171,7 +183,7 @@ export default function GlassPanel({
         />
 
         {/* Noise texture layer */}
-        {!deferVisualEnhancement && (
+        {!deferVisualEnhancement && !isLightVisual && (
           <div
             className="absolute inset-0 pointer-events-none select-none z-10"
             style={{
@@ -189,7 +201,7 @@ export default function GlassPanel({
         )}
 
         {/* Dynamic light reflection - follows mouse position */}
-        {isHovered && !deferVisualEnhancement && (
+        {enablePointerEffects && isHovered && (
           <motion.div
             className="absolute inset-0 pointer-events-none z-10"
             initial={{ opacity: 0 }}
@@ -209,7 +221,7 @@ export default function GlassPanel({
           style={{
             borderRadius: isMobileViewport ? 10 : 12,
             background: 'radial-gradient(circle at 50% 45%, var(--lacan-panel-sheen) 0%, transparent 78%)',
-            opacity: paperSheenOpacity,
+            opacity: isLightVisual ? 0.045 : paperSheenOpacity,
           }}
         />
 

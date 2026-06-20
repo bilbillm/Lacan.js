@@ -107,7 +107,6 @@ export default function FocusView({
             transition={{ duration: FOCUS_BACKDROP_FADE_S, ease: 'easeOut' }}
             style={{
               background: 'var(--lacan-focus-backdrop)',
-              backdropFilter: 'blur(1px)',
             }}
           />
 

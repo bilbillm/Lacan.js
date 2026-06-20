@@ -93,7 +93,7 @@ test('title fonts stay aligned across themes and timeline cards', async ({ page 
   await cardTitle.click()
   const modalCard = page.getByTestId('timeline-modal-card')
   await expect(modalCard).toBeVisible()
-  await expect(modalCard).toHaveCSS('backdrop-filter', 'blur(18px) saturate(1.1)')
+  await expect(modalCard).toHaveCSS('backdrop-filter', 'saturate(1.08)')
   await expect(modalCard).toHaveCSS('background-image', /rgba\(23, 23, 27, 0\.96\)/)
 })
 

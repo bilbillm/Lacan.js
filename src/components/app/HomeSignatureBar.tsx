@@ -14,7 +14,7 @@ export default function HomeSignatureBar({ isHidden, language }: HomeSignatureBa
       className="home-signature-bar"
       data-testid="home-signature-bar"
       aria-hidden={isHidden}
-      animate={isHidden ? { opacity: 0, y: 10, filter: 'blur(4px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+      animate={isHidden ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: 'easeOut' }}
     >
       <span>{uiCopy.homeSignature.designedBy[language]}</span>

@@ -128,13 +128,13 @@ export default function PanelGallery({
                 data-testid={`panel-card-${panel.id}`}
                 layout
                 className={isMobileViewport ? 'w-full' : undefined}
-                initial={isAppLoaded ? false : { opacity: 0, y: 30, filter: 'blur(5px)' }}
+                initial={isAppLoaded ? false : { opacity: 0, y: 24 }}
                 animate={
                   selectedId
-                    ? { opacity: 0, y: isSelected ? 0 : 60, filter: 'blur(5px)', scale: isSelected ? 1.1 : 0.95 }
-                    : { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }
+                    ? { opacity: 0, y: isSelected ? 0 : 56, scale: isSelected ? 1.08 : 0.96 }
+                    : { opacity: 1, y: 0, scale: 1 }
                 }
-                exit={{ opacity: 0, y: 60, filter: 'blur(5px)' }}
+                exit={{ opacity: 0, y: 56 }}
                 transition={cardTransition}
               >
                 {/* 包裹容器 */}
@@ -156,6 +156,7 @@ export default function PanelGallery({
                     className={isMobileViewport ? 'mobile-gallery-card cursor-pointer' : 'cursor-pointer'}
                     deferVisualEnhancement={!isAppLoaded}
                     isMobileViewport={isMobileViewport}
+                    visualMode="light"
                     style={{
                       maxWidth: isMobileViewport ? GALLERY_MOBILE_CARD_MAX_WIDTH : undefined,
                     }}
@@ -217,9 +218,9 @@ export default function PanelGallery({
                           height: Math.round(galleryCardHeight * galleryLayout.reflectionHeightRatio),
                           transform: 'scaleX(-1)',
                           transformOrigin: 'top center',
-                          opacity: Math.min(galleryLayout.reflectionOpacity, 0.16),
+                          opacity: Math.min(galleryLayout.reflectionOpacity, 0.12),
                           background: 'var(--lacan-gallery-reflection)',
-                          filter: 'blur(18px)',
+                          filter: 'blur(8px)',
                           maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
                           WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 45%, transparent)',
                         }}
@@ -237,8 +238,8 @@ export default function PanelGallery({
         <motion.nav
           className="mobile-gallery-pagination"
           aria-label={pageStatus}
-          initial={isAppLoaded ? false : { opacity: 0, y: 10, filter: 'blur(3px)' }}
-          animate={selectedId ? { opacity: 0, y: 10, filter: 'blur(4px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+          initial={isAppLoaded ? false : { opacity: 0, y: 10 }}
+          animate={selectedId ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
         >
           <button
@@ -262,7 +263,7 @@ export default function PanelGallery({
       <motion.div
         className="progress-indicator-shell absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none"
         data-testid="progress-indicator"
-        animate={selectedId ? { opacity: 0, filter: 'blur(5px)' } : { opacity: 1, filter: 'blur(0px)' }}
+        animate={selectedId ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.28, ease: 'easeOut' }}
       >
         <div className="flex flex-col items-center gap-2" style={{ width: `min(${progressTokens.widthViewport}vw, ${progressTokens.maxWidth}px)` }}>
@@ -311,8 +312,8 @@ export default function PanelGallery({
           </motion.div>
           <motion.span
             className="font-light"
-            initial={isAppLoaded ? false : { opacity: 0, y: 6, filter: 'blur(3px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={isAppLoaded ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
               delay: isAppLoaded ? 0 : progressEntryDelay + PROGRESS_LABEL_STAGGER_S,
               duration: PROGRESS_LABEL_ENTRY_DURATION_S,

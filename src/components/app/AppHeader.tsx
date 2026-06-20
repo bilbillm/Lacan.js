@@ -21,18 +21,15 @@ interface AppHeaderProps {
 const h1Variants = {
   initial: {
     opacity: 0,
-    filter: 'blur(10px)',
     y: -30,
   },
   visible: {
     opacity: 1,
-    filter: 'blur(0px)',
     y: 0,
     scale: 1,
   },
   blurred: {
     opacity: 0,
-    filter: 'blur(12px)',
     scale: 0.95,
   },
 }
@@ -41,18 +38,15 @@ const h1Variants = {
 const pVariants = {
   initial: {
     opacity: 0,
-    filter: 'blur(8px)',
     y: -20,
   },
   visible: {
     opacity: 1,
-    filter: 'blur(0px)',
     y: 0,
     scale: 1,
   },
   blurred: {
     opacity: 0,
-    filter: 'blur(12px)',
     scale: 0.95,
   },
 }
@@ -122,9 +116,6 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
           opacity: shouldAnimateEntry
             ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
-          filter: shouldAnimateEntry
-            ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
-            : { duration: 0.4, ease: 'easeInOut' },
           y: shouldAnimateEntry
             ? { delay: entryDelaySeconds, duration: HEADER_TITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
@@ -141,9 +132,6 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
         style={subtitleStyle}
         transition={{
           opacity: shouldAnimateEntry
-            ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
-            : { duration: 0.4, ease: 'easeInOut' },
-          filter: shouldAnimateEntry
             ? { delay: entryDelaySeconds + HEADER_SUBTITLE_STAGGER_MS / 1000, duration: HEADER_SUBTITLE_DURATION_MS / 1000, ease: 'easeOut' }
             : { duration: 0.4, ease: 'easeInOut' },
           y: shouldAnimateEntry

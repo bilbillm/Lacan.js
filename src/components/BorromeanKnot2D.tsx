@@ -82,7 +82,7 @@ function BorromeanSvg({ hoveredKey, isMobileViewport, language, onHoverKey }: Bo
             animate={{ opacity: dim ? 0.3 : 1, strokeWidth: isHov ? 7 : 5 }}
             transition={{ opacity: { delay: 0.3 + i * 0.35, duration: 0.8 }, strokeWidth: { duration: 0.3 } }}
             style={{
-              filter: isHov ? `drop-shadow(0 6px 10px ${ring.glow})` : `drop-shadow(0 2px 3px ${ring.glow})`,
+              filter: isHov ? `drop-shadow(0 4px 8px ${ring.glow})` : undefined,
               cursor: 'pointer',
             }}
             onClick={() => onHoverKey(isHov ? null : ring.key)}
@@ -122,7 +122,7 @@ function BorromeanSvg({ hoveredKey, isMobileViewport, language, onHoverKey }: Bo
             animate={{ opacity: dim ? 0.3 : 1, strokeWidth: isHov ? 8 : 6 }}
             transition={{ duration: 0.3 }}
             style={{
-              filter: isHov ? `drop-shadow(0 6px 10px ${ring.glow})` : `drop-shadow(0 2px 3px ${ring.glow})`,
+              filter: isHov ? `drop-shadow(0 4px 8px ${ring.glow})` : undefined,
               pointerEvents: 'none',
             }}
           />
@@ -212,7 +212,7 @@ export default function BorromeanKnot2D({ isMobileViewport, language }: Borromea
       className="absolute inset-0 z-30 flex flex-col items-center overflow-hidden"
       data-testid="borromean-view"
       style={{ background: 'var(--lacan-paper)' }}
-      exit={{ opacity: 0, filter: 'blur(10px)' }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.4, ease: 'easeInOut' }}
     >
       <div className="flex flex-col items-center gap-2.5" style={{ paddingTop: 96 }}>
@@ -227,8 +227,8 @@ export default function BorromeanKnot2D({ isMobileViewport, language }: Borromea
             fontWeight: 'var(--lacan-title-weight)',
             textShadow: 'var(--lacan-title-shadow)',
           }}
-          initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
-          animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           {uiCopy.borromean.title[language]}
@@ -236,8 +236,8 @@ export default function BorromeanKnot2D({ isMobileViewport, language }: Borromea
         <motion.p
           className="lacan-page-subtitle text-center font-light"
           style={{ fontSize: '1.125rem', letterSpacing: '0.35em', color: 'var(--lacan-muted)' }}
-          initial={{ opacity: 0, filter: 'blur(8px)', y: -20 }}
-          animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.7, ease: 'easeOut' }}
         >
           {uiCopy.borromean.subtitle[language]}

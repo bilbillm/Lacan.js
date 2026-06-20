@@ -164,7 +164,7 @@ export default function TimelineView({ isMobileViewport, language }: TimelineVie
       className="absolute inset-0 z-30 flex flex-col items-center overflow-hidden"
       data-testid="timeline-view"
       style={{ background: 'var(--lacan-paper)' }}
-      exit={{ opacity: 0, filter: 'blur(10px)' }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.4, ease: 'easeInOut' }}
     >
       {/* Title block — positioned like AppHeader, top center */}
@@ -180,11 +180,10 @@ export default function TimelineView({ isMobileViewport, language }: TimelineVie
             fontWeight: 'var(--lacan-title-weight)',
             textShadow: 'var(--lacan-title-shadow)',
           }}
-          initial={{ opacity: 0, filter: 'blur(10px)', y: -30 }}
-          animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
             opacity: { delay: 0, duration: titleDurationS, ease: 'easeOut' },
-            filter: { delay: 0, duration: titleDurationS, ease: 'easeOut' },
             y: { delay: 0, duration: titleDurationS, ease: 'easeOut' },
           }}
         >
@@ -198,11 +197,10 @@ export default function TimelineView({ isMobileViewport, language }: TimelineVie
             letterSpacing: '0.35em',
             color: 'var(--lacan-muted)',
           }}
-          initial={{ opacity: 0, filter: 'blur(8px)', y: -20 }}
-          animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
             opacity: { delay: subtitleDelayS, duration: titleDurationS, ease: 'easeOut' },
-            filter: { delay: subtitleDelayS, duration: titleDurationS, ease: 'easeOut' },
             y: { delay: subtitleDelayS, duration: titleDurationS, ease: 'easeOut' },
           }}
         >
@@ -306,9 +304,8 @@ export default function TimelineView({ isMobileViewport, language }: TimelineVie
                   initial={{
                     opacity: 0,
                     y: isAbove ? -30 : 30,
-                    filter: 'blur(4px)',
                   }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{
                     delay,
                     duration: TIMELINE_NODE_ENTRY_DURATION_S,
@@ -408,8 +405,8 @@ export default function TimelineView({ isMobileViewport, language }: TimelineVie
                   data-testid="timeline-modal-card"
                   style={{
                     background: 'var(--lacan-timeline-modal-surface)',
-                    backdropFilter: 'blur(18px) saturate(110%)',
-                    WebkitBackdropFilter: 'blur(18px) saturate(110%)',
+                    backdropFilter: 'saturate(108%)',
+                    WebkitBackdropFilter: 'saturate(108%)',
                     border: '1px solid var(--lacan-timeline-modal-border)',
                     borderRadius: 12,
                     boxShadow: 'var(--lacan-timeline-modal-shadow)',

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback, lazy, Suspense, type CSSProperties } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback, lazy, Suspense, type CSSProperties, type ReactNode } from 'react'
 import './App.css'
 import DeepEnvironment from './components/DeepEnvironment'
 import AppHeader from './components/app/AppHeader'
@@ -32,6 +32,42 @@ const BorromeanKnot2D = lazy(() => import('./components/BorromeanKnot2D'))
 const createRandomOrder = () => {
   const indices = [0, 1, 2, 3, 4, 5, 6, 7]
   return indices.sort(() => Math.random() - 0.5)
+}
+
+interface MobileDeferredSectionProps {
+  testId: string
+  children: ReactNode
+}
+
+function MobileDeferredSection({ testId, children }: MobileDeferredSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [isReady, setIsReady] = useState(() => typeof IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section || isReady) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsReady(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '320px 0px' },
+    )
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [isReady])
+
+  return (
+    <section ref={sectionRef} className="mobile-section" data-testid={testId}>
+      {isReady ? children : null}
+    </section>
+  )
 }
 
 function App() {
@@ -241,19 +277,19 @@ function App() {
               <HomeSignatureBar isHidden={selectedId !== null} language={language} />
             </section>
 
-            <section className="mobile-section" data-testid="mobile-timeline-section">
+            <MobileDeferredSection testId="mobile-timeline-section">
               <DeepEnvironment />
               <Suspense fallback={null}>
                 <TimelineView isMobileViewport={isMobileViewport} language={language} />
               </Suspense>
-            </section>
+            </MobileDeferredSection>
 
-            <section className="mobile-section" data-testid="mobile-borromean-section">
+            <MobileDeferredSection testId="mobile-borromean-section">
               <DeepEnvironment />
               <Suspense fallback={null}>
                 <BorromeanKnot2D isMobileViewport={isMobileViewport} language={language} />
               </Suspense>
-            </section>
+            </MobileDeferredSection>
           </div>
         ) : (
           <div
