@@ -1,12 +1,25 @@
 import { memo } from 'react'
 import { motion } from 'framer-motion'
 
+type RoomLineWeight = 'normal' | 'strong'
+
+interface PerspectiveRoomProps {
+  lineWeight: RoomLineWeight
+}
+
+interface DeepEnvironmentProps {
+  lineWeight?: RoomLineWeight
+}
+
 // Perspective Wireframe Room Component
-function PerspectiveRoom() {
+function PerspectiveRoom({ lineWeight }: PerspectiveRoomProps) {
   // 动画时序
   const verticalDuration = 2
   const perspectiveDuration = 6
   const bottomDuration = 1
+  const primaryStrokeWidth = lineWeight === 'strong' ? 0.9 : 0.5
+  const perspectiveStrokeWidth = lineWeight === 'strong' ? 1 : 0.6
+  const softStrokeWidth = lineWeight === 'strong' ? 0.8 : 0.5
 
   // Helper: 渲染所有线条
   const renderLines = () => (
@@ -16,7 +29,7 @@ function PerspectiveRoom() {
         x1="15" y1="0"
         x2="15" y2="75"
         stroke="var(--lacan-room-line)"
-        strokeWidth="0.5"
+        strokeWidth={primaryStrokeWidth}
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
@@ -32,7 +45,7 @@ function PerspectiveRoom() {
         x1="85" y1="0"
         x2="85" y2="75"
         stroke="var(--lacan-room-line)"
-        strokeWidth="0.5"
+        strokeWidth={primaryStrokeWidth}
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
@@ -48,7 +61,7 @@ function PerspectiveRoom() {
         x1="3" y1="100"
         x2="15" y2="75"
         stroke="var(--lacan-room-line)"
-        strokeWidth="0.6"
+        strokeWidth={perspectiveStrokeWidth}
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
@@ -64,7 +77,7 @@ function PerspectiveRoom() {
         x1="97" y1="100"
         x2="85" y2="75"
         stroke="var(--lacan-room-line)"
-        strokeWidth="0.6"
+        strokeWidth={perspectiveStrokeWidth}
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
@@ -80,7 +93,7 @@ function PerspectiveRoom() {
         x1="15" y1="75"
         x2="50" y2="75"
         stroke="var(--lacan-room-line-soft)"
-        strokeWidth="0.5"
+        strokeWidth={softStrokeWidth}
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
@@ -96,7 +109,7 @@ function PerspectiveRoom() {
         x1="85" y1="75"
         x2="50" y2="75"
         stroke="var(--lacan-room-line-soft)"
-        strokeWidth="0.5"
+        strokeWidth={softStrokeWidth}
         strokeDasharray="1000"
         strokeDashoffset="1000"
         vectorEffect="non-scaling-stroke"
@@ -135,7 +148,7 @@ function PerspectiveRoom() {
   )
 }
 
-function DeepEnvironment() {
+function DeepEnvironment({ lineWeight = 'normal' }: DeepEnvironmentProps) {
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: 'var(--lacan-paper)' }}>
       {/* Warm paper field with restrained scholarly depth */}
@@ -147,7 +160,7 @@ function DeepEnvironment() {
       />
 
       {/* Perspective wireframe room */}
-      <PerspectiveRoom />
+      <PerspectiveRoom lineWeight={lineWeight} />
 
       {/* Paper edge depth */}
       <div

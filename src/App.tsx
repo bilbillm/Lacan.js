@@ -243,7 +243,7 @@ function App() {
         {isMobileViewport ? (
           <div className="mobile-page-stack">
             <section className="mobile-section mobile-section-home" data-testid="mobile-gallery-section">
-              <DeepEnvironment />
+              <DeepEnvironment lineWeight="strong" />
 
               <AppHeader
                 selectedId={selectedId}
@@ -297,7 +297,7 @@ function App() {
             style={{ transform: `translateY(${-visibleSlide * 100}vh)` }}
           >
             <div className="slide">
-              <DeepEnvironment />
+              <DeepEnvironment lineWeight="strong" />
 
               <AppHeader
                 selectedId={selectedId}
