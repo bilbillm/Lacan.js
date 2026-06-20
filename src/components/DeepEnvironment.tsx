@@ -20,6 +20,9 @@ function PerspectiveRoom({ lineWeight }: PerspectiveRoomProps) {
   const primaryStrokeWidth = lineWeight === 'strong' ? 2 : 0.5
   const perspectiveStrokeWidth = lineWeight === 'strong' ? 2 : 0.6
   const softStrokeWidth = lineWeight === 'strong' ? 0.8 : 0.5
+  const maskImage = lineWeight === 'strong'
+    ? 'radial-gradient(ellipse 130% 118% at 50% 56%, black 58%, rgba(0,0,0,0.92) 82%, rgba(0,0,0,0.58) 100%)'
+    : 'radial-gradient(circle at center, black 30%, transparent 70%)'
 
   // Helper: 渲染所有线条
   const renderLines = () => (
@@ -138,8 +141,8 @@ function PerspectiveRoom({ lineWeight }: PerspectiveRoomProps) {
         preserveAspectRatio="none"
         viewBox="0 0 100 100"
         style={{
-          WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)',
-          maskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)',
+          WebkitMaskImage: maskImage,
+          maskImage,
         }}
       >
         {renderLines()}
