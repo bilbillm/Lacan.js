@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { timelineEvents } from '../../data/timelineData'
+import timeline1885Image from '../../assets/timeline/psychoanalysis-1885.webp'
+import timeline1900Image from '../../assets/timeline/psychoanalysis-1900.webp'
+import timeline1910Image from '../../assets/timeline/psychoanalysis-1910.webp'
+import timeline1920Image from '../../assets/timeline/psychoanalysis-1920.webp'
+import timeline1936Image from '../../assets/timeline/psychoanalysis-1936.webp'
+import timeline1953Image from '../../assets/timeline/psychoanalysis-1953.webp'
+import timeline1964Image from '../../assets/timeline/psychoanalysis-1964.webp'
+import timeline1973Image from '../../assets/timeline/psychoanalysis-1973.webp'
+import timeline1981Image from '../../assets/timeline/psychoanalysis-1981.webp'
+import timeline1990Image from '../../assets/timeline/psychoanalysis-1990.webp'
 import {
   TIMELINE_LINE_DRAW_DURATION_S,
   TIMELINE_NODE_STAGGER_S,
@@ -13,6 +23,19 @@ interface TimelineViewProps {
   isMobileViewport: boolean
 }
 
+const timelineEventImages: Record<number, string> = {
+  1885: timeline1885Image,
+  1900: timeline1900Image,
+  1910: timeline1910Image,
+  1920: timeline1920Image,
+  1936: timeline1936Image,
+  1953: timeline1953Image,
+  1964: timeline1964Image,
+  1973: timeline1973Image,
+  1981: timeline1981Image,
+  1990: timeline1990Image,
+}
+
 export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
   const eventCount = timelineEvents.length
   const titleDurationS = TIMELINE_TITLE_DURATION_MS / 1000
@@ -21,11 +44,13 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
   const expandedEvent = expandedYear
     ? timelineEvents.find((e) => e.year === expandedYear) ?? null
     : null
+  const expandedEventImage = expandedEvent ? timelineEventImages[expandedEvent.year] : undefined
 
   if (isMobileViewport) {
     return (
       <motion.div
         className="mobile-timeline-view"
+        data-modal-open={expandedYear ? 'true' : undefined}
         data-testid="timeline-view"
         style={{ background: 'transparent' }}
         initial={{ opacity: 0, y: 24 }}
@@ -101,11 +126,20 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                   transition={{ duration: 0.34, ease: [0.4, 0, 0.2, 1] }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div data-testid="timeline-modal-card">
-                    <span className="mobile-timeline-modal-year">{expandedEvent.year}</span>
-                    <span className="mobile-timeline-divider" aria-hidden="true" />
-                    <h3>{expandedEvent.title}</h3>
-                    <p>{expandedEvent.description}</p>
+                  <div className="mobile-timeline-modal-content" data-testid="timeline-modal-card">
+                    <div className="mobile-timeline-modal-copy">
+                      <span className="mobile-timeline-modal-year">{expandedEvent.year}</span>
+                      <span className="mobile-timeline-divider" aria-hidden="true" />
+                      <h3>{expandedEvent.title}</h3>
+                      <p>{expandedEvent.description}</p>
+                    </div>
+                    {expandedEventImage && (
+                      <img
+                        className="mobile-timeline-modal-image"
+                        src={expandedEventImage}
+                        alt={`${expandedEvent.year}年：${expandedEvent.title}插图`}
+                      />
+                    )}
                     <button type="button" onClick={() => setExpandedYear(null)}>关闭</button>
                   </div>
                 </motion.div>
@@ -358,9 +392,10 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                 exit={{ opacity: 0, scale: 0.92, y: 24 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                style={{ width: 480, maxWidth: '90vw' }}
+                style={{ width: 880, maxWidth: '92vw' }}
               >
                 <div
+                  className="timeline-modal-card"
                   data-testid="timeline-modal-card"
                   style={{
                     background: 'var(--lacan-timeline-modal-surface)',
@@ -369,42 +404,48 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                     border: '1px solid var(--lacan-timeline-modal-border)',
                     borderRadius: 12,
                     boxShadow: 'var(--lacan-timeline-modal-shadow)',
-                    padding: 32,
                   }}
                 >
-                  <span
-                    className="block font-semibold tracking-wider mb-3"
-                    style={{ fontSize: '1.05rem', letterSpacing: '0.2em', color: 'var(--lacan-vermilion)' }}
-                  >
-                    {expandedEvent.year}
-                  </span>
-                  <div
-                    style={{
-                      height: 1,
-                      width: '100%',
-                      marginBottom: 20,
-                      background:
-                        'var(--lacan-timeline-divider)',
-                    }}
-                  />
-                  <h3
-                    className="tracking-wide mb-5"
-                    style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
-                  >
-                    {expandedEvent.title}
-                  </h3>
-                  <p
-                    className="font-light leading-relaxed"
-                    style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--lacan-muted)' }}
-                  >
-                    {expandedEvent.description}
-                  </p>
-                  <p
-                    className="mt-6 font-light tracking-wider"
-                    style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'var(--lacan-muted-soft)' }}
-                  >
-                    点击空白处关闭
-                  </p>
+                  <div className="timeline-modal-copy">
+                    <span
+                      className="block font-semibold tracking-wider mb-3"
+                      style={{ fontSize: '1.05rem', letterSpacing: '0.2em', color: 'var(--lacan-vermilion)' }}
+                    >
+                      {expandedEvent.year}
+                    </span>
+                    <div
+                      style={{
+                        height: 1,
+                        width: '100%',
+                        marginBottom: 20,
+                        background:
+                          'var(--lacan-timeline-divider)',
+                      }}
+                    />
+                    <h3
+                      className="tracking-wide mb-5"
+                      style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
+                    >
+                      {expandedEvent.title}
+                    </h3>
+                    <p
+                      className="font-light leading-relaxed"
+                      style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--lacan-muted)' }}
+                    >
+                      {expandedEvent.description}
+                    </p>
+                    <p
+                      className="mt-6 font-light tracking-wider"
+                      style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'var(--lacan-muted-soft)' }}
+                    >
+                      点击空白处关闭
+                    </p>
+                  </div>
+                  {expandedEventImage && (
+                    <div className="timeline-modal-art" aria-hidden="true">
+                      <img src={expandedEventImage} alt="" />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </motion.div>

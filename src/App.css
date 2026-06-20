@@ -423,6 +423,10 @@
   padding: 0 20px calc(42px + var(--safe-area-bottom));
 }
 
+.mobile-timeline-view[data-modal-open='true'] {
+  z-index: 70;
+}
+
 .mobile-timeline-list {
   position: relative;
   display: grid;
@@ -535,6 +539,26 @@
   pointer-events: auto;
 }
 
+.mobile-timeline-modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-timeline-modal-copy {
+  display: contents;
+}
+
+.mobile-timeline-modal-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  margin-top: 20px;
+  border: 1px solid var(--lacan-timeline-modal-border);
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: 58% 50%;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
+}
+
 .mobile-timeline-modal-year {
   display: block;
   color: var(--lacan-vermilion);
@@ -567,6 +591,49 @@
   background: var(--lacan-toggle-surface);
   color: var(--lacan-vermilion);
   font-size: 0.82rem;
+}
+
+.timeline-modal-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
+  gap: 28px;
+  align-items: stretch;
+  padding: 24px;
+}
+
+.timeline-modal-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 8px 4px 8px 8px;
+}
+
+.timeline-modal-art {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--lacan-timeline-modal-border);
+  border-radius: 8px;
+  background: rgb(18 15 12 / 58%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
+}
+
+.timeline-modal-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(18 15 12 / 12%), transparent 28%),
+    linear-gradient(180deg, transparent 66%, rgb(18 15 12 / 22%));
+}
+
+.timeline-modal-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 58% 50%;
 }
 
 .mobile-borromean-stage {
