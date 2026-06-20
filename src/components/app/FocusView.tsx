@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import GlassPanel from '../GlassPanel'
-import type { PanelData } from './panels'
+import { getPanelText, type PanelData } from './panels'
+import type { Language } from '../../i18n'
+import { uiCopy } from '../../i18n'
 import {
   resolvePanelSchema,
   type InteractiveSchemaComponent,
@@ -19,8 +21,8 @@ interface FocusViewProps {
   selectedId: string | null
   selectedPanel?: PanelData
   selectedNodes: string[]
-  isExitingFocus: boolean
   isMobileViewport: boolean
+  language: Language
   onExitFocus: () => void
   onSelectionChange: (panelId: string, nodeIds: string[]) => void
   SchemaL: InteractiveSchemaComponent
@@ -33,8 +35,8 @@ export default function FocusView({
   selectedId,
   selectedPanel,
   selectedNodes,
-  isExitingFocus,
   isMobileViewport,
+  language,
   onExitFocus,
   onSelectionChange,
   SchemaL,
@@ -51,9 +53,10 @@ export default function FocusView({
       })
     : null
 
+  const selectedPanelText = selectedPanel ? getPanelText(selectedPanel, language) : null
   const hasSecondaryPanel = selectedNodes.length === 2
   const secondaryPanelContent = hasSecondaryPanel
-    ? `${selectedPanel?.title ?? ''} · ${selectedNodes.join(' · ')}`
+    ? `${selectedPanelText?.title ?? ''} · ${selectedNodes.join(' · ')}`
     : ''
 
   const focusPanelContent = resolvedSchema ? (
@@ -64,7 +67,7 @@ export default function FocusView({
             className="text-3xl tracking-widest"
             style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
           >
-            {selectedPanel?.title}
+            {selectedPanelText?.title}
           </span>
         </div>
       }
@@ -85,7 +88,7 @@ export default function FocusView({
         className="text-3xl tracking-widest"
         style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
       >
-        {selectedPanel?.title}
+        {selectedPanelText?.title}
       </span>
     </div>
   )
@@ -98,7 +101,7 @@ export default function FocusView({
           <motion.div
             className="focus-backdrop absolute inset-0 z-40"
             initial={{ opacity: 0 }}
-            animate={{ opacity: isExitingFocus ? 0 : 1 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onExitFocus}
             transition={{ duration: FOCUS_BACKDROP_FADE_S, ease: 'easeOut' }}
@@ -125,7 +128,7 @@ export default function FocusView({
                     type="button"
                     className="mobile-focus-close"
                     data-testid="mobile-focus-close"
-                    aria-label="关闭聚焦视图"
+                    aria-label={uiCopy.focus.close[language]}
                     onClick={onExitFocus}
                   >
                     ×

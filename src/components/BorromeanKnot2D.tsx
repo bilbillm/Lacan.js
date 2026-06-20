@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import type { Language } from '../i18n'
+import { uiCopy } from '../i18n'
 
 interface BorromeanKnot2DProps {
   isMobileViewport: boolean
+  language: Language
 }
 
 const RINGS = [
-  { key: 'S', cx: 200, cy: 148, r: 75, color: 'var(--lacan-borromean-s)', glow: 'var(--lacan-borromean-glow-s)', label: '符号界' },
-  { key: 'I', cx: 152, cy: 242, r: 75, color: 'var(--lacan-borromean-i)', glow: 'var(--lacan-borromean-glow-i)', label: '想象界' },
-  { key: 'R', cx: 248, cy: 242, r: 75, color: 'var(--lacan-borromean-r)', glow: 'var(--lacan-borromean-glow-r)', label: '实在界' },
+  { key: 'S', cx: 200, cy: 148, r: 75, color: 'var(--lacan-borromean-s)', glow: 'var(--lacan-borromean-glow-s)' },
+  { key: 'I', cx: 152, cy: 242, r: 75, color: 'var(--lacan-borromean-i)', glow: 'var(--lacan-borromean-glow-i)' },
+  { key: 'R', cx: 248, cy: 242, r: 75, color: 'var(--lacan-borromean-r)', glow: 'var(--lacan-borromean-glow-r)' },
 ] as const
 
 type RingKey = (typeof RINGS)[number]['key']
@@ -48,10 +51,11 @@ function describeArc(ring: (typeof RINGS)[number], angle: number, spread: number
 interface BorromeanSvgProps {
   hoveredKey: string | null
   isMobileViewport: boolean
+  language: Language
   onHoverKey: (key: string | null) => void
 }
 
-function BorromeanSvg({ hoveredKey, isMobileViewport, onHoverKey }: BorromeanSvgProps) {
+function BorromeanSvg({ hoveredKey, isMobileViewport, language, onHoverKey }: BorromeanSvgProps) {
   return (
     <svg
       viewBox="0 0 400 440"
@@ -60,7 +64,7 @@ function BorromeanSvg({ hoveredKey, isMobileViewport, onHoverKey }: BorromeanSvg
       role="img"
       aria-labelledby="borromean-title"
     >
-      <title id="borromean-title">波罗米结：符号界、想象界、实在界交错锁合</title>
+      <title id="borromean-title">{uiCopy.borromean.svgTitle[language]}</title>
       {RINGS.map((ring, i) => {
         const isHov = hoveredKey === ring.key
         const dim = hoveredKey !== null && hoveredKey !== ring.key
@@ -128,12 +132,14 @@ function BorromeanSvg({ hoveredKey, isMobileViewport, onHoverKey }: BorromeanSvg
       {RINGS.map((ring, i) => {
         const lx = i === 0 ? 200 : i === 1 ? 108 : 292
         const ly = i === 0 ? 78 : i === 1 ? 268 : 268
+        const labelWidth = language === 'en' ? 92 : 76
+        const labelFontSize = language === 'en' ? 10 : 11
         return (
           <motion.g key={`lbl-${ring.key}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8, duration: 0.6 }}>
             <rect
-              x={lx - 38}
+              x={lx - labelWidth / 2}
               y={ly - 17}
-              width={76}
+              width={labelWidth}
               height={34}
               rx={6}
               fill="var(--lacan-borromean-label-surface)"
@@ -146,12 +152,12 @@ function BorromeanSvg({ hoveredKey, isMobileViewport, onHoverKey }: BorromeanSvg
               textAnchor="middle"
               dominantBaseline="central"
               fill="var(--lacan-ink)"
-              fontSize={11}
+              fontSize={labelFontSize}
               fontFamily="var(--lacan-title-font)"
               fontWeight="var(--lacan-title-weight)"
               letterSpacing="0.08em"
             >
-              {ring.label}
+              {uiCopy.borromean.rings[ring.key][language]}
             </text>
           </motion.g>
         )
@@ -160,7 +166,7 @@ function BorromeanSvg({ hoveredKey, isMobileViewport, onHoverKey }: BorromeanSvg
   )
 }
 
-export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DProps) {
+export default function BorromeanKnot2D({ isMobileViewport, language }: BorromeanKnot2DProps) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null)
 
   if (isMobileViewport) {
@@ -183,19 +189,19 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
               textShadow: 'var(--lacan-title-shadow)',
             }}
           >
-            波罗米结
+            {uiCopy.borromean.title[language]}
           </h1>
           <p className="lacan-page-subtitle" style={{ color: 'var(--lacan-muted)' }}>
-            The RSI Interconnection
+            {uiCopy.borromean.subtitle[language]}
           </p>
         </div>
 
         <div className="mobile-borromean-stage">
-          <BorromeanSvg hoveredKey={hoveredKey} isMobileViewport={isMobileViewport} onHoverKey={setHoveredKey} />
+          <BorromeanSvg hoveredKey={hoveredKey} isMobileViewport={isMobileViewport} language={language} onHoverKey={setHoveredKey} />
         </div>
 
         <p className="mobile-borromean-copy">
-          三枚完整圆环，两两不相连，但三者交织，任取其一，其余便散。交叉处上下交替，每个环与另两环各交叉一次，形成拓扑锁合。
+          {uiCopy.borromean.copy[language]}
         </p>
       </motion.div>
     )
@@ -225,7 +231,7 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          波罗米结
+          {uiCopy.borromean.title[language]}
         </motion.h1>
         <motion.p
           className="lacan-page-subtitle text-center font-light"
@@ -234,12 +240,12 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
           animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
           transition={{ delay: 0.2, duration: 0.7, ease: 'easeOut' }}
         >
-          The RSI Interconnection
+          {uiCopy.borromean.subtitle[language]}
         </motion.p>
       </div>
 
       <div className="flex-1 flex items-center justify-center w-full">
-        <BorromeanSvg hoveredKey={hoveredKey} isMobileViewport={isMobileViewport} onHoverKey={setHoveredKey} />
+        <BorromeanSvg hoveredKey={hoveredKey} isMobileViewport={isMobileViewport} language={language} onHoverKey={setHoveredKey} />
       </div>
 
       <motion.div
@@ -252,8 +258,8 @@ export default function BorromeanKnot2D({ isMobileViewport }: BorromeanKnot2DPro
           className="text-center font-light leading-relaxed"
           style={{ fontSize: '0.85rem', letterSpacing: '0.04em', lineHeight: 1.9, color: 'var(--lacan-muted)' }}
         >
-          三枚完整圆环，两两不相连——但三者交织，任取其一，其余便散。
-          <br />交叉处上下交替：每个环与另两环各交叉一次，形成拓扑锁合。
+          {uiCopy.borromean.desktopCopyLine1[language]}
+          <br />{uiCopy.borromean.desktopCopyLine2[language]}
         </p>
       </motion.div>
     </motion.div>

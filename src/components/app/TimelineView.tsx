@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { timelineEvents } from '../../data/timelineData'
+import { getTimelineEventText, timelineEvents } from '../../data/timelineData'
+import type { Language } from '../../i18n'
+import { uiCopy } from '../../i18n'
 import timeline1885Image from '../../assets/timeline/psychoanalysis-1885.webp'
 import timeline1900Image from '../../assets/timeline/psychoanalysis-1900.webp'
 import timeline1910Image from '../../assets/timeline/psychoanalysis-1910.webp'
@@ -21,6 +23,7 @@ import {
 
 interface TimelineViewProps {
   isMobileViewport: boolean
+  language: Language
 }
 
 const timelineEventImages: Record<number, string> = {
@@ -36,7 +39,7 @@ const timelineEventImages: Record<number, string> = {
   1990: timeline1990Image,
 }
 
-export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
+export default function TimelineView({ isMobileViewport, language }: TimelineViewProps) {
   const eventCount = timelineEvents.length
   const titleDurationS = TIMELINE_TITLE_DURATION_MS / 1000
   const subtitleDelayS = TIMELINE_TITLE_STAGGER_MS / 1000
@@ -44,6 +47,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
   const expandedEvent = expandedYear
     ? timelineEvents.find((e) => e.year === expandedYear) ?? null
     : null
+  const expandedEventText = expandedEvent ? getTimelineEventText(expandedEvent, language) : null
   const expandedEventImage = expandedEvent ? timelineEventImages[expandedEvent.year] : undefined
 
   if (isMobileViewport) {
@@ -68,32 +72,36 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
               textShadow: 'var(--lacan-title-shadow)',
             }}
           >
-            精神分析发展史
+            {uiCopy.timeline.title[language]}
           </h1>
           <p className="lacan-page-subtitle" style={{ color: 'var(--lacan-muted)' }}>
-            A Timeline of Psychoanalytic Thought
+            {uiCopy.timeline.subtitle[language]}
           </p>
         </div>
 
         <div className="mobile-timeline-list">
-          {timelineEvents.map((event, index) => (
-            <motion.button
-              key={event.year}
-              type="button"
-              className="mobile-timeline-card"
-              data-testid={`timeline-event-card-${event.year}`}
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.42, ease: 'easeOut' }}
-              onClick={() => setExpandedYear(event.year)}
-            >
-              <span className="mobile-timeline-year">{event.year}</span>
-              <span className="mobile-timeline-divider" aria-hidden="true" />
-              <span className="mobile-timeline-title">{event.title}</span>
-              <span className="mobile-timeline-description">{event.description}</span>
-            </motion.button>
-          ))}
+          {timelineEvents.map((event, index) => {
+            const eventText = getTimelineEventText(event, language)
+
+            return (
+              <motion.button
+                key={event.year}
+                type="button"
+                className="mobile-timeline-card"
+                data-testid={`timeline-event-card-${event.year}`}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.42, ease: 'easeOut' }}
+                onClick={() => setExpandedYear(event.year)}
+              >
+                <span className="mobile-timeline-year">{event.year}</span>
+                <span className="mobile-timeline-divider" aria-hidden="true" />
+                <span className="mobile-timeline-title">{eventText.title}</span>
+                <span className="mobile-timeline-description">{eventText.description}</span>
+              </motion.button>
+            )
+          })}
         </div>
 
         <AnimatePresence>
@@ -130,17 +138,17 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                     <div className="mobile-timeline-modal-copy">
                       <span className="mobile-timeline-modal-year">{expandedEvent.year}</span>
                       <span className="mobile-timeline-divider" aria-hidden="true" />
-                      <h3>{expandedEvent.title}</h3>
-                      <p>{expandedEvent.description}</p>
+                      <h3>{expandedEventText?.title}</h3>
+                      <p>{expandedEventText?.description}</p>
                     </div>
                     {expandedEventImage && (
                       <img
                         className="mobile-timeline-modal-image"
                         src={expandedEventImage}
-                        alt={`${expandedEvent.year}年：${expandedEvent.title}插图`}
+                        alt={`${expandedEvent.year}: ${expandedEventText?.title} ${uiCopy.timeline.illustrationAlt[language]}`}
                       />
                     )}
-                    <button type="button" onClick={() => setExpandedYear(null)}>关闭</button>
+                    <button type="button" onClick={() => setExpandedYear(null)}>{uiCopy.timeline.closeButton[language]}</button>
                   </div>
                 </motion.div>
               </motion.div>
@@ -180,7 +188,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
             y: { delay: 0, duration: titleDurationS, ease: 'easeOut' },
           }}
         >
-          精神分析发展史
+          {uiCopy.timeline.title[language]}
         </motion.h1>
 
         <motion.p
@@ -198,7 +206,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
             y: { delay: subtitleDelayS, duration: titleDurationS, ease: 'easeOut' },
           }}
         >
-          A Timeline of Psychoanalytic Thought
+          {uiCopy.timeline.subtitle[language]}
         </motion.p>
       </div>
 
@@ -235,6 +243,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
             const maxYear = timelineEvents[eventCount - 1].year
             const yearSpan = maxYear - minYear
             const ratio = (event.year - minYear) / yearSpan
+            const eventText = getTimelineEventText(event, language)
 
             const pos = 5 + ratio * 86
             const isAbove = index % 2 === 0
@@ -337,7 +346,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                         fontWeight: 'var(--lacan-title-weight)',
                       }}
                     >
-                      {event.title}
+                      {eventText.title}
                     </h3>
                     <p
                       className="text-xs font-light leading-relaxed"
@@ -349,7 +358,7 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                         overflow: 'hidden',
                       }}
                     >
-                      {event.description}
+                      {eventText.description}
                     </p>
                   </div>
                 </motion.div>
@@ -426,19 +435,19 @@ export default function TimelineView({ isMobileViewport }: TimelineViewProps) {
                       className="tracking-wide mb-5"
                       style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                     >
-                      {expandedEvent.title}
+                      {expandedEventText?.title}
                     </h3>
                     <p
                       className="font-light leading-relaxed"
                       style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--lacan-muted)' }}
                     >
-                      {expandedEvent.description}
+                      {expandedEventText?.description}
                     </p>
                     <p
                       className="mt-6 font-light tracking-wider"
                       style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'var(--lacan-muted-soft)' }}
                     >
-                      点击空白处关闭
+                      {uiCopy.timeline.closeHint[language]}
                     </p>
                   </div>
                   {expandedEventImage && (

@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import GlassPanel from '../GlassPanel'
-import type { PanelData } from './panels'
+import { getPanelText, type PanelData } from './panels'
+import type { Language } from '../../i18n'
+import { uiCopy } from '../../i18n'
 import {
   resolvePanelSchema,
   type InteractiveSchemaComponent,
@@ -35,6 +37,7 @@ interface PanelGalleryProps {
   isAppLoaded: boolean
   cardEntryStartDelayMs: number
   isMobileViewport: boolean
+  language: Language
   onSelectPanel: (id: string) => void
   onSelectionChange: (panelId: string, nodeIds: string[]) => void
   SchemaL: InteractiveSchemaComponent
@@ -42,6 +45,7 @@ interface PanelGalleryProps {
   SchemaI: InteractiveSchemaComponent
   SchemaD: InteractiveSchemaComponent
   onWheelNavigate: (deltaY: number) => void
+  onPageChange: (pageGroup: number) => void
 }
 
 export default function PanelGallery({
@@ -54,6 +58,7 @@ export default function PanelGallery({
   isAppLoaded,
   cardEntryStartDelayMs,
   isMobileViewport,
+  language,
   onSelectPanel,
   onSelectionChange,
   SchemaL,
@@ -61,6 +66,7 @@ export default function PanelGallery({
   SchemaI,
   SchemaD,
   onWheelNavigate,
+  onPageChange,
 }: PanelGalleryProps) {
   const progress = ((pageGroup + 1) / totalPages) * 100
   const cardEntryMaxDelay = Math.max(...currentPanels.map((_, index) => randomOrder.indexOf(index) * GALLERY_CARD_STAGGER_S))
@@ -69,6 +75,11 @@ export default function PanelGallery({
   const progressTokens = isMobileViewport ? GALLERY_PROGRESS_TOKENS.mobile : GALLERY_PROGRESS_TOKENS.desktop
   const galleryCardWidth = isMobileViewport ? '100%' : GALLERY_CARD_WIDTH
   const galleryCardHeight = isMobileViewport ? GALLERY_MOBILE_CARD_HEIGHT : GALLERY_CARD_HEIGHT
+  const previousPage = (pageGroup - 1 + totalPages) % totalPages
+  const nextPage = (pageGroup + 1) % totalPages
+  const pageStatus = uiCopy.gallery.pageStatus[language]
+    .replace('{current}', String(pageGroup + 1).padStart(2, '0'))
+    .replace('{total}', String(totalPages).padStart(2, '0'))
 
   return (
     <div className="panel-gallery-shell absolute inset-0 flex items-center justify-center" data-testid="panel-gallery">
@@ -104,6 +115,7 @@ export default function PanelGallery({
               ease: 'easeOut' as const,
             }
             const currentSelectedNodes = selectedNodeState?.panelId === panel.id ? selectedNodeState.nodeIds : []
+            const panelText = getPanelText(panel, language)
             const resolvedSchema = resolvePanelSchema(panel.id, {
               SchemaL,
               SchemaR,
@@ -141,14 +153,20 @@ export default function PanelGallery({
                     width={galleryCardWidth}
                     height={galleryCardHeight}
                     onClick={() => onSelectPanel(panel.id)}
-                    className="cursor-pointer"
+                    className={isMobileViewport ? 'mobile-gallery-card cursor-pointer' : 'cursor-pointer'}
                     deferVisualEnhancement={!isAppLoaded}
                     isMobileViewport={isMobileViewport}
                     style={{
                       maxWidth: isMobileViewport ? GALLERY_MOBILE_CARD_MAX_WIDTH : undefined,
                     }}
                   >
-                    {resolvedSchema ? (
+                    {isMobileViewport ? (
+                      <div className="mobile-gallery-card-content">
+                        <h2>{panelText.galleryLabel}</h2>
+                        <span className="mobile-gallery-card-divider" aria-hidden="true" />
+                        <p>{panelText.mobileDescription ?? uiCopy.gallery.fallbackDescription[language]}</p>
+                      </div>
+                    ) : resolvedSchema ? (
                       <Suspense
                         fallback={
                             <div className="w-full h-full flex items-center justify-center">
@@ -156,7 +174,7 @@ export default function PanelGallery({
                                 className="text-xl tracking-widest"
                                 style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                               >
-                                {panel.galleryLabel ?? panel.title}
+                                {panelText.galleryLabel}
                               </span>
                             </div>
                           }
@@ -177,7 +195,7 @@ export default function PanelGallery({
                           className="text-xl tracking-widest"
                           style={{ color: 'var(--lacan-muted)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
                         >
-                          {panel.galleryLabel ?? panel.title}
+                          {panelText.galleryLabel}
                         </span>
                       </div>
                     )}
@@ -214,6 +232,32 @@ export default function PanelGallery({
           })}
         </motion.div>
       </AnimatePresence>
+
+      {isMobileViewport && totalPages > 1 && (
+        <motion.nav
+          className="mobile-gallery-pagination"
+          aria-label={pageStatus}
+          initial={isAppLoaded ? false : { opacity: 0, y: 10, filter: 'blur(3px)' }}
+          animate={selectedId ? { opacity: 0, y: 10, filter: 'blur(4px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.28, ease: 'easeOut' }}
+        >
+          <button
+            type="button"
+            aria-label={uiCopy.gallery.previousPage[language]}
+            onClick={() => onPageChange(previousPage)}
+          >
+            <span aria-hidden="true">‹</span>
+          </button>
+          <span className="mobile-gallery-page-status">{pageStatus}</span>
+          <button
+            type="button"
+            aria-label={uiCopy.gallery.nextPage[language]}
+            onClick={() => onPageChange(nextPage)}
+          >
+            <span aria-hidden="true">›</span>
+          </button>
+        </motion.nav>
+      )}
 
       <motion.div
         className="progress-indicator-shell absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none"

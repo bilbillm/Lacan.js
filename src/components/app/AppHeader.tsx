@@ -6,12 +6,15 @@ import {
   HEADER_SUBTITLE_STAGGER_MS,
   HEADER_TITLE_DURATION_MS,
 } from './uiConstants'
+import type { Language } from '../../i18n'
+import { uiCopy } from '../../i18n'
 
 interface AppHeaderProps {
   selectedId: string | null
   shouldAnimateEntry: boolean
   entryDelayMs: number
   isMobileViewport: boolean
+  language: Language
 }
 
 // Global Header Variants - h1 标题
@@ -54,7 +57,7 @@ const pVariants = {
   },
 }
 
-export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs, isMobileViewport }: AppHeaderProps) {
+export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs, isMobileViewport, language }: AppHeaderProps) {
   const entryDelaySeconds = entryDelayMs / 1000
 
   const containerStyle = useMemo<CSSProperties>(() => (
@@ -62,7 +65,7 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
       ? {
           maxWidth: HEADER_RESPONSIVE_TOKENS.containerMaxWidth.mobile,
           paddingInline: '0.25rem',
-          margin: '0 auto',
+          marginInline: 'auto',
         }
       : {
           maxWidth: HEADER_RESPONSIVE_TOKENS.containerMaxWidth.desktop,
@@ -149,7 +152,7 @@ export default function AppHeader({ selectedId, shouldAnimateEntry, entryDelayMs
           scale: { duration: 0.4 },
         }}
       >
-        The Spatial Architecture of Psychoanalysis
+        {uiCopy.app.headerSubtitle[language]}
       </motion.p>
     </motion.div>
   )

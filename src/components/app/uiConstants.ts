@@ -95,7 +95,7 @@ export const GALLERY_CARD_WIDTH = 252
 export const GALLERY_CARD_HEIGHT = 368
 
 export const GALLERY_MOBILE_CARD_MAX_WIDTH = 320
-export const GALLERY_MOBILE_CARD_HEIGHT = 392
+export const GALLERY_MOBILE_CARD_HEIGHT = 112
 
 export const GALLERY_LAYOUT_TOKENS = {
   desktop: {
@@ -108,7 +108,7 @@ export const GALLERY_LAYOUT_TOKENS = {
   },
   mobile: {
     columns: 1,
-    gap: 18,
+    gap: 10,
     maxWidth: 320,
     reflectionOffsetY: 42,
     reflectionHeightRatio: 0.16,
