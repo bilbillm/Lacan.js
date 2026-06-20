@@ -21,7 +21,7 @@ function PerspectiveRoom({ lineWeight }: PerspectiveRoomProps) {
   const perspectiveStrokeWidth = lineWeight === 'strong' ? 2 : 0.6
   const softStrokeWidth = lineWeight === 'strong' ? 0.8 : 0.5
   const maskImage = lineWeight === 'strong'
-    ? 'radial-gradient(ellipse 130% 118% at 50% 56%, black 58%, rgba(0,0,0,0.92) 82%, rgba(0,0,0,0.58) 100%)'
+    ? 'radial-gradient(ellipse 112% 104% at 50% 52%, black 38%, rgba(0,0,0,0.72) 70%, transparent 92%)'
     : 'radial-gradient(circle at center, black 30%, transparent 70%)'
 
   // Helper: 渲染所有线条
