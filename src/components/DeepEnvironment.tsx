@@ -18,7 +18,7 @@ function PerspectiveRoom({ lineWeight }: PerspectiveRoomProps) {
   const perspectiveDuration = 6
   const bottomDuration = 1
   const primaryStrokeWidth = lineWeight === 'strong' ? 2 : 0.5
-  const perspectiveStrokeWidth = lineWeight === 'strong' ? 1 : 0.6
+  const perspectiveStrokeWidth = lineWeight === 'strong' ? 2 : 0.6
   const softStrokeWidth = lineWeight === 'strong' ? 0.8 : 0.5
 
   // Helper: 渲染所有线条
