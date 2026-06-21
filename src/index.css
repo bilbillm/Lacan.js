@@ -59,6 +59,7 @@
   --lacan-room-glow-active: drop-shadow(0 1px 2px rgba(181,138,69,0.18));
   --lacan-schema-filter: sepia(0.35) saturate(0.78) contrast(1.08) brightness(0.86) opacity(0.88);
   --lacan-borromean-gap: #f8f2e8;
+  --lacan-borromean-casing: rgba(255,254,250,0.86);
   --lacan-borromean-s: #6b1d0e;
   --lacan-borromean-i: #b58a45;
   --lacan-borromean-r: #1a1613;
@@ -159,6 +160,7 @@ body, #root {
   --lacan-room-glow-active: drop-shadow(0 0 8px rgba(255,255,255,0.8));
   --lacan-schema-filter: invert(1) opacity(0.8);
   --lacan-borromean-gap: #050507;
+  --lacan-borromean-casing: rgba(5,5,7,0.92);
   --lacan-borromean-s: rgba(96,165,250,0.85);
   --lacan-borromean-i: rgba(234,179,8,0.85);
   --lacan-borromean-r: rgba(220,72,72,0.85);
