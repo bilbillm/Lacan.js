@@ -405,11 +405,6 @@
 }
 
 .theme-content img,
-.borromean-diagram,
-.borromean-diagram circle,
-.borromean-diagram path,
-.borromean-diagram rect,
-.borromean-diagram text,
 .mobile-borromean-svg,
 .mobile-borromean-svg circle,
 .mobile-borromean-svg path,
@@ -424,7 +419,6 @@
 .mobile-gallery-card,
 .mobile-timeline-card,
 .mobile-borromean-stage,
-.borromean-stage,
 .timeline-modal-card,
 .mobile-timeline-modal,
 .mobile-gallery-pagination button {
@@ -967,9 +961,13 @@
 .mobile-borromean-stage {
   position: relative;
   z-index: 2;
-  width: min(100%, 360px);
+  width: min(100%, 340px);
   margin: 0 auto;
-  padding: 0;
+  padding: 14px;
+  border: 1px solid var(--lacan-border);
+  border-radius: 14px;
+  background: var(--lacan-panel-background);
+  box-shadow: var(--lacan-paper-shadow);
 }
 
 .mobile-borromean-svg {
@@ -977,114 +975,6 @@
   width: 100%;
   height: auto;
   max-height: 52vh;
-}
-
-.borromean-view {
-  color: var(--lacan-ink);
-}
-
-.borromean-view--desktop {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  justify-items: center;
-  overflow: hidden;
-  padding: 86px clamp(40px, 5vw, 80px) 44px;
-}
-
-.borromean-copy-block {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  gap: 12px;
-  justify-items: center;
-  text-align: center;
-}
-
-.borromean-copy-block .lacan-page-title {
-  margin: 0;
-  font-size: clamp(2.1rem, 3vw, 3.2rem);
-  line-height: 0.96;
-  letter-spacing: 0.36em;
-}
-
-.borromean-copy-block .lacan-page-subtitle {
-  margin: 0;
-  font-size: clamp(0.9rem, 1.05vw, 1.08rem);
-  letter-spacing: 0.26em;
-}
-
-.borromean-stage {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: min(78vw, 880px);
-  min-width: 0;
-}
-
-.borromean-stage::before {
-  content: "";
-  position: absolute;
-  inset: 12% 8% 8%;
-  z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, var(--lacan-vermilion-soft), transparent 68%);
-  opacity: 0.62;
-}
-
-.borromean-diagram {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.borromean-diagram--desktop {
-  max-height: min(66vh, 620px);
-}
-
-.borromean-aura ellipse,
-.borromean-aura path {
-  fill: none;
-  stroke: var(--lacan-border);
-  stroke-width: 1;
-  stroke-dasharray: 2 9;
-  opacity: 0.42;
-}
-
-.borromean-center circle {
-  fill: var(--lacan-borromean-label-surface);
-  stroke: var(--lacan-border-strong);
-  stroke-width: 1;
-}
-
-.borromean-center text {
-  fill: var(--lacan-ink-strong);
-  font-family: var(--lacan-title-font);
-  font-size: 20px;
-  font-weight: var(--lacan-title-weight);
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-
-.borromean-desktop-copy {
-  position: relative;
-  z-index: 2;
-  width: min(100%, 560px);
-  margin: 0;
-  color: var(--lacan-muted);
-  font-size: 0.86rem;
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  line-height: 1.9;
-  text-align: center;
-}
-
-.borromean-diagram--mobile {
-  max-height: 54vh;
 }
 
 .mobile-borromean-copy {
