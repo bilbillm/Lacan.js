@@ -2,110 +2,78 @@
 
 ## Stack
 
-- **React 19** + **TypeScript 5.9** (strict mode) + **Vite 7**
-- **Tailwind CSS 4** via `@tailwindcss/vite` (no `tailwind.config`, use `@import "tailwindcss"` in CSS)
-- **Framer Motion 12** for all animations
-- **No React Router** — single-page app with custom state-driven view switching (gallery ↔ focus)
+- React 19 + TypeScript 5.9 strict mode + Vite 7
+- Tailwind CSS 4 via `@tailwindcss/vite`; page layout lives in `App.css`
+- Framer Motion 12 for all motion; no GSAP or Three.js
+- Lucide React for interface icons
+- Fontsource variable Archivo, Noto Sans SC, and Noto Serif SC
+- No React Router; one semantic scrolling document with anchors and a state-driven dossier dialog
 
 ## Commands
 
 ```bash
-npm run dev          # Vite dev server
-npm run build        # tsc -b && vite build  (typecheck first, then build)
-npm run lint         # eslint .
-npm run preview      # vite preview — e2e tests use port 4173
-npm run test:e2e     # playwright test (headless, 1 worker, via preview server)
-npm run test:e2e:headed  # headed mode
-npm run test:e2e:ui      # Playwright UI mode
+npm run dev
+npm run lint
+npm run build
+npm run test:e2e
+npm run perf:sample
 ```
 
-**Order matters**: `tsc -b` runs **before** `vite build`. Type errors block the build.
+`npm run build` runs `tsc -b` before Vite. Playwright preview uses port 4373; performance sampling uses 4473.
 
-## Architecture
+## State And Page Flow
 
-### Entry and State Ownership
+`App.tsx` owns only:
 
-- `main.tsx` → `<App />` in `StrictMode`
-- `App.tsx` owns **all application state** via `useState`:
-  - `selectedId` (panel id or null)
-  - `selectedNodeState` (panelId + nodeIds for interactive schemas)
-  - `pageGroup` (pagination index)
-  - `isAppLoaded` / `isExitingFocus` (animation timing)
-- No state management library. Pure React hooks.
+- `theme`: `day | night`, persisted as `lacan-theme`
+- `language`: `zh | en`, persisted as `lacan-language`
+- `selectedPanelId`: full-screen dossier state
+- `activeSection`: nav state derived from natural scroll position
 
-### Panel / Schema System
+Page order is Hero → Theory Atlas → Timeline → Borromean Knot → Footer. Do not add wheel interception, full-page snapping, a blocking splash, or duplicate desktop/mobile trees.
 
-- **8 panels** defined in `src/components/app/panels.ts`
-- **4 schemas**: Schema L (Mirror Stage), Schema R (The Symbolic), Schema I (The Imaginary), Schema D (Graph of Desire)
-- Panel→Schema mapping via `panelSchemaRegistry.ts` — looks up `schemaKey` + `interactive` flag
-- All schemas are **lazy-loaded** via `React.lazy()` in `App.tsx` (passed as props, not imported directly by children)
-- 3/4 schemas are interactive (L, I, D); Schema R is intentionally non-interactive
+## Theory System
 
-### Interactive Schema Shared Abstraction
+- 8 definitions live in `src/components/app/panels.ts`.
+- Groups are `core` and `extended`; visualization keys are a strict union.
+- `visualizationRegistry.ts` lazy-loads every visualization behind `TheoryVisualizationProps`.
+- Preview mode must remain non-interactive because it renders inside the index button.
+- Detail mode may report an insight id to `TheoryDossier`; the matching localized explanation comes from panel metadata.
+- Schema L, I, and Graph of Desire select up to two nodes. Schema R uses single annotations.
+- Extended interactions are discourse selection, formula selection, observer range, and topology selection.
 
-- `InteractiveSchemaFrame` — generic SVG overlay that renders hit-target circles over a schema image
-- `useSchemaInteraction` — shared hook: max 2 nodes selected, click toggles/deselects
-- Each interactive schema (L/I/D) configures node positions relative to its SVG `viewBox`
-- `viewBox` differs per schema — must match the SVG source
+## Dialog And Accessibility Rules
 
-### View Modes
+- `TheoryDossier` and timeline archives use semantic `role="dialog"` with `aria-modal`.
+- Opening focuses Close, Escape closes, Tab stays inside, and closing restores the original trigger.
+- All controls require a minimum 44px target and visible `:focus-visible` treatment.
+- Reduced Motion must remove parallax, smooth scrolling, continuous motion, and SVG draw-in while leaving the final state complete.
 
-| Mode | Component | Description |
-|------|-----------|-------------|
-| Gallery | `PanelGallery` | 4-column grid (desktop) / 2-column (mobile). Wheel navigation. Progress bar. |
-| Focus | `FocusView` | Selected panel expands. Interactive: right panel appears when 2 nodes selected. |
-| Exiting | `FocusView` + `App.tsx` | `FOCUS_EXIT_MS` (600ms) controls animation + state reset timing. |
+## Styling
 
-### Asset Loading
+- Light defaults: paper `#F3EDDF`, ink `#12110F`, vermilion `#C03A2C`, cobalt `#214FBC`.
+- Dark defaults: paper `#11110F`, ink `#F3EDDF`, vermilion `#FF6855`, cobalt `#7894FF`.
+- Use semantic CSS variables; do not hard-code per-component theme colors.
+- Typography uses discrete breakpoint sizes. Do not use viewport-scaled type or negative letter spacing.
+- Maximum card radius is 4px; current design intentionally uses square editorial blocks.
+- Do not reintroduce GlassPanel, DeepEnvironment, gradient orbs, nested cards, or a wireframe-room background.
 
-- **Gallery (thumbnail)**: PNG imports from `src/pngs/`
-- **Focus (expanded)**: SVG imports with **`?url` suffix** from `src/svgs/` (Vite asset import)
-- SVG type declaration in `src/vite-env.d.ts` for `*.svg?raw` imports
-- All schema images rendered with `filter: invert(1) opacity(0.8)` for dark theme
+## Assets And Loading
 
-### Responsive System
+- Existing Schema previews are PNG; dossier diagrams are SVG URLs.
+- Timeline reuses the ten WebP archive images with CSS duotone treatment.
+- Vite base must remain `/Lacan.js/` for GitHub Pages.
+- Timeline, Borromean, and all theory visualizations stay lazy-loaded.
+- Initial JavaScript gzip budget is 140 kB.
 
-- CSS custom properties set inline on `.app-container` via `useMemo` — values from `uiConstants.ts`
-- `data-mobile-layout="true"` toggles all responsive CSS in `App.css`
-- Breakpoint: **960px** (defined as `MOBILE_BREAKPOINT_PX` in `uiConstants.ts`)
-- `useMobileViewport` hook uses `window.matchMedia()` with `addEventListener('change')` fallback
+## Verification
 
-### CSS Architecture
+- E2E covers all 8 panels, extended interactions, navigation, persistence, timeline, Borromean selection, mobile, and Reduced Motion.
+- Visual QA targets 1440×900, 1024×768, 390×844, 375×667, and phone landscape.
+- Reject any horizontal overflow, fixed-nav overlap, blank visual stage, nested interactive element, or unreadable dual-theme state.
+- Performance budget: p95 frame interval ≤34ms and no more than 2 frames over 50ms per sample.
 
-- `index.css`: Tailwind import, CSS reset, dark theme, `overflow: hidden` on body/root
-- `App.css` (NOT Tailwind utility classes): Layout rules using CSS custom properties (`--app-shell-*`, `--app-header-*`, etc.)
-- All positioning uses absolute/relative with z-index layering
-- `100dvh` fallback via `@supports`
+## Git
 
-### GlassPanel Component
-
-- Reusable glassmorphism panel with parallax, glare, and noise texture
-- Parallax: Framer Motion `useMotionValue` + `useSpring` + `useTransform` for rotation
-- `deferVisualEnhancement` flag reduces blur/noise during entry animation (performance)
-- `disableParallax` for focus mode
-
-## Notable Quirks
-
-1. **No `vite-plugin-svgr`** despite README listing it. SVGs imported as URL strings via `?url`, not as components.
-2. **Borromean knot components** (`BorromeanKnot2D.tsx`, `borromean/`) are all empty stubs — not integrated yet.
-3. **E2E test** (`tests/borromean.spec.ts`) is empty — not runnable.
-4. **Commit convention**: Chinese messages, conventional-commit-style prefixes (`feat:`, `fix:`, `refactor:`, `chore:`).
-5. **CI**: GitHub Pages deploy on push to `main`. Build uses `npm ci`.
-6. **`vite.config.ts`** has `base: '/Lacan.js/'` — critical for Pages deployment.
-7. **TypeScript**: `verbatimModuleSyntax: true` means use `import type` for type-only imports. `erasableSyntaxOnly: true` prohibits enums/namespaces.
-8. **`tsc -b` uses project references** (`tsconfig.json` references `tsconfig.app.json` + `tsconfig.node.json`).
-9. **Safe area** CSS custom properties (`--safe-area-*`) used in `App.css` for mobile notch support.
-
-## Testing
-
-- Playwright e2e only. No unit tests.
-- Web server config starts `vite preview` on port 4173. Server restarts every test run.
-- `fullyParallel: false`, `workers: 1` — sequential execution.
-- `data-testid` attributes used: `app-header`, `panel-gallery`, `panel-card-{id}`, `focus-view`, `focus-secondary`, `progress-indicator`.
-
-## Visual Style
-
-- Dark theme (`background-color: #242424`, text `rgba(255,255,255,0.87)`)
-- Apple visionOS-inspired glassmorphism (`backdropFilter: blur(28px) saturate(150%)`)
-- Deep environment: layered SVG wireframe room with `requestAnimationFrame` staggered mount + CSS blur/radial-gradient masks
-- Entry animation sequence: header (2s) → cards (staggered, 950ms after header) → progress bar
+- Commit messages use Chinese conventional-commit prefixes.
+- GitHub HTTPS is unreliable on this machine; use the authenticated SSH URL per push/fetch command without rewriting `origin`.

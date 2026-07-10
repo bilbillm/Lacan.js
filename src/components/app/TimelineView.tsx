@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { X } from 'lucide-react'
 import { getTimelineEventText, timelineEvents } from '../../data/timelineData'
 import type { Language } from '../../i18n'
 import { uiCopy } from '../../i18n'
@@ -13,16 +14,8 @@ import timeline1964Image from '../../assets/timeline/psychoanalysis-1964.webp'
 import timeline1973Image from '../../assets/timeline/psychoanalysis-1973.webp'
 import timeline1981Image from '../../assets/timeline/psychoanalysis-1981.webp'
 import timeline1990Image from '../../assets/timeline/psychoanalysis-1990.webp'
-import {
-  TIMELINE_LINE_DRAW_DURATION_S,
-  TIMELINE_NODE_STAGGER_S,
-  TIMELINE_NODE_ENTRY_DURATION_S,
-  TIMELINE_TITLE_DURATION_MS,
-  TIMELINE_TITLE_STAGGER_MS,
-} from './uiConstants'
 
 interface TimelineViewProps {
-  isMobileViewport: boolean
   language: Language
 }
 
@@ -39,425 +32,172 @@ const timelineEventImages: Record<number, string> = {
   1990: timeline1990Image,
 }
 
-export default function TimelineView({ isMobileViewport, language }: TimelineViewProps) {
-  const eventCount = timelineEvents.length
-  const titleDurationS = TIMELINE_TITLE_DURATION_MS / 1000
-  const subtitleDelayS = TIMELINE_TITLE_STAGGER_MS / 1000
+export default function TimelineView({ language }: TimelineViewProps) {
+  const reduceMotion = useReducedMotion()
+  const [activeIndex, setActiveIndex] = useState(0)
   const [expandedYear, setExpandedYear] = useState<number | null>(null)
-  const expandedEvent = expandedYear
-    ? timelineEvents.find((e) => e.year === expandedYear) ?? null
-    : null
-  const expandedEventText = expandedEvent ? getTimelineEventText(expandedEvent, language) : null
-  const expandedEventImage = expandedEvent ? timelineEventImages[expandedEvent.year] : undefined
+  const eventRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const lastTriggerRef = useRef<HTMLButtonElement | null>(null)
+  const activeEvent = timelineEvents[activeIndex]
+  const expandedEvent = expandedYear === null ? null : timelineEvents.find((event) => event.year === expandedYear) ?? null
 
-  if (isMobileViewport) {
-    return (
-      <motion.div
-        className="mobile-timeline-view"
-        data-modal-open={expandedYear ? 'true' : undefined}
-        data-testid="timeline-view"
-        style={{ background: 'transparent' }}
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.16 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
-        <div className="mobile-page-heading">
-          <h1
-            className="lacan-page-title"
-            style={{
-              color: 'var(--lacan-ink-strong)',
-              fontFamily: 'var(--lacan-title-font)',
-              fontWeight: 'var(--lacan-title-weight)',
-              textShadow: 'var(--lacan-title-shadow)',
-            }}
-          >
-            {uiCopy.timeline.title[language]}
-          </h1>
-          <p className="lacan-page-subtitle" style={{ color: 'var(--lacan-muted)' }}>
-            {uiCopy.timeline.subtitle[language]}
-          </p>
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (!visible) return
+        const index = Number((visible.target as HTMLElement).dataset.timelineIndex)
+        if (Number.isFinite(index)) setActiveIndex(index)
+      },
+      { rootMargin: '-30% 0px -42%', threshold: [0.2, 0.5, 0.8] },
+    )
+
+    eventRefs.current.forEach((element) => {
+      if (element) observer.observe(element)
+    })
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (expandedYear === null) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    closeRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setExpandedYear(null)
+      if (event.key === 'Tab') {
+        event.preventDefault()
+        closeRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+      lastTriggerRef.current?.focus()
+    }
+  }, [expandedYear])
+
+  const openEvent = (year: number, trigger: HTMLButtonElement) => {
+    lastTriggerRef.current = trigger
+    setExpandedYear(year)
+  }
+
+  return (
+    <section id="timeline" className="page-section timeline-section" data-section="timeline" data-testid="timeline-view" aria-labelledby="timeline-title">
+      <div className="section-heading section-heading--timeline">
+        <span className="section-number">{uiCopy.timeline.sectionNumber}</span>
+        <div>
+          <p className="section-eyebrow">{uiCopy.timeline.eyebrow[language]}</p>
+          <h2 id="timeline-title">{uiCopy.timeline.title[language]}</h2>
+        </div>
+        <p>{uiCopy.timeline.subtitle[language]}</p>
+      </div>
+
+      <div className="timeline-layout">
+        <div className="timeline-stage" aria-live="polite">
+          <div className="timeline-stage-meta">
+            <span>{String(activeIndex + 1).padStart(2, '0')} / {String(timelineEvents.length).padStart(2, '0')}</span>
+            <strong>{activeEvent?.year}</strong>
+          </div>
+          <div className="archive-image-frame">
+            <AnimatePresence mode="wait" initial={false}>
+              {activeEvent && (
+                <motion.img
+                  key={activeEvent.year}
+                  src={timelineEventImages[activeEvent.year]}
+                  alt={`${activeEvent.year}: ${getTimelineEventText(activeEvent, language).title}`}
+                  initial={reduceMotion ? false : { opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={reduceMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.42 }}
+                />
+              )}
+            </AnimatePresence>
+            <span className="archive-image-ink" aria-hidden="true" />
+          </div>
+          <p>{activeEvent ? getTimelineEventText(activeEvent, language).title : ''}</p>
         </div>
 
-        <div className="mobile-timeline-list">
+        <div className="timeline-event-list">
           {timelineEvents.map((event, index) => {
             const eventText = getTimelineEventText(event, language)
+            const active = index === activeIndex
 
             return (
               <motion.button
                 key={event.year}
+                ref={(element) => { eventRefs.current[index] = element }}
                 type="button"
-                className="mobile-timeline-card"
+                className="timeline-event"
+                data-active={active ? 'true' : undefined}
+                data-timeline-index={index}
                 data-testid={`timeline-event-card-${event.year}`}
-                initial={{ opacity: 0, y: 18 }}
+                aria-label={`${uiCopy.timeline.openEvent[language]}: ${event.year} ${eventText.title}`}
+                initial={reduceMotion ? false : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.42, ease: 'easeOut' }}
-                onClick={() => setExpandedYear(event.year)}
+                viewport={{ once: true, amount: 0.25 }}
+                onFocus={() => setActiveIndex(index)}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={(clickEvent) => openEvent(event.year, clickEvent.currentTarget)}
               >
-                <span className="mobile-timeline-year">{event.year}</span>
-                <span className="mobile-timeline-divider" aria-hidden="true" />
-                <span className="mobile-timeline-title">{eventText.title}</span>
-                <span className="mobile-timeline-description">{eventText.description}</span>
+                <span className="timeline-event-index">{String(index + 1).padStart(2, '0')}</span>
+                <span className="timeline-event-year">{event.year}</span>
+                <span className="timeline-event-copy">
+                  <strong>{eventText.title}</strong>
+                  <span>{eventText.description}</span>
+                </span>
+                <span className="timeline-mobile-image archive-image-frame" aria-hidden="true">
+                  <img loading="lazy" src={timelineEventImages[event.year]} alt="" />
+                  <span className="archive-image-ink" />
+                </span>
               </motion.button>
             )
           })}
         </div>
-
-        <AnimatePresence>
-          {expandedYear && expandedEvent && (
-            <>
-              <motion.div
-                className="mobile-timeline-modal-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                onClick={() => setExpandedYear(null)}
-                style={{
-                  background: 'var(--lacan-timeline-modal-backdrop)',
-                  backdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
-                  WebkitBackdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
-                }}
-              />
-              <motion.div
-                className="mobile-timeline-modal-shell"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="mobile-timeline-modal"
-                  initial={{ opacity: 0, scale: 0.94, y: 24 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.94, y: 24 }}
-                  transition={{ duration: 0.34, ease: [0.4, 0, 0.2, 1] }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="mobile-timeline-modal-content" data-testid="timeline-modal-card">
-                    <div className="mobile-timeline-modal-copy">
-                      <span className="mobile-timeline-modal-year">{expandedEvent.year}</span>
-                      <span className="mobile-timeline-divider" aria-hidden="true" />
-                      <h3>{expandedEventText?.title}</h3>
-                      <p>{expandedEventText?.description}</p>
-                    </div>
-                    {expandedEventImage && (
-                      <img
-                        className="mobile-timeline-modal-image"
-                        src={expandedEventImage}
-                        alt={`${expandedEvent.year}: ${expandedEventText?.title} ${uiCopy.timeline.illustrationAlt[language]}`}
-                      />
-                    )}
-                    <button type="button" onClick={() => setExpandedYear(null)}>{uiCopy.timeline.closeButton[language]}</button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    )
-  }
-
-  return (
-    <motion.div
-      className="absolute inset-0 z-30 flex flex-col items-center overflow-hidden"
-      data-testid="timeline-view"
-      style={{ background: 'var(--lacan-paper)' }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: 'easeInOut' }}
-    >
-      {/* Title block — positioned like AppHeader, top center */}
-      <div className="flex flex-col items-center gap-2.5" style={{ paddingTop: 96 }}>
-        <motion.h1
-          className="lacan-page-title text-center"
-          style={{
-            fontSize: '2.35rem',
-            letterSpacing: '0.35em',
-            lineHeight: 0.96,
-            color: 'var(--lacan-ink-strong)',
-            fontFamily: 'var(--lacan-title-font)',
-            fontWeight: 'var(--lacan-title-weight)',
-            textShadow: 'var(--lacan-title-shadow)',
-          }}
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            opacity: { delay: 0, duration: titleDurationS, ease: 'easeOut' },
-            y: { delay: 0, duration: titleDurationS, ease: 'easeOut' },
-          }}
-        >
-          {uiCopy.timeline.title[language]}
-        </motion.h1>
-
-        <motion.p
-          className="lacan-page-subtitle text-center font-light"
-          style={{
-            fontSize: '1.125rem',
-            letterSpacing: '0.35em',
-            color: 'var(--lacan-muted)',
-          }}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            opacity: { delay: subtitleDelayS, duration: titleDurationS, ease: 'easeOut' },
-            y: { delay: subtitleDelayS, duration: titleDurationS, ease: 'easeOut' },
-          }}
-        >
-          {uiCopy.timeline.subtitle[language]}
-        </motion.p>
       </div>
 
-      {/* Timeline track */}
-      <div
-        className="relative flex-1 flex items-center w-full"
-        style={{ maxWidth: '90vw', margin: '0 auto' }}
-      >
-        <div style={{ position: 'relative', width: '100%', height: 320 }}>
-          {/* Horizontal line */}
-          <div
-            className="absolute left-0 right-0"
-            style={{ top: '50%', height: 1, background: 'var(--lacan-timeline-line)' }}
+      <AnimatePresence>
+        {expandedEvent && (
+          <motion.div
+            className="timeline-dialog-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setExpandedYear(null)
+            }}
           >
             <motion.div
-              className="absolute inset-y-0 left-0"
-              initial={{ width: 0 }}
-              animate={{ width: '100%' }}
-              transition={{
-                duration: TIMELINE_LINE_DRAW_DURATION_S,
-                ease: 'easeOut',
-              }}
-              style={{
-                background:
-                  'var(--lacan-timeline-fill)',
-                boxShadow: 'var(--lacan-timeline-shadow)',
-              }}
-            />
-          </div>
-
-          {/* Nodes — dot + connector line + glass card, positioned by year */}
-          {timelineEvents.map((event, index) => {
-            const minYear = timelineEvents[0].year
-            const maxYear = timelineEvents[eventCount - 1].year
-            const yearSpan = maxYear - minYear
-            const ratio = (event.year - minYear) / yearSpan
-            const eventText = getTimelineEventText(event, language)
-
-            const pos = 5 + ratio * 86
-            const isAbove = index % 2 === 0
-            const delay =
-              TIMELINE_LINE_DRAW_DURATION_S * 0.15 +
-              index * TIMELINE_NODE_STAGGER_S
-
-            return (
-              <div key={event.year}>
-                {/* Dot on the line */}
-                <motion.div
-                  className="absolute"
-                  style={{
-                    left: `${pos}%`,
-                    top: '50%',
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    background: 'var(--lacan-vermilion)',
-                    border: '2px solid var(--lacan-surface)',
-                    boxShadow: '0 0 0 1px var(--lacan-border)',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 2,
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay, duration: 0.3, ease: 'easeOut' }}
-                />
-
-                {/* Connector line */}
-                <motion.div
-                  className="absolute"
-                  style={{
-                    left: `${pos}%`,
-                    width: 1,
-                    ...(isAbove
-                      ? { top: 'calc(50% - 30px)', height: 30 }
-                      : { top: '50%', height: 30 }),
-                    background:
-                      'var(--lacan-timeline-connector)',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1,
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay, duration: 0.4, ease: 'easeOut' }}
-                />
-
-                {/* Glass card — clickable */}
-                <motion.div
-                  className="absolute cursor-pointer"
-                  style={{
-                    left: `${pos}%`,
-                    transform: 'translateX(-50%)',
-                    ...(isAbove
-                      ? { bottom: 'calc(50% + 30px)' }
-                      : { top: 'calc(50% + 30px)' }),
-                    width: 172,
-                  }}
-                  initial={{
-                    opacity: 0,
-                    y: isAbove ? -30 : 30,
-                  }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay,
-                    duration: TIMELINE_NODE_ENTRY_DURATION_S,
-                    ease: 'easeOut',
-                  }}
-                  onClick={() => setExpandedYear(event.year)}
-                >
-                  <div
-                    style={{
-                      background: 'var(--lacan-surface)',
-                      border: '1px solid var(--lacan-border)',
-                      borderRadius: 12,
-                      boxShadow: 'var(--lacan-paper-shadow)',
-                      padding: 14,
-                    }}
-                  >
-                    <span className="text-xs font-semibold tracking-wider" style={{ color: 'var(--lacan-vermilion)' }}>
-                      {event.year}
-                    </span>
-                    <div
-                      style={{
-                        height: 1,
-                        width: '100%',
-                        marginTop: 6,
-                        marginBottom: 8,
-                        background:
-                          'var(--lacan-timeline-divider)',
-                      }}
-                    />
-                    <h3
-                      className="text-sm tracking-wide mt-1 mb-1"
-                      style={{
-                        color: 'var(--lacan-ink)',
-                        fontFamily: 'var(--lacan-title-font)',
-                        fontWeight: 'var(--lacan-title-weight)',
-                      }}
-                    >
-                      {eventText.title}
-                    </h3>
-                    <p
-                      className="text-xs font-light leading-relaxed"
-                      style={{
-                        color: 'var(--lacan-muted)',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {eventText.description}
-                    </p>
-                  </div>
-                </motion.div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Expanded card modal */}
-      <AnimatePresence>
-        {expandedYear && expandedEvent && (
-          <>
-            {/* Blur overlay */}
-            <motion.div
-              className="absolute inset-0 z-40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setExpandedYear(null)}
-              style={{
-                background: 'var(--lacan-timeline-modal-backdrop)',
-                backdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
-                WebkitBackdropFilter: 'var(--lacan-timeline-modal-backdrop-filter)',
-              }}
-            />
-
-            {/* Expanded card */}
-            <motion.div
-              className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              className="timeline-dialog"
+              data-testid="timeline-modal-card"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="timeline-dialog-title"
+              initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: 16 }}
             >
-              <motion.div
-                className="pointer-events-auto"
-                initial={{ opacity: 0, scale: 0.92, y: 24 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92, y: 24 }}
-                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                onClick={(e) => e.stopPropagation()}
-                style={{ width: 880, maxWidth: '92vw' }}
-              >
-                <div
-                  className="timeline-modal-card"
-                  data-testid="timeline-modal-card"
-                  style={{
-                    background: 'var(--lacan-timeline-modal-surface)',
-                    backdropFilter: 'saturate(108%)',
-                    WebkitBackdropFilter: 'saturate(108%)',
-                    border: '1px solid var(--lacan-timeline-modal-border)',
-                    borderRadius: 12,
-                    boxShadow: 'var(--lacan-timeline-modal-shadow)',
-                  }}
-                >
-                  <div className="timeline-modal-copy">
-                    <span
-                      className="block font-semibold tracking-wider mb-3"
-                      style={{ fontSize: '1.05rem', letterSpacing: '0.2em', color: 'var(--lacan-vermilion)' }}
-                    >
-                      {expandedEvent.year}
-                    </span>
-                    <div
-                      style={{
-                        height: 1,
-                        width: '100%',
-                        marginBottom: 20,
-                        background:
-                          'var(--lacan-timeline-divider)',
-                      }}
-                    />
-                    <h3
-                      className="tracking-wide mb-5"
-                      style={{ fontSize: '1.6rem', letterSpacing: '0.08em', lineHeight: 1.3, color: 'var(--lacan-ink-strong)', fontFamily: 'var(--lacan-title-font)', fontWeight: 'var(--lacan-title-weight)' }}
-                    >
-                      {expandedEventText?.title}
-                    </h3>
-                    <p
-                      className="font-light leading-relaxed"
-                      style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--lacan-muted)' }}
-                    >
-                      {expandedEventText?.description}
-                    </p>
-                    <p
-                      className="mt-6 font-light tracking-wider"
-                      style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'var(--lacan-muted-soft)' }}
-                    >
-                      {uiCopy.timeline.closeHint[language]}
-                    </p>
-                  </div>
-                  {expandedEventImage && (
-                    <div className="timeline-modal-art" aria-hidden="true">
-                      <img src={expandedEventImage} alt="" />
-                    </div>
-                  )}
-                </div>
-              </motion.div>
+              <button ref={closeRef} type="button" className="dialog-close" aria-label={uiCopy.timeline.close[language]} onClick={() => setExpandedYear(null)}>
+                <X aria-hidden="true" />
+              </button>
+              <div className="timeline-dialog-copy">
+                <span>{expandedEvent.year}</span>
+                <h3 id="timeline-dialog-title">{getTimelineEventText(expandedEvent, language).title}</h3>
+                <p>{getTimelineEventText(expandedEvent, language).description}</p>
+              </div>
+              <div className="archive-image-frame timeline-dialog-image">
+                <img src={timelineEventImages[expandedEvent.year]} alt={`${expandedEvent.year}: ${uiCopy.timeline.illustrationAlt[language]}`} />
+                <span className="archive-image-ink" aria-hidden="true" />
+              </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </section>
   )
 }

@@ -14,8 +14,12 @@
     "perf:sample": "node scripts/perf-sample.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.2.8",
+    "@fontsource-variable/noto-sans-sc": "^5.2.10",
+    "@fontsource-variable/noto-serif-sc": "^5.2.10",
     "@tailwindcss/vite": "^4.2.1",
     "framer-motion": "^12.34.3",
+    "lucide-react": "^1.24.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.2.1"
