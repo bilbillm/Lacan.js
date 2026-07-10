@@ -4,6 +4,7 @@ import './App.css'
 import type { Language } from './i18n'
 import { uiCopy } from './i18n'
 import SiteNav from './components/app/SiteNav'
+import ReadingProgress from './components/app/ReadingProgress'
 import SignifierHero from './components/app/SignifierHero'
 import TheoryIndex from './components/app/TheoryIndex'
 import TheoryDossier from './components/app/TheoryDossier'
@@ -75,6 +76,7 @@ function App() {
   return (
     <div className="app-container" lang={language === 'zh' ? 'zh-CN' : 'en'} data-theme={theme}>
       <a className="skip-link" href="#main-content">{uiCopy.app.skipToContent[language]}</a>
+      <ReadingProgress />
       <SiteNav
         language={language}
         theme={theme}

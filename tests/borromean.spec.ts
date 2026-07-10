@@ -11,6 +11,17 @@ test('desktop editorial journey exposes eight theory dossiers and natural chapte
   await openHome(page)
 
   await expect(page.getByTestId('site-nav')).toBeVisible()
+  const readingProgress = page.getByTestId('reading-progress')
+  const readingProgressBar = page.getByTestId('reading-progress-bar')
+  await expect(readingProgress).toHaveCSS('position', 'fixed')
+  await expect(readingProgress).toHaveCSS('height', '3px')
+  await expect(readingProgressBar).toHaveCSS('background-color', 'rgb(192, 58, 44)')
+  const progressLayering = await page.evaluate(() => ({
+    progress: Number.parseInt(getComputedStyle(document.querySelector('.reading-progress')!).zIndex, 10),
+    navigation: Number.parseInt(getComputedStyle(document.querySelector('.site-nav-shell')!).zIndex, 10),
+  }))
+  expect(progressLayering.progress).toBeGreaterThan(progressLayering.navigation)
+
   const portrait = page.getByTestId('hero-portrait')
   await expect(portrait).toBeVisible()
   await expect.poll(() => portrait.locator('img').evaluate((image) => image.naturalWidth)).toBeGreaterThan(1000)
@@ -127,6 +138,7 @@ test('desktop editorial journey exposes eight theory dossiers and natural chapte
   await page.getByRole('link', { name: '发展史' }).click()
   await expect(page.getByRole('heading', { name: '精神分析发展史' })).toBeInViewport()
   await expect(page.getByRole('link', { name: '发展史' })).toHaveAttribute('aria-current', 'page')
+  await expect.poll(async () => readingProgressBar.evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).a)).toBeGreaterThan(0)
 
   await page.getByRole('link', { name: '波罗米结' }).click()
   await expect(page.getByRole('heading', { name: '三界并不叠加，它们彼此锁合' })).toBeInViewport()
@@ -142,6 +154,7 @@ test('desktop editorial journey exposes eight theory dossiers and natural chapte
   await expect(forumLink).toHaveCSS('color', 'rgb(192, 58, 44)')
   await page.getByTestId('closing-back-to-top').click()
   await expect(page.getByRole('heading', { name: 'LACAN.JS' })).toBeInViewport()
+  await expect.poll(async () => readingProgressBar.evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).a)).toBeLessThan(0.02)
 })
 
 test('extended constructions provide concept-specific interactions', async ({ page }) => {
